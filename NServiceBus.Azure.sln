@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure.HostProcess", "src\NServiceBus.Hosting.Azure.HostProcess\NServiceBus.Hosting.Azure.HostProcess.csproj", "{11B81F23-64C6-4341-94AC-38B3C4C6B1E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Timeout.Hosting.Azure", "src\NServiceBus.Timeout.Hosting.Azure\NServiceBus.Timeout.Hosting.Azure.csproj", "{046FC5EF-EAE3-4306-BA3D-973197F32EB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{11B81F23-64C6-4341-94AC-38B3C4C6B1E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11B81F23-64C6-4341-94AC-38B3C4C6B1E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11B81F23-64C6-4341-94AC-38B3C4C6B1E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046FC5EF-EAE3-4306-BA3D-973197F32EB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046FC5EF-EAE3-4306-BA3D-973197F32EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046FC5EF-EAE3-4306-BA3D-973197F32EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046FC5EF-EAE3-4306-BA3D-973197F32EB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
