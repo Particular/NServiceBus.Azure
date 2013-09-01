@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure", "src\NServiceBus.Azure\NServiceBus.Azure.csproj", "{12F1D9F1-0A2C-4442-8D18-67DD096C6300}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure", "NServiceBus.Azure\NServiceBus.Azure.csproj", "{12F1D9F1-0A2C-4442-8D18-67DD096C6300}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{533C8FC3-9F1C-42E2-BD5A-1FE14053FC22}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,15 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{533C8F
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure", "src\NServiceBus.Hosting.Azure\NServiceBus.Hosting.Azure.csproj", "{6591ED91-F9A1-4CC3-813E-A33E07439D49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure", "NServiceBus.Hosting.Azure\NServiceBus.Hosting.Azure.csproj", "{6591ED91-F9A1-4CC3-813E-A33E07439D49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure.HostProcess", "src\NServiceBus.Hosting.Azure.HostProcess\NServiceBus.Hosting.Azure.HostProcess.csproj", "{11B81F23-64C6-4341-94AC-38B3C4C6B1E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure.HostProcess", "NServiceBus.Hosting.Azure.HostProcess\NServiceBus.Hosting.Azure.HostProcess.csproj", "{11B81F23-64C6-4341-94AC-38B3C4C6B1E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Timeout.Hosting.Azure", "src\NServiceBus.Timeout.Hosting.Azure\NServiceBus.Timeout.Hosting.Azure.csproj", "{046FC5EF-EAE3-4306-BA3D-973197F32EB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Timeout.Hosting.Azure", "NServiceBus.Timeout.Hosting.Azure\NServiceBus.Timeout.Hosting.Azure.csproj", "{046FC5EF-EAE3-4306-BA3D-973197F32EB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Integration.Azure.Tests", "src\NServiceBus.Integration.Azure.Tests\NServiceBus.Integration.Azure.Tests.csproj", "{CA59C36D-FA35-42B4-99B5-5725C6AF1B01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Integration.Azure.Tests", "NServiceBus.Integration.Azure.Tests\NServiceBus.Integration.Azure.Tests.csproj", "{CA59C36D-FA35-42B4-99B5-5725C6AF1B01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Unicast.Queuing.Azure.Tests", "src\NServiceBus.Unicast.Queuing.Azure.Tests\NServiceBus.Unicast.Queuing.Azure.Tests.csproj", "{D917D6B0-53F0-4D21-BCBD-35BFE19FB4FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Unicast.Queuing.Azure.Tests", "NServiceBus.Unicast.Queuing.Azure.Tests\NServiceBus.Unicast.Queuing.Azure.Tests.csproj", "{D917D6B0-53F0-4D21-BCBD-35BFE19FB4FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
