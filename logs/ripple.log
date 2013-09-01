@@ -1,179 +1,264 @@
-01/09/13 21:18:19: [Info] Restoring dependencies for solution NServiceBus.Azure to C:\github.org\nsb\NServiceBus.Azure\src\packages
-01/09/13 21:18:19: [Debug] 
-============================================================================================================
+01/09/13 22:48:53: [Debug] 
+============================================================
 RippleOperation: NServiceBus.Azure (develop)
-============================================================================================================
+============================================================
      ** Ripple Steps
-          1.) DownloadMissingNugets       Download missing nugets for NServiceBus.Azure                     
-          2.) ExplodeDownloadedNugets     Explode nugets at C:\github.org\nsb\NServiceBus.Azure\src\packages
-          3.) ProcessDirectives           Process directives from nugets                                    
+          1.) UpdateNuspecs      ripple.Steps.UpdateNuspecs 
+          2.) CreatePackages     ripple.Steps.CreatePackages
 
-01/09/13 21:18:19: [Debug] Searching for latest of CommonServiceLocator,1.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:19: [Debug] Searching for latest of Microsoft.Data.Edm,5.5.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:19: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\CommonServiceLocator.1.0.0.0.nupkg
-01/09/13 21:18:19: [Debug] Searching for latest of Microsoft.Data.OData,5.5.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:19: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Microsoft.Data.Edm.5.6.0.0.nupkg
-01/09/13 21:18:19: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Microsoft.Data.OData.5.6.0.0.nupkg
-01/09/13 21:18:19: [Debug] Searching for latest of Fody,1.13.12 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:19: [Info] Downloaded CommonServiceLocator,1.0
-01/09/13 21:18:19: [Debug] Searching for Fody,1.13.12 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:19: [Info] Downloaded Microsoft.Data.Edm,5.5.0
-01/09/13 21:18:19: [Info] Downloaded Microsoft.Data.OData,5.5.0
-01/09/13 21:18:26: [Debug] Searching for Fody,1.13.12 from http://builds.nservicebus.com/guestAuth/app/nuget/v1/FeedService.svc
-01/09/13 21:18:29: [Debug] Searching for Fody,1.13.12 from http://nuget.org/api/v2
-01/09/13 21:18:30: [Debug] Searching for latest of Microsoft.WindowsAzure.ConfigurationManager,2.0.1.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:30: [Debug] Downloading Download and cache Fody.1.15.0.0.nupkg
-01/09/13 21:18:30: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Microsoft.WindowsAzure.ConfigurationManager.2.0.1.0.nupkg
-01/09/13 21:18:30: [Debug] Searching for latest of Newtonsoft.Json,5.0.6 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:30: [Info] Downloaded Microsoft.WindowsAzure.ConfigurationManager,2.0.1.0
-01/09/13 21:18:30: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Newtonsoft.Json.5.0.6.0.nupkg
-01/09/13 21:18:30: [Debug] Searching for latest of NServiceBus,4.1.0-unstable3377 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:30: [Debug] Downloading Download and cache NServiceBus.4.1.0.0-unstable3377.nupkg
-01/09/13 21:18:30: [Debug] Searching for latest of NServiceBus.Interfaces,4.1.0-unstable3377 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:30: [Info] Downloaded Newtonsoft.Json,5.0.6
-01/09/13 21:18:30: [Debug] Searching for latest of NUnit,2.6.2 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:30: [Debug] Downloading Download and cache NServiceBus.Interfaces.4.1.0.0-unstable3377.nupkg
-01/09/13 21:18:30: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\NUnit.2.6.2.0.nupkg
-01/09/13 21:18:30: [Debug] Searching for latest of Obsolete.Fody,2.3.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:30: [Info] Downloaded NUnit,2.6.2
-01/09/13 21:18:30: [Debug] Searching for Obsolete.Fody,2.3.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:30: [Debug] Searching for Obsolete.Fody,2.3.0 from http://builds.nservicebus.com/guestAuth/app/nuget/v1/FeedService.svc
-01/09/13 21:18:32: [Debug] Searching for Obsolete.Fody,2.3.0 from http://nuget.org/api/v2
-01/09/13 21:18:33: [Info] Downloaded NServiceBus.Interfaces,4.1.0-unstable3377
-01/09/13 21:18:33: [Info] Downloaded Fody,1.13.12
-01/09/13 21:18:35: [Debug] Downloading Download and cache Obsolete.Fody.2.3.0.0.nupkg
-01/09/13 21:18:35: [Debug] Searching for latest of RhinoMocks,3.6.1 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:35: [Debug] Searching for RhinoMocks,3.6.1 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:35: [Debug] Searching for RhinoMocks,3.6.1 from http://builds.nservicebus.com/guestAuth/app/nuget/v1/FeedService.svc
-01/09/13 21:18:35: [Info] Downloaded Obsolete.Fody,2.3.0
-01/09/13 21:18:36: [Debug] Searching for RhinoMocks,3.6.1 from http://nuget.org/api/v2
-01/09/13 21:18:37: [Debug] Downloading Download and cache RhinoMocks.3.6.1.0.nupkg
-01/09/13 21:18:37: [Debug] Searching for latest of System.Spatial,5.5.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:37: [Debug] Searching for latest of WindowsAzure.ServiceBus,2.1.2.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:37: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\System.Spatial.5.6.0.0.nupkg
-01/09/13 21:18:37: [Info] Downloaded System.Spatial,5.5.0
-01/09/13 21:18:37: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\WindowsAzure.ServiceBus.2.1.2.0.nupkg
-01/09/13 21:18:37: [Info] Downloaded RhinoMocks,3.6.1
-01/09/13 21:18:37: [Debug] Searching for latest of WindowsAzure.Storage,2.0.6.1 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:18:37: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\WindowsAzure.Storage.2.0.6.1.nupkg
-01/09/13 21:18:37: [Info] Downloaded WindowsAzure.ServiceBus,2.1.2.0
-01/09/13 21:18:37: [Info] Downloaded WindowsAzure.Storage,2.0.6.1
-01/09/13 21:19:20: [Info] Downloaded NServiceBus,4.1.0-unstable3377
-01/09/13 21:19:20: [Debug] Exploding Name: CommonServiceLocator, Version: 1.0.0.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\CommonServiceLocator
-01/09/13 21:19:20: [Debug] Exploding Name: Microsoft.Data.Edm, Version: 5.6.0.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Microsoft.Data.Edm
-01/09/13 21:19:20: [Debug] Exploding Name: Microsoft.Data.OData, Version: 5.6.0.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Microsoft.Data.OData
-01/09/13 21:19:20: [Debug] Exploding Name: Microsoft.WindowsAzure.ConfigurationManager, Version: 2.0.1.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Microsoft.WindowsAzure.ConfigurationManager
-01/09/13 21:19:20: [Debug] Exploding Name: Newtonsoft.Json, Version: 5.0.6.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Newtonsoft.Json
-01/09/13 21:19:20: [Debug] Exploding Name: NUnit, Version: 2.6.2.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\NUnit
-01/09/13 21:19:20: [Debug] Exploding Name: NServiceBus.Interfaces, Version: 4.1.0.0-unstable3377, IsPreRelease: True
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\NServiceBus.Interfaces
-01/09/13 21:19:20: [Debug] Exploding Name: Fody, Version: 1.15.0.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Fody
-01/09/13 21:19:20: [Debug] Exploding Name: Obsolete.Fody, Version: 2.3.0.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Obsolete.Fody
-01/09/13 21:19:20: [Debug] Exploding Name: System.Spatial, Version: 5.6.0.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\System.Spatial
-01/09/13 21:19:20: [Debug] Exploding Name: RhinoMocks, Version: 3.6.1.0, IsPreRelease: False
-01/09/13 21:19:20: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\RhinoMocks
-01/09/13 21:19:21: [Debug] Exploding Name: WindowsAzure.ServiceBus, Version: 2.1.2.0, IsPreRelease: False
-01/09/13 21:19:21: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\WindowsAzure.ServiceBus
-01/09/13 21:19:21: [Debug] Exploding Name: WindowsAzure.Storage, Version: 2.0.6.1, IsPreRelease: False
-01/09/13 21:19:21: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\WindowsAzure.Storage
-01/09/13 21:19:21: [Debug] Exploding Name: NServiceBus, Version: 4.1.0.0-unstable3377, IsPreRelease: True
-01/09/13 21:19:21: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\NServiceBus
-01/09/13 21:19:41: [Info] Restoring dependencies for solution NServiceBus.Azure to C:\github.org\nsb\NServiceBus.Azure\src\packages
-01/09/13 21:19:41: [Debug] 
-============================================================================================================
+01/09/13 22:48:53: [Info] Building the nuget spec file at C:\github.org\nsb\NServiceBus.Azure\packaging/nuget\nservicebus.azure.nuspec as version 4.1.0-unstable
+01/09/13 22:48:53: [Error] Error creating package: Could not find a part of the path 'C:\github.org\nsb\NServiceBus.Azure\packaging\nuget\src\binaries'.
+01/09/13 22:48:53: [Error] ripple.RippleFatalError: Error creating package: Could not find a part of the path 'C:\github.org\nsb\NServiceBus.Azure\packaging\nuget\src\binaries'.
+01/09/13 22:48:53: [Error] Error executing CreatePackages
+01/09/13 22:48:53: [Error] ripple.RippleFatalError: Error creating package: Could not find a part of the path 'C:\github.org\nsb\NServiceBus.Azure\packaging\nuget\src\binaries'.
+   at ripple.RippleAssert.Fail(String message, Object[] substitutions)
+   at ripple.Model.PublishingService.packageBuilderFor(NugetSpec spec, SemanticVersion version)
+   at ripple.Model.PublishingService.CreatePackage(PackageParams ctx)
+   at ripple.Steps.CreatePackages.<>c__DisplayClass1.<execute>b__0(NugetSpec spec)
+   at System.Collections.Generic.GenericEnumerableExtensions.Each[T](IEnumerable`1 values, Action`1 eachAction)
+   at ripple.RippleOperation.Execute(Boolean throwOnFailure)
+01/09/13 22:48:53: [Debug] 
+==============================================================================================================================================================================================
+Solution "NServiceBus.Azure": C:\github.org\nsb\NServiceBus.Azure\ripple.config
+==============================================================================================================================================================================================
+     ** Solution-Level
+        * CommonServiceLocator                            Float
+        * Fody                                            Float
+        * Microsoft.Data.Edm                              Float
+        * Microsoft.Data.OData                            Float
+        * Microsoft.WindowsAzure.ConfigurationManager     Float
+        * Newtonsoft.Json                                 Float
+        * NServiceBus                                     Float
+        * NServiceBus.Interfaces                          Float
+        * NUnit                                           Float
+        * Obsolete.Fody                                   Float
+        * RhinoMocks                                      Float
+        * System.Spatial                                  Float
+        * WindowsAzure.ServiceBus                         Float
+        * WindowsAzure.Storage                            Float
+     ** NuGet Feeds
+        * Feed     http://builds.nservicebus.com/guestAuth/app/nuget/v1/FeedService.svc (Float)
+        * Feed     http://nuget.org/api/v2 (Fixed)                                             
+        * Feed     http://packages.nuget.org/v1/FeedService.svc (Fixed)                        
+     ** Projects
+        * Project "NServiceBus.Azure"                           C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Azure\NServiceBus.Azure.csproj                                            
+             ** Dependencies
+                * Fody                                            1.13.12           
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * Obsolete.Fody                                   2.3.0             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Hosting.Azure"                   C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Hosting.Azure\NServiceBus.Hosting.Azure.csproj                            
+             ** Dependencies
+                * Fody                                            1.13.12           
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * Obsolete.Fody                                   2.3.0             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Hosting.Azure.HostProcess"       C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Hosting.Azure.HostProcess\NServiceBus.Hosting.Azure.HostProcess.csproj    
+             ** Dependencies
+                * CommonServiceLocator                            1.0               
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Integration.Azure.Tests"         C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Integration.Azure.Tests\NServiceBus.Integration.Azure.Tests.csproj        
+             ** Dependencies
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * NUnit                                           2.6.2             
+                * RhinoMocks                                      3.6.1             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Timeout.Hosting.Azure"           C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Timeout.Hosting.Azure\NServiceBus.Timeout.Hosting.Azure.csproj            
+             ** Dependencies
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * Newtonsoft.Json                                 5.0.6             
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Unicast.Queuing.Azure.Tests"     C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Unicast.Queuing.Azure.Tests\NServiceBus.Unicast.Queuing.Azure.Tests.csproj
+             ** Dependencies
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * NUnit                                           2.6.2             
+                * RhinoMocks                                      3.6.1             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.Storage                            2.0.6.1           
+     ** Local
+        * CommonServiceLocator                            Version: 1.0.0.0, IsPreRelease: False            
+        * Fody                                            Version: 1.15.0.0, IsPreRelease: False           
+        * Microsoft.Data.Edm                              Version: 5.6.0.0, IsPreRelease: False            
+        * Microsoft.Data.OData                            Version: 5.6.0.0, IsPreRelease: False            
+        * Microsoft.WindowsAzure.ConfigurationManager     Version: 2.0.1.0, IsPreRelease: False            
+        * Newtonsoft.Json                                 Version: 5.0.6.0, IsPreRelease: False            
+        * NServiceBus                                     Version: 4.1.0.0-unstable3377, IsPreRelease: True
+        * NServiceBus.Interfaces                          Version: 4.1.0.0-unstable3377, IsPreRelease: True
+        * NUnit                                           Version: 2.6.2.0, IsPreRelease: False            
+        * Obsolete.Fody                                   Version: 2.3.0.0, IsPreRelease: False            
+        * RhinoMocks                                      Version: 3.6.1.0, IsPreRelease: False            
+        * System.Spatial                                  Version: 5.6.0.0, IsPreRelease: False            
+        * WindowsAzure.ServiceBus                         Version: 2.1.2.0, IsPreRelease: False            
+        * WindowsAzure.Storage                            Version: 2.0.6.1, IsPreRelease: False            
+
+01/09/13 22:50:09: [Debug] 
+============================================================
 RippleOperation: NServiceBus.Azure (develop)
-============================================================================================================
+============================================================
      ** Ripple Steps
-          1.) DownloadMissingNugets       Download missing nugets for NServiceBus.Azure                     
-          2.) ExplodeDownloadedNugets     Explode nugets at C:\github.org\nsb\NServiceBus.Azure\src\packages
-          3.) ProcessDirectives           Process directives from nugets                                    
+          1.) UpdateNuspecs      ripple.Steps.UpdateNuspecs 
+          2.) CreatePackages     ripple.Steps.CreatePackages
 
-01/09/13 21:31:56: [Info] Restoring dependencies for solution NServiceBus.Azure to C:\github.org\nsb\NServiceBus.Azure\src\packages
-01/09/13 21:31:56: [Debug] 
-============================================================================================================
+01/09/13 22:50:09: [Info] Building the nuget spec file at C:\github.org\nsb\NServiceBus.Azure\packaging/nuget\nservicebus.azure.nuspec as version 4.1.0-unstable
+01/09/13 22:50:09: [Error] Error creating package: File not found: '..\..\src\lib\azure\Microsoft.ServiceBus.dll'.
+01/09/13 22:50:09: [Error] ripple.RippleFatalError: Error creating package: File not found: '..\..\src\lib\azure\Microsoft.ServiceBus.dll'.
+01/09/13 22:50:09: [Error] Error executing CreatePackages
+01/09/13 22:50:09: [Error] ripple.RippleFatalError: Error creating package: File not found: '..\..\src\lib\azure\Microsoft.ServiceBus.dll'.
+   at ripple.RippleAssert.Fail(String message, Object[] substitutions)
+   at ripple.Model.PublishingService.packageBuilderFor(NugetSpec spec, SemanticVersion version)
+   at ripple.Model.PublishingService.CreatePackage(PackageParams ctx)
+   at ripple.Steps.CreatePackages.<>c__DisplayClass1.<execute>b__0(NugetSpec spec)
+   at System.Collections.Generic.GenericEnumerableExtensions.Each[T](IEnumerable`1 values, Action`1 eachAction)
+   at ripple.RippleOperation.Execute(Boolean throwOnFailure)
+01/09/13 22:50:09: [Debug] 
+==============================================================================================================================================================================================
+Solution "NServiceBus.Azure": C:\github.org\nsb\NServiceBus.Azure\ripple.config
+==============================================================================================================================================================================================
+     ** Solution-Level
+        * CommonServiceLocator                            Float
+        * Fody                                            Float
+        * Microsoft.Data.Edm                              Float
+        * Microsoft.Data.OData                            Float
+        * Microsoft.WindowsAzure.ConfigurationManager     Float
+        * Newtonsoft.Json                                 Float
+        * NServiceBus                                     Float
+        * NServiceBus.Interfaces                          Float
+        * NUnit                                           Float
+        * Obsolete.Fody                                   Float
+        * RhinoMocks                                      Float
+        * System.Spatial                                  Float
+        * WindowsAzure.ServiceBus                         Float
+        * WindowsAzure.Storage                            Float
+     ** NuGet Feeds
+        * Feed     http://builds.nservicebus.com/guestAuth/app/nuget/v1/FeedService.svc (Float)
+        * Feed     http://nuget.org/api/v2 (Fixed)                                             
+        * Feed     http://packages.nuget.org/v1/FeedService.svc (Fixed)                        
+     ** Projects
+        * Project "NServiceBus.Azure"                           C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Azure\NServiceBus.Azure.csproj                                            
+             ** Dependencies
+                * Fody                                            1.13.12           
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * Obsolete.Fody                                   2.3.0             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Hosting.Azure"                   C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Hosting.Azure\NServiceBus.Hosting.Azure.csproj                            
+             ** Dependencies
+                * Fody                                            1.13.12           
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * Obsolete.Fody                                   2.3.0             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Hosting.Azure.HostProcess"       C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Hosting.Azure.HostProcess\NServiceBus.Hosting.Azure.HostProcess.csproj    
+             ** Dependencies
+                * CommonServiceLocator                            1.0               
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Integration.Azure.Tests"         C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Integration.Azure.Tests\NServiceBus.Integration.Azure.Tests.csproj        
+             ** Dependencies
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * NUnit                                           2.6.2             
+                * RhinoMocks                                      3.6.1             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Timeout.Hosting.Azure"           C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Timeout.Hosting.Azure\NServiceBus.Timeout.Hosting.Azure.csproj            
+             ** Dependencies
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * Newtonsoft.Json                                 5.0.6             
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.ServiceBus                         2.1.2.0           
+                * WindowsAzure.Storage                            2.0.6.1           
+        * Project "NServiceBus.Unicast.Queuing.Azure.Tests"     C:\github.org\nsb\NServiceBus.Azure\src\NServiceBus.Unicast.Queuing.Azure.Tests\NServiceBus.Unicast.Queuing.Azure.Tests.csproj
+             ** Dependencies
+                * Microsoft.Data.Edm                              5.5.0             
+                * Microsoft.Data.OData                            5.5.0             
+                * Microsoft.WindowsAzure.ConfigurationManager     2.0.1.0           
+                * NServiceBus                                     4.1.0-unstable3377
+                * NServiceBus.Interfaces                          4.1.0-unstable3377
+                * NUnit                                           2.6.2             
+                * RhinoMocks                                      3.6.1             
+                * System.Spatial                                  5.5.0             
+                * WindowsAzure.Storage                            2.0.6.1           
+     ** Local
+        * CommonServiceLocator                            Version: 1.0.0.0, IsPreRelease: False            
+        * Fody                                            Version: 1.15.0.0, IsPreRelease: False           
+        * Microsoft.Data.Edm                              Version: 5.6.0.0, IsPreRelease: False            
+        * Microsoft.Data.OData                            Version: 5.6.0.0, IsPreRelease: False            
+        * Microsoft.WindowsAzure.ConfigurationManager     Version: 2.0.1.0, IsPreRelease: False            
+        * Newtonsoft.Json                                 Version: 5.0.6.0, IsPreRelease: False            
+        * NServiceBus                                     Version: 4.1.0.0-unstable3377, IsPreRelease: True
+        * NServiceBus.Interfaces                          Version: 4.1.0.0-unstable3377, IsPreRelease: True
+        * NUnit                                           Version: 2.6.2.0, IsPreRelease: False            
+        * Obsolete.Fody                                   Version: 2.3.0.0, IsPreRelease: False            
+        * RhinoMocks                                      Version: 3.6.1.0, IsPreRelease: False            
+        * System.Spatial                                  Version: 5.6.0.0, IsPreRelease: False            
+        * WindowsAzure.ServiceBus                         Version: 2.1.2.0, IsPreRelease: False            
+        * WindowsAzure.Storage                            Version: 2.0.6.1, IsPreRelease: False            
+
+01/09/13 22:50:59: [Debug] 
+============================================================
 RippleOperation: NServiceBus.Azure (develop)
-============================================================================================================
+============================================================
      ** Ripple Steps
-          1.) DownloadMissingNugets       Download missing nugets for NServiceBus.Azure                     
-          2.) ExplodeDownloadedNugets     Explode nugets at C:\github.org\nsb\NServiceBus.Azure\src\packages
-          3.) ProcessDirectives           Process directives from nugets                                    
+          1.) UpdateNuspecs      ripple.Steps.UpdateNuspecs 
+          2.) CreatePackages     ripple.Steps.CreatePackages
 
-01/09/13 21:31:56: [Debug] Searching for latest of CommonServiceLocator,1.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:56: [Debug] Searching for latest of Microsoft.Data.OData,5.5.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:56: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\CommonServiceLocator.1.0.0.0.nupkg
-01/09/13 21:31:56: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Microsoft.Data.OData.5.6.0.0.nupkg
-01/09/13 21:31:56: [Debug] Searching for latest of Fody,1.13.12 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:56: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Fody.1.15.0.0.nupkg
-01/09/13 21:31:56: [Debug] Searching for latest of Microsoft.Data.Edm,5.5.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:56: [Info] Downloaded CommonServiceLocator,1.0
-01/09/13 21:31:56: [Debug] Searching for latest of Microsoft.WindowsAzure.ConfigurationManager,2.0.1.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:56: [Info] Downloaded Fody,1.13.12
-01/09/13 21:31:56: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Microsoft.Data.Edm.5.6.0.0.nupkg
-01/09/13 21:31:56: [Debug] Searching for latest of Newtonsoft.Json,5.0.6 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:56: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Microsoft.WindowsAzure.ConfigurationManager.2.0.1.0.nupkg
-01/09/13 21:31:56: [Info] Downloaded Microsoft.WindowsAzure.ConfigurationManager,2.0.1.0
-01/09/13 21:31:56: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Newtonsoft.Json.5.0.6.0.nupkg
-01/09/13 21:31:56: [Debug] Searching for latest of NServiceBus,4.1.0-unstable3377 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:56: [Info] Downloaded Microsoft.Data.Edm,5.5.0
-01/09/13 21:31:56: [Info] Downloaded Microsoft.Data.OData,5.5.0
-01/09/13 21:31:56: [Info] Downloaded Newtonsoft.Json,5.0.6
-01/09/13 21:31:59: [Debug] Searching for latest of NUnit,2.6.2 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:59: [Debug] Downloading Download and cache NServiceBus.4.1.0.0-unstable3377.nupkg
-01/09/13 21:31:59: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\NUnit.2.6.2.0.nupkg
-01/09/13 21:31:59: [Debug] Searching for latest of NServiceBus.Interfaces,4.1.0-unstable3377 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:59: [Info] Downloaded NUnit,2.6.2
-01/09/13 21:31:59: [Debug] Downloading Download and cache NServiceBus.Interfaces.4.1.0.0-unstable3377.nupkg
-01/09/13 21:31:59: [Debug] Searching for latest of Obsolete.Fody,2.3.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:59: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\Obsolete.Fody.2.3.0.0.nupkg
-01/09/13 21:31:59: [Debug] Searching for latest of RhinoMocks,3.6.1 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:59: [Info] Downloaded Obsolete.Fody,2.3.0
-01/09/13 21:31:59: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\RhinoMocks.3.6.1.0.nupkg
-01/09/13 21:31:59: [Debug] Searching for latest of System.Spatial,5.5.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:59: [Info] Downloaded RhinoMocks,3.6.1
-01/09/13 21:31:59: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\System.Spatial.5.6.0.0.nupkg
-01/09/13 21:31:59: [Debug] Searching for latest of WindowsAzure.ServiceBus,2.1.2.0 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:59: [Info] Downloaded System.Spatial,5.5.0
-01/09/13 21:31:59: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\WindowsAzure.ServiceBus.2.1.2.0.nupkg
-01/09/13 21:31:59: [Debug] Searching for latest of WindowsAzure.Storage,2.0.6.1 in C:\Users\yves_000\AppData\Roaming\ripple
-01/09/13 21:31:59: [Debug] Downloading From filesystem: C:\Users\yves_000\AppData\Roaming\ripple\WindowsAzure.Storage.2.0.6.1.nupkg
-01/09/13 21:31:59: [Info] Downloaded WindowsAzure.ServiceBus,2.1.2.0
-01/09/13 21:31:59: [Info] Downloaded WindowsAzure.Storage,2.0.6.1
-01/09/13 21:32:03: [Info] Downloaded NServiceBus.Interfaces,4.1.0-unstable3377
-01/09/13 21:32:55: [Info] Downloaded NServiceBus,4.1.0-unstable3377
-01/09/13 21:32:55: [Debug] Exploding Name: CommonServiceLocator, Version: 1.0.0.0, IsPreRelease: False
-01/09/13 21:32:55: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\CommonServiceLocator
-01/09/13 21:32:55: [Debug] Exploding Name: Fody, Version: 1.15.0.0, IsPreRelease: False
-01/09/13 21:32:55: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Fody
-01/09/13 21:32:55: [Debug] Exploding Name: Microsoft.WindowsAzure.ConfigurationManager, Version: 2.0.1.0, IsPreRelease: False
-01/09/13 21:32:55: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Microsoft.WindowsAzure.ConfigurationManager
-01/09/13 21:32:55: [Debug] Exploding Name: Microsoft.Data.Edm, Version: 5.6.0.0, IsPreRelease: False
-01/09/13 21:32:55: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Microsoft.Data.Edm
-01/09/13 21:32:55: [Debug] Exploding Name: Microsoft.Data.OData, Version: 5.6.0.0, IsPreRelease: False
-01/09/13 21:32:55: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Microsoft.Data.OData
-01/09/13 21:32:56: [Debug] Exploding Name: Newtonsoft.Json, Version: 5.0.6.0, IsPreRelease: False
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Newtonsoft.Json
-01/09/13 21:32:56: [Debug] Exploding Name: NUnit, Version: 2.6.2.0, IsPreRelease: False
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\NUnit
-01/09/13 21:32:56: [Debug] Exploding Name: Obsolete.Fody, Version: 2.3.0.0, IsPreRelease: False
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\Obsolete.Fody
-01/09/13 21:32:56: [Debug] Exploding Name: RhinoMocks, Version: 3.6.1.0, IsPreRelease: False
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\RhinoMocks
-01/09/13 21:32:56: [Debug] Exploding Name: System.Spatial, Version: 5.6.0.0, IsPreRelease: False
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\System.Spatial
-01/09/13 21:32:56: [Debug] Exploding Name: WindowsAzure.ServiceBus, Version: 2.1.2.0, IsPreRelease: False
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\WindowsAzure.ServiceBus
-01/09/13 21:32:56: [Debug] Exploding Name: WindowsAzure.Storage, Version: 2.0.6.1, IsPreRelease: False
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\WindowsAzure.Storage
-01/09/13 21:32:56: [Debug] Exploding Name: NServiceBus.Interfaces, Version: 4.1.0.0-unstable3377, IsPreRelease: True
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\NServiceBus.Interfaces
-01/09/13 21:32:56: [Debug] Exploding Name: NServiceBus, Version: 4.1.0.0-unstable3377, IsPreRelease: True
-01/09/13 21:32:56: [Info] Exploding to C:\github.org\nsb\NServiceBus.Azure\src\packages\NServiceBus
+01/09/13 22:50:59: [Info] Building the nuget spec file at C:\github.org\nsb\NServiceBus.Azure\packaging/nuget\nservicebus.azure.nuspec as version 4.1.0-unstable
+01/09/13 22:50:59: [Info] Created nuget at: .\nugets\NServiceBus.Azure.4.1.0-unstable.nupkg

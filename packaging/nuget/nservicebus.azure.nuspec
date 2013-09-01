@@ -1,5 +1,6 @@
-<package>
-  <metadata>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>NServiceBus.Azure</id>
     <title>NServiceBus Azure</title>
     <version>4.1.0-alpha0</version>
@@ -10,22 +11,25 @@
     <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Azure support for NServicebus</description>
-    <releaseNotes>
-    </releaseNotes>
+    <releaseNotes></releaseNotes>
     <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
     <dependencies>
-	  <dependency id="NServiceBus" version="4.1.0-unstable3377" />
-	  <dependency id="NServiceBus-Interfaces" version="4.1.0-unstable3377" />
-	  <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="2.0.1.0" />	  
-	  <dependency id="WindowsAzure.ServiceBus" version="2.1.2.0" />
-      <dependency id="WindowsAzure.Storage" version="2.0.6.1" />
+      <dependency id="Fody" version="1.15.0.0" />
+      <dependency id="Microsoft.Data.Edm" version="5.6.0.0" />
+      <dependency id="Microsoft.Data.OData" version="5.6.0.0" />
+      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="2.0.1.0" />
+      <dependency id="NServiceBus" version="4.1.0.0-unstable3377" />
+      <dependency id="NServiceBus.Interfaces" version="4.1.0.0-unstable3377" />
+      <dependency id="Obsolete.Fody" version="2.3.0.0" />
+      <dependency id="System.Spatial" version="5.6.0.0" />
+      <dependency id="WindowsAzure.ServiceBus" version="2.1.2.0" />
+      <dependency id="WindowsAzure.Storage" version="2.0.6.1" />      
     </dependencies>
   </metadata>
   <files>
-    <file src="\src\binaries\NServiceBus.Azure.???" target="lib\net40" />
-    <file src="\src\lib\azure\Microsoft.WindowsAzure.Diagnostics.dll" target="lib\net40" />
-    <file src="\src\lib\azure\Microsoft.WindowsAzure.ServiceRuntime.dll" target="lib\net40" />
-    <file src="\src\lib\azure\Microsoft.ServiceBus.dll" target="lib\net40" />
+    <file src="..\..\src\binaries\NServiceBus.Azure.???" target="lib\net40" />
+    <file src="..\..\src\lib\azure\Microsoft.WindowsAzure.Diagnostics.dll" target="lib\net40" />
+    <file src="..\..\src\lib\azure\Microsoft.WindowsAzure.ServiceRuntime.dll" target="lib\net40" />
   </files>
 </package>
