@@ -30,3 +30,5 @@ csx
 *.ncrunchproject
 *.ncrunchsolution
 _NCrunch_NServiceBus/*
+nugets
+logs
