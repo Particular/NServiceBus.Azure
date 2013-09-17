@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid.Server", "Hybrid.Server\Hybrid.Server.csproj", "{9DB45FFE-75A6-499A-9124-6770D76D97B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid.Client", "Hybrid.Client\Hybrid.Client.csproj", "{5918443E-74BE-4C8F-BB32-5A7B76C5C11F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid.Messages", "Hybrid.Messages\Hybrid.Messages.csproj", "{B706AC46-7B70-45A9-8DD2-4ABFD78216C4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9DB45FFE-75A6-499A-9124-6770D76D97B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DB45FFE-75A6-499A-9124-6770D76D97B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DB45FFE-75A6-499A-9124-6770D76D97B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DB45FFE-75A6-499A-9124-6770D76D97B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5918443E-74BE-4C8F-BB32-5A7B76C5C11F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5918443E-74BE-4C8F-BB32-5A7B76C5C11F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5918443E-74BE-4C8F-BB32-5A7B76C5C11F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5918443E-74BE-4C8F-BB32-5A7B76C5C11F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B706AC46-7B70-45A9-8DD2-4ABFD78216C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B706AC46-7B70-45A9-8DD2-4ABFD78216C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B706AC46-7B70-45A9-8DD2-4ABFD78216C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B706AC46-7B70-45A9-8DD2-4ABFD78216C4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
