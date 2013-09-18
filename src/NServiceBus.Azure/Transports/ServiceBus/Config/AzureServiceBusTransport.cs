@@ -27,17 +27,9 @@
             }
 
             var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
+            var queuename = AzureQueueNamingConventions.Apply(configSection);
 
-            if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
-            {
-                NServiceBus.Configure.Instance.DefineEndpointName(configSection.QueuePerInstance ? QueueIndividualizer.Individualize(configSection.QueueName) : configSection.QueueName);
-                Address.InitializeLocalAddress(NServiceBus.Configure.EndpointName);
-            }
-            else if (IsRoleEnvironmentAvailable())
-            {
-                NServiceBus.Configure.Instance.DefineEndpointName(RoleEnvironment.CurrentRoleInstance.Role.Name);
-                Address.InitializeLocalAddress(NServiceBus.Configure.EndpointName);
-            }
+            Address.InitializeLocalAddress(queuename);
 
             var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;
 
@@ -73,11 +65,11 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = configSection == null ? ConnectivityMode.Tcp : (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
-
-            if (string.IsNullOrEmpty(connectionString) && configSection != null)
-                connectionString = configSection.ConnectionString;
-
+            var connectionString = configSection != null ? new ConnectionStringParser().ParseNamespaceFrom(configSection.ConnectionString) : string.Empty;
+                
+            if(string.IsNullOrEmpty(connectionString))
+                connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
+            
             if (string.IsNullOrEmpty(connectionString) && (configSection == null || string.IsNullOrEmpty(configSection.IssuerKey) || string.IsNullOrEmpty(configSection.ServiceNamespace)))
             {
                 throw new ConfigurationErrorsException("No Servicebus Connection information specified, either set the ConnectionString or set the IssuerKey and ServiceNamespace properties");

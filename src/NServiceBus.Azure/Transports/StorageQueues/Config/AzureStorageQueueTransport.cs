@@ -72,25 +72,13 @@
             NServiceBus.Configure.Component<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             NServiceBus.Configure.Component<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
-
+            var queuename = AzureQueueNamingConventions.Apply(configSection);
             SettingsHolder.ApplyTo<AzureMessageQueueReceiver>();
-
-            if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
-            {
-                var queueName = configSection.QueueName;
-
-                if (SettingsHolder.GetOrDefault<bool>("AzureMessageQueueReceiver.QueuePerInstance"))
-                    queueName = QueueIndividualizer.Individualize(queueName);
-
-                NServiceBus.Configure.Instance.DefineEndpointName(queueName);
-            }
-            else if (IsRoleEnvironmentAvailable())
-            {
-                NServiceBus.Configure.Instance.DefineEndpointName(RoleEnvironment.CurrentRoleInstance.Role.Name);
-            }
-            Address.InitializeLocalAddress(NServiceBus.Configure.EndpointName);
+            Address.InitializeLocalAddress(queuename);
 
         }
+
+       
 
         static string TryGetConnectionString(AzureQueueConfig configSection)
         {
