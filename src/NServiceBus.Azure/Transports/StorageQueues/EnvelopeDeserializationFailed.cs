@@ -15,7 +15,7 @@ namespace NServiceBus.Unicast.Queuing.Azure
             this.message = message;
         }
 
-        public CloudQueueMessage Message
+        public CloudQueueMessage FailedMessage
         {
             get { return message; }
         }
