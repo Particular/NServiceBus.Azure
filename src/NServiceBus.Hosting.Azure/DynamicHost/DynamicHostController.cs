@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NServiceBus.Config;
 using NServiceBus.Hosting.Configuration;
 using NServiceBus.Hosting.Profiles;
 

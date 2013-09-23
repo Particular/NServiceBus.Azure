@@ -1,6 +1,5 @@
 using Microsoft.WindowsAzure.ServiceRuntime;
 using NServiceBus.Config;
-using NServiceBus.Config.Conventions;
 using NServiceBus.Hosting.Helpers;
 using NServiceBus.Integration.Azure;
 using System.Threading;
@@ -17,7 +16,8 @@ namespace NServiceBus.Hosting.Azure
     /// </summary>
     public class RoleEntryPoint : Microsoft.WindowsAzure.ServiceRuntime.RoleEntryPoint
     {
-        private const string ProfileSetting = "AzureProfileConfig.Profiles";
+        const string ProfileSetting = "AzureProfileConfig.Profiles";
+        const string EndpointConfigurationType = "EndpointConfigurationType";
         private IHost host;
         private readonly ManualResetEvent waitForStop = new ManualResetEvent(false);
         private bool doNotReturnFromRun = true;
@@ -35,17 +35,15 @@ namespace NServiceBus.Hosting.Azure
         public override bool OnStart()
         {
             var azureSettings = new AzureConfigurationSettings();
-            var requestedProfileSetting = azureSettings.GetSetting(ProfileSetting);
             
+            var requestedProfiles = GetRequestedProfiles(azureSettings);
             var endpointConfigurationType = GetEndpointConfigurationType(azureSettings);
 
             AssertThatEndpointConfigurationTypeHasDefaultConstructor(endpointConfigurationType);
 
             var specifier = (IConfigureThisEndpoint)Activator.CreateInstance(endpointConfigurationType);
-            var requestedProfiles = requestedProfileSetting.Split(' ');
-            requestedProfiles = AddProfilesFromConfiguration(requestedProfiles);
+            
 
-            //var endpointName = "Put somethingt smart here Yves"; // wonder if I live up to the expectations :)
             var endpointName = RoleEnvironment.IsAvailable ? RoleEnvironment.CurrentRoleInstance.Role.Name : GetType().Name;
 
             if (specifier is AsA_Host)
@@ -85,10 +83,19 @@ namespace NServiceBus.Hosting.Azure
                 throw new InvalidOperationException("Endpoint configuration type needs to have a default constructor: " + type.FullName);
         }
 
+        private static string[] GetRequestedProfiles(IAzureConfigurationSettings azureSettings)
+        {
+            string requestedProfileSetting;
+            azureSettings.TryGetSetting(ProfileSetting, out requestedProfileSetting);
+            var requestedProfiles = requestedProfileSetting.Split(' ');
+            requestedProfiles = AddProfilesFromConfiguration(requestedProfiles);
+            return requestedProfiles;
+        }
+
         private static Type GetEndpointConfigurationType(AzureConfigurationSettings settings)
         {
-            string endpoint = settings.GetSetting("EndpointConfigurationType");
-            if (!String.IsNullOrEmpty(endpoint))
+            string endpoint; 
+            if (!settings.TryGetSetting(EndpointConfigurationType, out endpoint))
             {
                 var endpointType = Type.GetType(endpoint, false);
                 if (endpointType == null)
