@@ -67,6 +67,5 @@ namespace NServiceBus.Azure.Tests
 
             Assert.AreEqual(index, 1);
         }
-
     }
 }

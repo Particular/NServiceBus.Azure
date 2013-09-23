@@ -83,6 +83,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="When_creating_subscriptions_on_servicebus_topics.cs" />
     <Compile Include="When_parsing_connectionstrings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

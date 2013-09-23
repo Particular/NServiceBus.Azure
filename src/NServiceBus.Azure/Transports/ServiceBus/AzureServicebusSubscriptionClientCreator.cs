@@ -3,6 +3,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
     using System;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Azure.Transports.ServiceBus;
 
     /// <summary>
     /// 
@@ -49,13 +50,9 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
                         if (eventType != null)
                         {
-                            var filter =
-                                string.Format(
-                                    "[{0}] LIKE '{1}%' OR [{0}] LIKE '%{1}%' OR [{0}] LIKE '%{1}' OR [{0}] = '{1}'",
-                                    Headers.EnclosedMessageTypes, eventType.AssemblyQualifiedName);
-                            var typefilter = new SqlFilter(filter);
+                            var filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
 
-                            NamespaceClient.CreateSubscription(description, typefilter);
+                            NamespaceClient.CreateSubscription(description, new SqlFilter(filter));
                         }
                         else
                         {
