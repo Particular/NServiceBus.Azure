@@ -7,7 +7,6 @@
     using Config;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    using Microsoft.WindowsAzure.ServiceRuntime;
     using Settings;
     using Transports;
     using Unicast.Queuing.Azure.ServiceBus;
@@ -18,7 +17,7 @@
         {
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            if (IsRoleEnvironmentAvailable())
+            if (SafeRoleEnvironment.IsAvailable)
             {
                 EnableByDefault<QueueAutoCreation>();
 
@@ -43,20 +42,6 @@
             Enable<AzureServiceBusTransport>();
             EnableByDefault<TimeoutManager>();
             AzureServiceBusPersistence.UseAsDefault();
-        }
-
-
-
-        static bool IsRoleEnvironmentAvailable()
-        {
-            try
-            {
-                return RoleEnvironment.IsAvailable;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
         }
 
         public override void Initialize()

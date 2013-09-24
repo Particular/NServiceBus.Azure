@@ -1,5 +1,6 @@
 namespace NServiceBus.Config
 {
+    using System;
     using System.Globalization;
     using Microsoft.WindowsAzure.ServiceRuntime;
 
@@ -9,7 +10,7 @@ namespace NServiceBus.Config
         {
             var parser = new ConnectionStringParser();
             var individualQueueName = queueName;
-            if (RoleEnvironment.IsAvailable)
+            if (SafeRoleEnvironment.IsAvailable)
             {
                 var index = parser.ParseIndexFrom(RoleEnvironment.CurrentRoleInstance.Id);
                 individualQueueName = parser.ParseQueueNameFrom(queueName)
@@ -22,7 +23,5 @@ namespace NServiceBus.Config
 
             return individualQueueName;
         }
-
-        
     }
 }

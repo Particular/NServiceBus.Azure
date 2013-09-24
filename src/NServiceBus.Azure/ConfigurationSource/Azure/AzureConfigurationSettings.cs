@@ -1,12 +1,13 @@
 namespace NServiceBus.Integration.Azure
 {
+    using Config;
     using Microsoft.WindowsAzure.ServiceRuntime;
 
     public class AzureConfigurationSettings : IAzureConfigurationSettings
     {
         public string GetSetting(string name)
         {
-            if (!RoleEnvironment.IsAvailable) return string.Empty;
+            if (!SafeRoleEnvironment.IsAvailable) return string.Empty;
 
             return RoleEnvironment.GetConfigurationSettingValue(name);
         }
@@ -15,7 +16,7 @@ namespace NServiceBus.Integration.Azure
         {
             setting = string.Empty;
 
-            if (!RoleEnvironment.IsAvailable) return false;
+            if (!SafeRoleEnvironment.IsAvailable) return false;
 
             try
             {

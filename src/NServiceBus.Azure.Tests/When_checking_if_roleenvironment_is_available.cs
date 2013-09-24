@@ -1,6 +1,6 @@
 ﻿namespace NServiceBus.Azure.Tests
 {
-    using Microsoft.WindowsAzure.ServiceRuntime;
+    using Config;
     using NUnit.Framework;
 
     [TestFixture]
@@ -10,7 +10,7 @@
         [Test]
         public void Should_not_throw_when_not_available()
         {
-           Assert.AreEqual(false, RoleEnvironment.IsAvailable);
+            Assert.AreEqual(false, SafeRoleEnvironment.IsAvailable);
         }
     }
 }

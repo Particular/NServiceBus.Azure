@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Azure
 {
+    using Config;
     using Microsoft.WindowsAzure.ServiceRuntime;
     using System;
     using System.Collections.Generic;
@@ -408,7 +409,7 @@
 
         string GetUniqueEndpointName()
         {
-            var identifier = RoleEnvironment.IsAvailable ? RoleEnvironment.CurrentRoleInstance.Id : RuntimeEnvironment.MachineName;
+            var identifier = SafeRoleEnvironment.IsAvailable ? RoleEnvironment.CurrentRoleInstance.Id : RuntimeEnvironment.MachineName;
 
             return Configure.EndpointName + "_" + identifier;
         }

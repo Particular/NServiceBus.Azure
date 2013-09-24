@@ -44,7 +44,7 @@ namespace NServiceBus.Hosting.Azure
             var specifier = (IConfigureThisEndpoint) Activator.CreateInstance(endpointConfigurationType);
 
 
-            var endpointName = RoleEnvironment.IsAvailable
+            var endpointName = SafeRoleEnvironment.IsAvailable
                 ? RoleEnvironment.CurrentRoleInstance.Role.Name
                 : GetType().Name;
 

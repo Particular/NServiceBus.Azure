@@ -9,6 +9,7 @@ using NServiceBus.Logging;
 namespace NServiceBus.Integration.Azure
 {
     using System.Security;
+    using Config;
     using Config.ConfigurationSource;
     using NServiceBus.Azure;
 
@@ -83,7 +84,7 @@ namespace NServiceBus.Integration.Azure
                 if (!exists) Trace.Listeners.Add(new ConsoleTraceListener());
             }
 
-            if (!RoleEnvironment.IsAvailable || !InitializeDiagnostics) return;
+            if (!SafeRoleEnvironment.IsAvailable || !InitializeDiagnostics) return;
 
             var roleInstanceDiagnosticManager = CloudAccountDiagnosticMonitorExtensions.CreateRoleInstanceDiagnosticManager(
                 GetConnectionString(),

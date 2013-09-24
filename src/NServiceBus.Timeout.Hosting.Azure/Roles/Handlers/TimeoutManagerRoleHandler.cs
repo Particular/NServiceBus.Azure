@@ -21,7 +21,7 @@ namespace NServiceBus.Timeout.Hosting.Azure
         /// <returns></returns>
         public ConfigUnicastBus ConfigureRole(IConfigureThisEndpoint specifier)
         {
-            if (RoleEnvironment.IsAvailable && !IsHostedIn.ChildHostProcess())
+            if (SafeRoleEnvironment.IsAvailable && !IsHostedIn.ChildHostProcess())
             {
                 Configure.Instance.AzureConfigurationSource();
             }

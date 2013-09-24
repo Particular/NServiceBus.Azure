@@ -102,8 +102,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <None Include="app.config" />
-    <None Include="Fody.targets" />
-    <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AzureProfileConfig.cs" />
@@ -143,7 +141,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-	<None Include="Fody.targets" />
+    <None Include="Fody.targets" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

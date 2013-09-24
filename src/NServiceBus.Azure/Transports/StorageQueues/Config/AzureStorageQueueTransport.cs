@@ -1,9 +1,7 @@
 ﻿namespace NServiceBus.Features
 {
-    using System;
     using Azure;
     using Config;
-    using Microsoft.WindowsAzure.ServiceRuntime;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using Settings;
@@ -21,7 +19,7 @@
             EnableByDefault<TimeoutManager>();
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            if (IsRoleEnvironmentAvailable())
+            if (SafeRoleEnvironment.IsAvailable)
             {
                 EnableByDefault<QueueAutoCreation>();
 
@@ -105,17 +103,5 @@
             get { return "todo - refactor the transport to use a connection string instead of a custom section"; }
         }
 
-
-        static bool IsRoleEnvironmentAvailable()
-        {
-            try
-            {
-                return RoleEnvironment.IsAvailable;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
     }
 }
