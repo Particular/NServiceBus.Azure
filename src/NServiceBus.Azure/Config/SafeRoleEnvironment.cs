@@ -1,5 +1,6 @@
 namespace NServiceBus.Config
 {
+    using System;
     using System.IO;
     using Microsoft.WindowsAzure.ServiceRuntime;
 
@@ -12,16 +13,14 @@ namespace NServiceBus.Config
                 {
                     return RoleEnvironment.IsAvailable;
                 }
-                catch (FileNotFoundException ex)
+                catch (TypeInitializationException ex)
                 {
-                    if (ex.Message.Contains("msshrtmi"))
+                    var e = ex.InnerException;
+                    if (e is FileNotFoundException && e.Message.Contains("msshrtmi"))
                     {
                         return false;
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
             }
         }
