@@ -15,6 +15,7 @@
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>false</RestorePackages>
+	<FodyPath>..\packages\Fody</FodyPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -104,6 +105,10 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="ripple.dependencies.config" />
+	<None Include="Fody.targets" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -113,4 +118,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Import Project="Fody.targets" />
+  <Import Project="$(SolutionDir)..\BuildSupport\RippleRestoreTask.targets" />
 </Project>

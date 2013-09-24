@@ -17,6 +17,7 @@
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>false</RestorePackages>
+	<FodyPath>..\packages\Fody</FodyPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -109,6 +110,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="ripple.dependencies.config" />
+	<None Include="Fody.targets" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
@@ -121,6 +123,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -131,4 +136,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Import Project="Fody.targets" />
+  <Import Project="$(SolutionDir)..\BuildSupport\RippleRestoreTask.targets" />
 </Project>

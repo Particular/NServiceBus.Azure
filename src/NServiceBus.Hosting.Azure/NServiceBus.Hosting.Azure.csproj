@@ -143,6 +143,10 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+	<None Include="Fody.targets" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
@@ -152,4 +156,5 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="Fody.targets" />
+  <Import Project="$(SolutionDir)..\BuildSupport\RippleRestoreTask.targets" />
 </Project>
