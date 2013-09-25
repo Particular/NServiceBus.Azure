@@ -24,14 +24,15 @@ namespace NServiceBus.Integration.Azure
         private const string ScheduledTransferPeriodKey = "ScheduledTransferPeriod";
         private const string EventLogsKey = "EventLogs";
 
-        IConfigurationSource internalConfigurationSource;
+        readonly Diagnostics config;
 
         public AzureDiagnosticsLoggerFactory()
         {
-            internalConfigurationSource = new AzureConfigurationSource(new AzureConfigurationSettings())
+            IConfigurationSource internalConfigurationSource = new AzureConfigurationSource(new AzureConfigurationSettings())
             {
                 ConfigurationPrefix = Prefix
             };
+            config = internalConfigurationSource.GetConfiguration<Diagnostics>() ?? new Diagnostics();
         }
 
         public int ScheduledTransferPeriod { get; set; }
@@ -133,22 +134,22 @@ namespace NServiceBus.Integration.Azure
 
         private string GetConnectionString()
         {
-            return internalConfigurationSource.GetConfiguration<Diagnostics>().ConnectionString;
+            return config.ConnectionString;
         }
 
         private LogLevel GetLevel()
         {
-            return (LogLevel)Enum.Parse(typeof(LogLevel), internalConfigurationSource.GetConfiguration<Diagnostics>().Level);
+            return (LogLevel)Enum.Parse(typeof(LogLevel), config.Level);
         }
 
         private int GetScheduledTransferPeriod()
         {
-            return internalConfigurationSource.GetConfiguration<Diagnostics>().ScheduledTransferPeriod;
+            return config.ScheduledTransferPeriod;
         }
 
         private string GetEventLogs()
         {
-            return internalConfigurationSource.GetConfiguration<Diagnostics>().EventLogs;
+            return config.EventLogs;
         }
     }
 }

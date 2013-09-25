@@ -91,16 +91,19 @@ namespace NServiceBus.Hosting.Azure
         static string[] GetRequestedProfiles(IAzureConfigurationSettings azureSettings)
         {
             string requestedProfileSetting;
-            azureSettings.TryGetSetting(ProfileSetting, out requestedProfileSetting);
-            var requestedProfiles = requestedProfileSetting.Split(' ');
-            requestedProfiles = AddProfilesFromConfiguration(requestedProfiles);
-            return requestedProfiles;
+            if (azureSettings.TryGetSetting(ProfileSetting, out requestedProfileSetting))
+            {
+                var requestedProfiles = requestedProfileSetting.Split(' ');
+                requestedProfiles = AddProfilesFromConfiguration(requestedProfiles);
+                return requestedProfiles;
+            }
+            return new string[0];
         }
 
         static Type GetEndpointConfigurationType(AzureConfigurationSettings settings)
         {
             string endpoint;
-            if (!settings.TryGetSetting(EndpointConfigurationType, out endpoint))
+            if (settings.TryGetSetting(EndpointConfigurationType, out endpoint))
             {
                 var endpointType = Type.GetType(endpoint, false);
                 if (endpointType == null)

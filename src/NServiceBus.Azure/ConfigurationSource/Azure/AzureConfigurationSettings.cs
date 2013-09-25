@@ -14,7 +14,7 @@ namespace NServiceBus.Integration.Azure
 
         public bool TryGetSetting(string name, out string setting)
         {
-            setting = string.Empty;
+            setting = null;
 
             if (!SafeRoleEnvironment.IsAvailable) return false;
 

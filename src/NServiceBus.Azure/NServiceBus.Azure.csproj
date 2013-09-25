@@ -180,7 +180,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Fody.targets" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ripple.dependencies.config" />
   </ItemGroup>
   <ItemGroup>
