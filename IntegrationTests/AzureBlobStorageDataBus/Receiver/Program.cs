@@ -1,5 +1,6 @@
 ﻿using System;
 using NServiceBus;
+using NServiceBus.Features;
 
 namespace Receiver
 {
@@ -17,6 +18,7 @@ namespace Receiver
         {
             Configure.Transactions.Enable();
             Configure.Serialization.Binary();
+            Feature.Disable<Audit>();
 
             Configure.With()
                .DefaultBuilder()

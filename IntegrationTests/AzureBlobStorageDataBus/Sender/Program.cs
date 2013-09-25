@@ -1,5 +1,6 @@
 ﻿using System;
 using NServiceBus;
+using NServiceBus.Features;
 using Receiver.Messages;
 
 namespace Sender
@@ -56,6 +57,7 @@ namespace Sender
         {
             Configure.Transactions.Enable();
             Configure.Serialization.Binary();
+            Feature.Disable<Audit>();
 
             bus = Configure.With()
                .DefaultBuilder()

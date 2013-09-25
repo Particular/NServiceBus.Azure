@@ -76,7 +76,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
                         blockBlob.DeleteIfExists();
                 }
             }
-            catch (StorageException ex) 
+            catch (StorageException ex) // needs to stay as it runs on a background thread
             {
                 logger.Warn(ex.Message);
             }
@@ -84,30 +84,16 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
 
         void UploadBlobInParallel(CloudBlockBlob blob, Stream stream)
         {
-            try
-            {
-                blob.ServiceClient.ParallelOperationThreadCount = NumberOfIOThreads;
-                blob.UploadFromStream(stream);
-            }
-            catch (StorageException ex)
-            {
-                 logger.Warn(ex.Message);
-            }
+            blob.ServiceClient.ParallelOperationThreadCount = NumberOfIOThreads;
+            blob.UploadFromStream(stream);
         }
 
         void DownloadBlobInParallel(CloudBlockBlob blob, Stream stream)
         {
-            try
-            {
-                blob.FetchAttributes();
-                blob.ServiceClient.ParallelOperationThreadCount = NumberOfIOThreads;
-                blob.DownloadToStream(stream);
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-            catch (StorageException ex) 
-            {
-                logger.Warn(ex.Message);
-            }
+            blob.FetchAttributes();
+            blob.ServiceClient.ParallelOperationThreadCount = NumberOfIOThreads;
+            blob.DownloadToStream(stream);
+            stream.Seek(0, SeekOrigin.Begin);
         }
 
     }

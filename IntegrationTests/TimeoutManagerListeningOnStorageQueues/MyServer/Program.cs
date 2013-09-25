@@ -1,5 +1,3 @@
-using NServiceBus.Timeout.Hosting.Azure;
-
 namespace MyServer
 {
     using System;
@@ -61,7 +59,9 @@ namespace MyServer
         private static void BootstrapNServiceBus()
         {
             Configure.Transactions.Enable();
-            Configure.Features.Enable<Sagas>();
+            Feature.Enable<Sagas>();
+            Feature.Disable<Audit>();
+
             Configure.Serialization.Json();
 
             Bus = Configure.With()
