@@ -1,5 +1,7 @@
 ﻿namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
+    using Microsoft.ServiceBus;
+    using Microsoft.ServiceBus.Messaging;
     using Transports;
 
     /// <summary>
@@ -7,11 +9,19 @@
     /// </summary>
     public class AzureServiceBusQueueCreator:ICreateQueues
     {
-        public ICreateQueueClients CreateQueueClients { get; set; }
-
+        ICreateQueueClients QueueCreator { get; set; }
+       
         public void CreateQueueIfNecessary(Address address, string account)
         {
-            CreateQueueClients.Create(address);
+            try
+            {
+                QueueCreator.CreateQueue(address);
+                
+            }
+            catch (MessagingEntityAlreadyExistsException)
+            {
+                // is ok.
+            }
         }
     }
 }

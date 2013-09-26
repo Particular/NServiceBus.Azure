@@ -1,24 +1,24 @@
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
+    using Microsoft.ServiceBus.Messaging;
+
     /// <summary>
     /// 
     /// </summary>
-    public interface ICreateQueueClients
+    public interface ICreateTopicClients
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        QueueClient Create(Address address);
+        TopicClient Create(Address address);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        string CreateQueue(Address address);
+        string CreateTopic(Address address);
     }
 }

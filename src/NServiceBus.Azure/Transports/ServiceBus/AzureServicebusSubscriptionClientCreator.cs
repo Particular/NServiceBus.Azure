@@ -37,16 +37,16 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                     if (!NamespaceClient.SubscriptionExists(topicPath, subscriptionname))
                     {
                         var description = new SubscriptionDescription(topicPath, subscriptionname)
-                            {
-                                LockDuration = LockDuration,
-                                RequiresSession = RequiresSession,
-                                DefaultMessageTimeToLive = DefaultMessageTimeToLive,
-                                EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
-                                MaxDeliveryCount = MaxDeliveryCount,
-                                EnableBatchedOperations = EnableBatchedOperations,
-                                EnableDeadLetteringOnFilterEvaluationExceptions =
-                                    EnableDeadLetteringOnFilterEvaluationExceptions
-                            };
+                        {
+                            LockDuration = LockDuration,
+                            RequiresSession = RequiresSession,
+                            DefaultMessageTimeToLive = DefaultMessageTimeToLive,
+                            EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
+                            MaxDeliveryCount = MaxDeliveryCount,
+                            EnableBatchedOperations = EnableBatchedOperations,
+                            EnableDeadLetteringOnFilterEvaluationExceptions =
+                                EnableDeadLetteringOnFilterEvaluationExceptions
+                        };
 
                         if (eventType != null)
                         {
@@ -68,7 +68,10 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                 return Factory.CreateSubscriptionClient(topicPath, subscriptionname, ReceiveMode.PeekLock);
                
             }
-            return null;
+           else
+            {
+                throw new InvalidOperationException(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist", topicPath));
+            }
         }
     }
 }

@@ -102,11 +102,14 @@
     <Compile Include="Config\ConnectionStringParser.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Logging\Azure\Diagnostics.cs" />
+    <Compile Include="Transports\ServiceBus\AutoCreateTopic.cs" />
     <Compile Include="Transports\ServiceBus\AzureServiceBusPublisherAddressConvention.cs" />
     <Compile Include="Transports\ServiceBus\AzureServiceBusPublisherAddressConventionForSubscriptions.cs" />
     <Compile Include="Transports\ServiceBus\AzureServiceBusSubscriptionNameConvention.cs" />
+    <Compile Include="Transports\ServiceBus\AzureServicebusTopicClientCreator.cs" />
     <Compile Include="Transports\ServiceBus\Config\IsHostedIn.cs" />
     <Compile Include="Transports\AzureQueueNamingConventions.cs" />
+    <Compile Include="Transports\ServiceBus\ICreateTopicClients.cs" />
     <Compile Include="Transports\ServiceBus\ServicebusSubscriptionFilterBuilder.cs" />
     <Compile Include="Transports\StorageQueues\Config\ConfigureAzureMessageQueue.cs" />
     <Compile Include="ConfigureAzureSagaPersister.cs" />

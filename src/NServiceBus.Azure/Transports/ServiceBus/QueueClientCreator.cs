@@ -21,23 +21,32 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
         public QueueClient Create(Address address)
         {
+            var queueName = CreateQueue(address);
+
+            var client = Factory.CreateQueueClient(queueName, ReceiveMode.PeekLock);
+            client.PrefetchCount = 100; // todo make configurable
+            return client;
+        }
+
+        public string CreateQueue(Address address)
+        {
             var queueName = address.Queue;
             try
             {
                 if (!NamespaceClient.QueueExists(queueName))
                 {
                     var description = new QueueDescription(queueName)
-                        {
-                            LockDuration = LockDuration,
-                            MaxSizeInMegabytes = MaxSizeInMegabytes,
-                            RequiresDuplicateDetection = RequiresDuplicateDetection,
-                            RequiresSession = RequiresSession,
-                            DefaultMessageTimeToLive = DefaultMessageTimeToLive,
-                            EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
-                            DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
-                            MaxDeliveryCount = MaxDeliveryCount,
-                            EnableBatchedOperations = EnableBatchedOperations
-                        };
+                    {
+                        LockDuration = LockDuration,
+                        MaxSizeInMegabytes = MaxSizeInMegabytes,
+                        RequiresDuplicateDetection = RequiresDuplicateDetection,
+                        RequiresSession = RequiresSession,
+                        DefaultMessageTimeToLive = DefaultMessageTimeToLive,
+                        EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
+                        DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
+                        MaxDeliveryCount = MaxDeliveryCount,
+                        EnableBatchedOperations = EnableBatchedOperations
+                    };
 
                     NamespaceClient.CreateQueue(description);
                 }
@@ -46,10 +55,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             {
                 // the queue already exists or another node beat us to it, which is ok
             }
-
-            var client = Factory.CreateQueueClient(queueName, ReceiveMode.PeekLock);
-            client.PrefetchCount = 100; // todo make configurable
-            return client;
+            return queueName;
         }
     }
 }
