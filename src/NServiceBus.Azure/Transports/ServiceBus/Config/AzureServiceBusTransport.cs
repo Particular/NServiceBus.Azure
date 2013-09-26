@@ -50,7 +50,7 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = configSection == null ? ConnectivityMode.Tcp : (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = configSection != null ? new ConnectionStringParser().ParseNamespaceFrom(configSection.ConnectionString) : string.Empty;
+            var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
                 
             if(string.IsNullOrEmpty(connectionString))
                 connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
