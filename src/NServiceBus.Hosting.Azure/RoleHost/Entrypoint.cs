@@ -124,7 +124,7 @@ namespace NServiceBus.Hosting.Azure
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            return AssemblyScanner.GetScannableAssemblies().Assemblies.SelectMany(
+            return new AssemblyScanner().GetScannableAssemblies().Assemblies.SelectMany(
                 assembly => assembly.GetTypes().Where(
                     t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
                          && t != typeof(IConfigureThisEndpoint)
