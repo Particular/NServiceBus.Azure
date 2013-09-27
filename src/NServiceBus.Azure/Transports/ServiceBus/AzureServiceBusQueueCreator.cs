@@ -12,7 +12,7 @@
 
         public AzureServiceBusQueueCreator(ICreateQueueClients queueCreator)
         {
-            queueCreator = queueCreator;
+            this.queueCreator = queueCreator;
         }
 
         public void CreateQueueIfNecessary(Address address, string account)
