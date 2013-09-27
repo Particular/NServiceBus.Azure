@@ -5,13 +5,18 @@
 
     public class AutoCreateTopic : IWantToRunWhenConfigurationIsComplete
     {
-        ICreateTopicClients TopicCreator { get; set; }
+        readonly ICreateTopics topicCreator;
+
+        public AutoCreateTopic(ICreateTopics topicCreator)
+        {
+            this.topicCreator = topicCreator;
+        }
 
         public void Run()
         {
             try
             {
-                TopicCreator.CreateTopic(Address.Local);
+                topicCreator.Create(Address.Local);
             }
             catch (MessagingEntityAlreadyExistsException)
             {

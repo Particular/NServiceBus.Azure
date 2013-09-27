@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Transactions;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 
@@ -18,8 +17,8 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
 
-        public MessagingFactory Factory { get; set; }
-        public NamespaceManager NamespaceClient { get; set; }
+        public ICreateTopicClients TopicClientCreator { get; set; }
+
         private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
         private static readonly object SenderLock = new Object();
 
@@ -104,10 +103,8 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                     {
                         try
                         {
-                            sender = Factory.CreateTopicClient(destination);
+                            sender = TopicClientCreator.Create(Address.Parse(destination));
                             senders[destination] = sender;
-
-                            NamespaceClient.CreateTopic(destination);
                         }
                         catch (MessagingEntityNotFoundException)
                         {

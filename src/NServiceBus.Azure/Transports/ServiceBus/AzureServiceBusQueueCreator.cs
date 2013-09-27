@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
-    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
     using Transports;
 
@@ -16,7 +15,6 @@
             try
             {
                 QueueCreator.CreateQueue(address);
-                
             }
             catch (MessagingEntityAlreadyExistsException)
             {
