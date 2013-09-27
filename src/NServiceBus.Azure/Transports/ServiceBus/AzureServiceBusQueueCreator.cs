@@ -8,13 +8,18 @@
     /// </summary>
     public class AzureServiceBusQueueCreator:ICreateQueues
     {
-        ICreateQueueClients QueueCreator { get; set; }
-       
+        readonly ICreateQueueClients queueCreator;
+
+        public AzureServiceBusQueueCreator(ICreateQueueClients queueCreator)
+        {
+            queueCreator = queueCreator;
+        }
+
         public void CreateQueueIfNecessary(Address address, string account)
         {
             try
             {
-                QueueCreator.CreateQueue(address);
+                queueCreator.CreateQueue(address);
             }
             catch (MessagingEntityAlreadyExistsException)
             {
