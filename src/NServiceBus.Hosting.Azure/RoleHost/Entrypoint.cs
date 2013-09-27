@@ -34,6 +34,9 @@ namespace NServiceBus.Hosting.Azure
 
         public override bool OnStart()
         {
+            // temporary, to force the nservicebus reference
+            Trace.WriteLine("Starting " + typeof(IMessage).Assembly.GetName().Name);
+
             var azureSettings = new AzureConfigurationSettings();
 
             var requestedProfiles = GetRequestedProfiles(azureSettings);
@@ -170,5 +173,7 @@ namespace NServiceBus.Hosting.Azure
 
             return list.ToArray();
         }
+
+        
     }
 }
