@@ -18,7 +18,7 @@ namespace NServiceBus.Integration.Azure
     /// </summary>
     public class AzureDiagnosticsLoggerFactory : ILoggerFactory
     {
-        const string Prefix = "Microsoft.WindowsAzure.Plugins.Diagnostics";
+        const string Prefix = "Microsoft.WindowsAzure.Plugins";
         private const string ConnectionStringKey = "ConnectionString";
         private const string LevelKey = "Level";
         private const string ScheduledTransferPeriodKey = "ScheduledTransferPeriod";
@@ -101,7 +101,7 @@ namespace NServiceBus.Integration.Azure
                 
                 ConfigureDiagnostics(configuration);
 
-                DiagnosticMonitor.Start(Prefix + "." + ConnectionStringKey, configuration);
+                DiagnosticMonitor.Start(Prefix + ".Diagnostics." + ConnectionStringKey, configuration);
             }
            
         }
