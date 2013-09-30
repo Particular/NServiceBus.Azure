@@ -27,10 +27,6 @@
                     config.AzureConfigurationSource();
             }
 
-
-
-            AzureStoragePersistence.UseAsDefault();
-
             var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
 
             if(configSection == null)

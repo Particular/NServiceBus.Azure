@@ -41,7 +41,7 @@
 
             Enable<AzureServiceBusTransport>();
             EnableByDefault<TimeoutManager>();
-            AzureServiceBusPersistence.UseAsDefault();
+            
         }
 
         public override void Initialize()

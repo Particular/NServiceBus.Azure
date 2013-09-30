@@ -120,11 +120,9 @@
     <Compile Include="Config\AzureDataBusConfig.cs" />
     <Compile Include="Transports\StorageQueues\Config\AzureQueueConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
-    <Compile Include="Config\AzureServiceBusPersistence.cs" />
     <Compile Include="Transports\ServiceBus\Config\AzureServiceBusQueueConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
     <Compile Include="ConfigureAzureIntegration.cs" />
-    <Compile Include="Config\AzureStoragePersistence.cs" />
     <Compile Include="Transports\StorageQueues\AzureMessageQueueUtils.cs" />
     <Compile Include="Transports\StorageQueues\Config\AzureStorageQueueTransport.cs" />
     <Compile Include="Config\QueueIndividualizer.cs" />

@@ -123,6 +123,7 @@
     <Compile Include="Profiles\OnSqlAzure.cs" />
     <Compile Include="Profiles\WithAzureServiceBusQueues.cs" />
     <Compile Include="Profiles\WithAzureStorageQueues.cs" />
+    <Compile Include="RoleHost\Config\DefaultStorageForHost.cs" />
     <Compile Include="RoleHost\Entrypoint.cs" />
     <Compile Include="DynamicHost\DynamicHostController.cs" />
     <Compile Include="LoggingHandlers\ProductionLoggingHandler.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Roles\AsA_Host.cs" />
     <Compile Include="Roles\AsA_Worker.cs" />
-    <Compile Include="Roles\Handlers\DefaultTransportForHost.cs" />
+    <Compile Include="RoleHost\Config\DefaultTransportForHost.cs" />
     <Compile Include="Roles\Handlers\TransportRoleHandler.cs" />
     <Compile Include="Roles\Handlers\WorkerRoleHandler.cs" />
     <Compile Include="Roles\UsingTransport.cs" />
