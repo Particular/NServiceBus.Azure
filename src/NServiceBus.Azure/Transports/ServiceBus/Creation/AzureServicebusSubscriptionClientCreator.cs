@@ -1,7 +1,6 @@
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
     using System;
-    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Azure.Transports.ServiceBus;
 
@@ -10,9 +9,6 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
     /// </summary>
     public class AzureServicebusSubscriptionClientCreator : ICreateSubscriptionClients
     {
-        public MessagingFactory Factory { get; set; }
-        public NamespaceManager NamespaceClient { get; set; }
-
         public TimeSpan LockDuration { get; set; }
         public bool RequiresSession { get; set; }
         public TimeSpan DefaultMessageTimeToLive { get; set; }
@@ -23,18 +19,19 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
         public SubscriptionClient Create(Address address, Type eventType)
         {
-            var topicPath = address.Queue;
             var subscriptionname = AzureServiceBusSubscriptionNameConvention.Create(eventType);
-            return Create(eventType, topicPath, subscriptionname);
+            return Create(eventType, address, subscriptionname);
         }
 
-        public SubscriptionClient Create(Type eventType, string topicPath, string subscriptionname)
+        public SubscriptionClient Create(Type eventType, Address topic, string subscriptionname)
         {
-            if (NamespaceClient.TopicExists(topicPath))
+            var topicPath = topic.Queue;
+            var namespaceClient = new CreatesNamespaceManagers().Create(topic.Machine);
+            if (namespaceClient.TopicExists(topicPath))
             {
                 try
                 {
-                    if (!NamespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                    if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
                     {
                         var description = new SubscriptionDescription(topicPath, subscriptionname)
                         {
@@ -52,11 +49,11 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                         {
                             var filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
 
-                            NamespaceClient.CreateSubscription(description, new SqlFilter(filter));
+                            namespaceClient.CreateSubscription(description, new SqlFilter(filter));
                         }
                         else
                         {
-                            NamespaceClient.CreateSubscription(description);
+                            namespaceClient.CreateSubscription(description);
                         }
                     }
                 }
@@ -65,7 +62,8 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                     // the queue already exists or another node beat us to it, which is ok
                 }
 
-                return Factory.CreateSubscriptionClient(topicPath, subscriptionname, ReceiveMode.PeekLock);
+                var factory = new CreatesMessagingFactories().Create(topic.Machine);
+                return factory.CreateSubscriptionClient(topicPath, subscriptionname, ReceiveMode.PeekLock);
                
             }
            else

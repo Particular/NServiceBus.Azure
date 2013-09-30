@@ -1,20 +1,18 @@
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
-    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
 
     public class AzureServicebusTopicCreator : ICreateTopics
     {
-        public NamespaceManager NamespaceClient { get; set; }
-
         public string Create(Address address)
         {
             var topicName = AzureServiceBusPublisherAddressConvention.Create(address);
             try
             {
-                if (!NamespaceClient.TopicExists(topicName))
+                var namespaceclient = new CreatesNamespaceManagers().Create(address.Machine);
+                if (!namespaceclient.TopicExists(topicName))
                 {
-                    NamespaceClient.CreateTopic(topicName);
+                    namespaceclient.CreateTopic(topicName);
                 }
             }
             catch (MessagingEntityAlreadyExistsException)

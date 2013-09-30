@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Transactions;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
@@ -18,13 +17,11 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         public const int DefaultBackoffTimeInSeconds = 10;
 
         private readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
+        
         private static readonly object SenderLock = new Object();
 
         public int MaxDeliveryCount { get; set; }
-       
-        public MessagingFactory Factory { get; set; }
-        public NamespaceManager NamespaceClient { get; set; }
-
+  
         public void Send(TransportMessage message, string destination)
         {
             Send(message, Address.Parse(destination));
@@ -33,6 +30,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         public void Send(TransportMessage message, Address address)
         {
             var destination = address.Queue;
+            var @namespace = address.Machine;
 
             QueueClient sender;
             if (!senders.TryGetValue(destination, out sender))
@@ -41,7 +39,8 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                 {
                     if (!senders.TryGetValue(destination, out sender))
                     {
-                        sender = Factory.CreateQueueClient(destination);
+                        var factory = new CreatesMessagingFactories().Create(@namespace);
+                        sender = factory.CreateQueueClient(destination);
                         senders[destination] = sender;
                     }
                 }
@@ -109,5 +108,6 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             }
         }
 
-    }
+      
+   }
 }

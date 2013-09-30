@@ -1,14 +1,10 @@
 using System;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
     public class AzureServicebusQueueClientCreator : ICreateQueueClients
     {
-        public MessagingFactory Factory { get; set; }
-        public NamespaceManager NamespaceClient { get; set; }
-
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }
         public bool RequiresDuplicateDetection { get; set; }
@@ -23,7 +19,9 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         {
             var queueName = CreateQueue(address);
 
-            var client = Factory.CreateQueueClient(queueName, ReceiveMode.PeekLock);
+
+            var factory = new CreatesMessagingFactories().Create(address.Machine);
+            var client = factory.CreateQueueClient(queueName, ReceiveMode.PeekLock);
             client.PrefetchCount = 100; // todo make configurable
             return client;
         }
@@ -33,7 +31,8 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             var queueName = address.Queue;
             try
             {
-                if (!NamespaceClient.QueueExists(queueName))
+                var namespaceClient = new CreatesNamespaceManagers().Create(address.Machine);
+                if (!namespaceClient.QueueExists(queueName))
                 {
                     var description = new QueueDescription(queueName)
                     {
@@ -48,7 +47,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                         EnableBatchedOperations = EnableBatchedOperations
                     };
 
-                    NamespaceClient.CreateQueue(description);
+                    namespaceClient.CreateQueue(description);
                 }
             }
             catch (MessagingEntityAlreadyExistsException)

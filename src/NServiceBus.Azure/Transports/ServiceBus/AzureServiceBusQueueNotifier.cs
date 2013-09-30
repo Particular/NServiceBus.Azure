@@ -1,8 +1,6 @@
 using System;
 using System.Threading;
 using Microsoft.ServiceBus.Messaging;
-using NServiceBus.Unicast.Transport.Transactional;
-using NServiceBus.Utils;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {

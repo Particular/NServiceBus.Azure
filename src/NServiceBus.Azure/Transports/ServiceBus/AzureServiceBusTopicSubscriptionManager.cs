@@ -29,7 +29,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             var publisherAddress = Address.Parse(AzureServiceBusPublisherAddressConventionForSubscriptions.Create(original));
             var subscriptionname = AzureServiceBusSubscriptionNameConvention.Create(eventType);
 
-            ClientCreator.Create(eventType, publisherAddress.Queue, subscriptionname);
+            ClientCreator.Create(eventType, publisherAddress, subscriptionname);
 
             // how to make the correct strategy listen to this subscription
 

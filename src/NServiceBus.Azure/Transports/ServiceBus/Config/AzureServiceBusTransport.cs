@@ -1,13 +1,11 @@
 ﻿namespace NServiceBus.Features
 {
     using System;
-    using System.Configuration;
     using System.Transactions;
     using Azure;
     using Config;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    using Settings;
     using Transports;
     using Unicast.Queuing.Azure.ServiceBus;
 
@@ -50,34 +48,12 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = configSection == null ? ConnectivityMode.Tcp : (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
-                
-            if(string.IsNullOrEmpty(connectionString))
-                connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
+            var connectionString = new DeterminesBestConnectionString().Determine();
+
+            var namespaceClient = NamespaceManager.CreateFromConnectionString(connectionString);
+            var factory = MessagingFactory.CreateFromConnectionString(connectionString);
             
-            if (string.IsNullOrEmpty(connectionString) && (configSection == null || string.IsNullOrEmpty(configSection.IssuerKey) || string.IsNullOrEmpty(configSection.ServiceNamespace)))
-            {
-                throw new ConfigurationErrorsException("No Servicebus Connection information specified, either set the ConnectionString or set the IssuerKey and ServiceNamespace properties");
-            }
-
-            NamespaceManager namespaceClient;
-            MessagingFactory factory;
-            Uri serviceUri;
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                namespaceClient = NamespaceManager.CreateFromConnectionString(connectionString);
-                serviceUri = namespaceClient.Address;
-                factory = MessagingFactory.CreateFromConnectionString(connectionString);
-            }
-            else
-            {
-                var credentials = TokenProvider.CreateSharedSecretTokenProvider(configSection.IssuerName, configSection.IssuerKey);
-                serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", configSection.ServiceNamespace, string.Empty);
-                namespaceClient = new NamespaceManager(serviceUri, credentials);
-                factory = MessagingFactory.Create(serviceUri, credentials);
-            }
-            Address.OverrideDefaultMachine(serviceUri.ToString());
-
+            Address.OverrideDefaultMachine(connectionString);
 
             NServiceBus.Configure.Instance.Configurer.RegisterSingleton<NamespaceManager>(namespaceClient);
             NServiceBus.Configure.Instance.Configurer.RegisterSingleton<MessagingFactory>(factory);

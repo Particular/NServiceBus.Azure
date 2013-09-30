@@ -4,14 +4,14 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
     public class AzureServicebusTopicClientCreator : ICreateTopicClients
     {
-        public MessagingFactory Factory { get; set; }
         public ICreateTopics TopicCreator { get; set; }
 
         public TopicClient Create(Address address)
         {
             var topicName = TopicCreator.Create(address);
 
-            return Factory.CreateTopicClient(topicName);
+            var factory = new CreatesMessagingFactories().Create(address.Machine);
+            return factory.CreateTopicClient(topicName);
         }
     }
 }
