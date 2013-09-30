@@ -7,6 +7,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
+    using Settings;
     using Transports;
 
     /// <summary>
@@ -16,19 +17,19 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
     {
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
-
+        
         public ICreateTopicClients TopicClientCreator { get; set; }
 
         private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
         private static readonly object SenderLock = new Object();
-
+        
         public bool Publish(TransportMessage message, IEnumerable<Type> eventTypes)
         {
             var sender = GetTopicClientForDestination(AzureServiceBusPublisherAddressConvention.Create(Address.Local));
 
             if (sender == null) return false;
 
-            if (Transaction.Current == null)
+            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Send(message, sender);
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender)), EnlistmentOptions.None);

@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Transactions;
-using Microsoft.WindowsAzure;
 using NServiceBus.Serialization;
 
 namespace NServiceBus.Unicast.Queuing.Azure
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
+    using Settings;
     using Transports;
     using Transports.StorageQueues;
 
@@ -19,22 +19,13 @@ namespace NServiceBus.Unicast.Queuing.Azure
     {
         private readonly Dictionary<string, CloudQueueClient> destinationQueueClients = new Dictionary<string, CloudQueueClient>();
         private static readonly object SenderLock = new Object();
+
         /// <summary>
         /// Gets or sets the message serializer
         /// </summary>
         public IMessageSerializer MessageSerializer { get; set; }
 
         public CloudQueueClient Client { get; set; }
-
-        public void Init(string address, bool transactional)
-        {
-            Init(Address.Parse(address), transactional);
-        }
-
-        public void Init(Address address, bool transactional)
-        {
-            
-        }
 
         public void Send(TransportMessage message, string destination)
         {
@@ -52,7 +43,7 @@ namespace NServiceBus.Unicast.Queuing.Azure
 
             var rawMessage = SerializeMessage(message);
 
-            if (Transaction.Current == null)
+            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
                 sendQueue.AddMessage(rawMessage);
             }

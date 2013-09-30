@@ -7,6 +7,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
+    using Settings;
     using Transports;
 
     /// <summary>
@@ -19,28 +20,10 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         private readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
         private static readonly object SenderLock = new Object();
 
-        public TimeSpan LockDuration { get; set; }
-        public long MaxSizeInMegabytes { get; set; }
-        public bool RequiresDuplicateDetection { get; set; }
-        public bool RequiresSession { get; set; }
-        public TimeSpan DefaultMessageTimeToLive { get; set; }
-        public bool EnableDeadLetteringOnMessageExpiration { get; set; }
-        public TimeSpan DuplicateDetectionHistoryTimeWindow { get; set; }
         public int MaxDeliveryCount { get; set; }
-        public bool EnableBatchedOperations { get; set; }
-
+       
         public MessagingFactory Factory { get; set; }
         public NamespaceManager NamespaceClient { get; set; }
-
-        public void Init(string address, bool transactional)
-        {
-            Init(Address.Parse(address), transactional);
-        }
-
-        public void Init(Address address, bool transactional)
-        {
-
-        }
 
         public void Send(TransportMessage message, string destination)
         {
@@ -64,7 +47,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                 }
             }
 
-            if (Transaction.Current == null)
+            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Send(message, sender,address);
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender, address)), EnlistmentOptions.None);

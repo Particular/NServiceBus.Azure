@@ -10,4 +10,12 @@ namespace Hybrid.Server
             Feature.Disable<Audit>();
         }
     }
+
+    public class DisableTransactions : IWantCustomInitialization
+    {
+        public void Init()
+        {
+            Configure.Transactions.Disable();
+        }
+    }
 }
