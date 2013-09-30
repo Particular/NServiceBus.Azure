@@ -139,9 +139,6 @@
     <Compile Include="Roles\UsingTransport.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Fody.targets" />
   </ItemGroup>
   <ItemGroup>
