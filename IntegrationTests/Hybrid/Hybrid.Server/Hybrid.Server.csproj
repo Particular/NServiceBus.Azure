@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisableAuditing.cs" />
     <Compile Include="EndpointConfig.cs" />
     <Compile Include="OverrideTransport.cs" />
     <Compile Include="PlaceOrderHandler.cs" />
