@@ -4,6 +4,6 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
     public static class AzureServiceBusPublisherAddressConvention
     {
-        public static Func<Address, string> Create = address => address.Queue + ".events";
+        public static Func<Address, string> Create = address => AzureServiceBusTopicNamingConvention.Create(address.Queue + ".events");
     }
 }

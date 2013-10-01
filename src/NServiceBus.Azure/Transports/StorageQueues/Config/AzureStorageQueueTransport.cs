@@ -66,13 +66,10 @@
             NServiceBus.Configure.Component<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             NServiceBus.Configure.Component<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
-            var queuename = AzureQueueNamingConventions.Apply(configSection);
+            var queuename = AzureQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
             SettingsHolder.ApplyTo<AzureMessageQueueReceiver>();
             Address.InitializeLocalAddress(queuename);
-
         }
-
-       
 
         static string TryGetConnectionString(AzureQueueConfig configSection)
         {

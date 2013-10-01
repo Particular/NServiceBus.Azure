@@ -4,6 +4,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
     using System.Collections.Generic;
     using Features;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Azure.Transports.ServiceBus;
     using Support;
 
     public class CreatesMessagingFactories : ICreateMessagingFactories

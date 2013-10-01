@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Features
+﻿namespace NServiceBus.Azure.Transports.ServiceBus
 {
     using System.Configuration;
     using Config;

@@ -3,6 +3,7 @@
     using System;
     using System.Transactions;
     using Azure;
+    using Azure.Transports.ServiceBus;
     using Config;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
@@ -23,13 +24,13 @@
                     config.AzureConfigurationSource();
             }
 
-            var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
-            var queuename = AzureQueueNamingConventions.Apply(configSection);
+            var queuename = AzureServiceBusQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
 
             Address.InitializeLocalAddress(queuename);
 
             var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;
 
+            var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection != null)
                 serverWaitTime = configSection.ServerWaitTime;
 

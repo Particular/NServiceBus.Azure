@@ -1,30 +1,33 @@
-﻿using System;
-using Microsoft.WindowsAzure.ServiceRuntime;
-using NServiceBus.Config;
+﻿using NServiceBus.Config;
 using NServiceBus.Settings;
 
 namespace NServiceBus.Azure
 {
-    public class AzureQueueNamingConventions
+    using System;
+
+    public static class AzureQueueNamingConvention
     {
-        public static string Apply(dynamic configSection)
+        public static Func<string, string> Apply = queueName =>
         {
-            var queueName = Configure.EndpointName;
+            var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
             {
-                queueName = (string)configSection.QueueName;
+                queueName = (string) configSection.QueueName;
 
                 if ((bool) configSection.QueuePerInstance)
                 {
                     SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", true);
                 }
             }
-            
+
+            if (queueName.Length >= 253) // 260 - a spot for the "." & 6 digits for the individualizer
+                queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
+
             if (SettingsHolder.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
                 queueName = QueueIndividualizer.Individualize(queueName);
 
             return queueName;
-        }
+        };
     }
 }

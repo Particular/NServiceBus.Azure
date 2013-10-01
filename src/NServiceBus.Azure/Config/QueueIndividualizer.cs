@@ -1,6 +1,5 @@
 namespace NServiceBus.Config
 {
-    using System;
     using System.Globalization;
     using Microsoft.WindowsAzure.ServiceRuntime;
 

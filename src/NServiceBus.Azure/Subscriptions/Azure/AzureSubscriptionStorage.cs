@@ -1,9 +1,6 @@
-﻿using System;
-
-namespace NServiceBus.Unicast.Subscriptions
+﻿namespace NServiceBus.Unicast.Subscriptions
 {
     using System.Collections.Generic;
-    using System.Data.Services.Client;
     using System.Linq;
     using MessageDrivenSubscriptions;
     using Microsoft.WindowsAzure.Storage;

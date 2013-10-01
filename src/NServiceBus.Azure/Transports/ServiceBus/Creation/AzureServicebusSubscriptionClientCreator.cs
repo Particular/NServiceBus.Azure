@@ -19,7 +19,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
         public SubscriptionClient Create(Address address, Type eventType)
         {
-            var subscriptionname = AzureServiceBusSubscriptionNameConvention.Create(eventType);
+            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
             return Create(eventType, address, subscriptionname);
         }
 
@@ -31,6 +31,8 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             {
                 try
                 {
+                    
+
                     if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
                     {
                         var description = new SubscriptionDescription(topicPath, subscriptionname)
