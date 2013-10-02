@@ -2,25 +2,32 @@
 {
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Config;
+    using Settings;
+    using Transports;
 
     public class AutoCreateTopic : IWantToRunWhenConfigurationIsComplete
     {
         readonly ICreateTopics topicCreator;
 
-        public AutoCreateTopic(ICreateTopics topicCreator)
+        public AutoCreateTopic()
         {
-            this.topicCreator = topicCreator;
+            topicCreator = new AzureServicebusTopicCreator();
         }
 
         public void Run()
         {
-            try
+             var selectedTransport = SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
+
+            if (selectedTransport is AzureServiceBus)
             {
-                topicCreator.Create(Address.Local);
-            }
-            catch (MessagingEntityAlreadyExistsException)
-            {
-                // very likely to exist already
+                try
+                {
+                    topicCreator.Create(Address.Local);
+                }
+                catch (MessagingEntityAlreadyExistsException)
+                {
+                    // very likely to exist already
+                }
             }
         }
     }

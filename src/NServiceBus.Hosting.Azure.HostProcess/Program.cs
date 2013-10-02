@@ -184,7 +184,12 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
         private static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            foreach (var assembly in new AssemblyScanner().GetScannableAssemblies().Assemblies)
+            var assemblyScanner = new AssemblyScanner();
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
+
+            foreach (var assembly in assemblyScanner.GetScannableAssemblies().Assemblies)
                 foreach (Type type in assembly.GetTypes().Where(
                         t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
                         && t != typeof(IConfigureThisEndpoint)

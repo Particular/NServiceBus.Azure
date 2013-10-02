@@ -34,9 +34,6 @@ namespace NServiceBus.Hosting.Azure
 
         public override bool OnStart()
         {
-            // temporary, to force the nservicebus reference
-            Trace.WriteLine("Starting " + typeof(IMessage).Assembly.GetName().Name);
-
             var azureSettings = new AzureConfigurationSettings();
 
             var requestedProfiles = GetRequestedProfiles(azureSettings);
@@ -127,7 +124,12 @@ namespace NServiceBus.Hosting.Azure
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            return new AssemblyScanner().GetScannableAssemblies().Assemblies.SelectMany(
+            var assemblyScanner = new AssemblyScanner();
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(RoleEntryPoint).Assembly);
+
+            return assemblyScanner.GetScannableAssemblies().Assemblies.SelectMany(
                 assembly => assembly.GetTypes().Where(
                     t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
                          && t != typeof(IConfigureThisEndpoint)
