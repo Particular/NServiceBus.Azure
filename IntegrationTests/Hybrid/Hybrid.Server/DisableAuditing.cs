@@ -3,19 +3,11 @@ using NServiceBus.Features;
 
 namespace Hybrid.Server
 {
-    public class DisableAuditing : IWantCustomInitialization
+    public class DisableAuditing : INeedInitialization
     {
         public void Init()
         {
             Feature.Disable<Audit>();
-        }
-    }
-
-    public class DisableTransactions : IWantCustomInitialization
-    {
-        public void Init()
-        {
-            Configure.Transactions.Disable();
         }
     }
 }

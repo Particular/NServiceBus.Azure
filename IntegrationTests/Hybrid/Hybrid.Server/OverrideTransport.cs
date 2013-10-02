@@ -2,7 +2,7 @@ using NServiceBus;
 
 namespace Hybrid.Server
 {
-    public class OverrideTransport : IWantCustomInitialization
+    public class OverrideTransport : INeedInitialization
     {
         public void Init()
         {
