@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Azure.Tests
+﻿namespace NServiceBus.Azure.QuickTests
 {
     using NUnit.Framework;
     using Transports.ServiceBus;
@@ -14,7 +14,7 @@
 
             var filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
 
-            Assert.AreEqual(filter, "[NServiceBus.EnclosedMessageTypes] LIKE 'NServiceBus.Azure.Tests.SomeEvent%' OR [NServiceBus.EnclosedMessageTypes] LIKE '%NServiceBus.Azure.Tests.SomeEvent%' OR [NServiceBus.EnclosedMessageTypes] LIKE '%NServiceBus.Azure.Tests.SomeEvent' OR [NServiceBus.EnclosedMessageTypes] = 'NServiceBus.Azure.Tests.SomeEvent'");
+            Assert.AreEqual(filter, "[NServiceBus.EnclosedMessageTypes] LIKE 'NServiceBus.Azure.QuickTests.SomeEvent%' OR [NServiceBus.EnclosedMessageTypes] LIKE '%NServiceBus.Azure.QuickTests.SomeEvent%' OR [NServiceBus.EnclosedMessageTypes] LIKE '%NServiceBus.Azure.QuickTests.SomeEvent' OR [NServiceBus.EnclosedMessageTypes] = 'NServiceBus.Azure.QuickTests.SomeEvent'");
         }
     }
 

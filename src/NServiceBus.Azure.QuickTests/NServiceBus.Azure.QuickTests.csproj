@@ -7,8 +7,8 @@
     <ProjectGuid>{E25B5433-7166-4C10-A76E-C0546F9E2497}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.Azure.Tests</RootNamespace>
-    <AssemblyName>NServiceBus.Azure.Tests</AssemblyName>
+    <RootNamespace>NServiceBus.Azure.QuickTests</RootNamespace>
+    <AssemblyName>NServiceBus.Azure.QuickTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>

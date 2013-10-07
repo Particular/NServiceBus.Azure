@@ -82,6 +82,9 @@
     <Reference Include="NServiceBus.Hosting.Azure">
       <HintPath>..\..\..\src\binaries\NServiceBus.Hosting.Azure.dll</HintPath>
     </Reference>
+    <Reference Include="Obsolete">
+      <HintPath>..\..\..\src\packages\Obsolete.Fody\Lib\NET35\Obsolete.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>True</Private>
     </Reference>

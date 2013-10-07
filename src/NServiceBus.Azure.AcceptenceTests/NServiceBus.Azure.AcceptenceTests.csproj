@@ -1,0 +1,366 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A2B266FB-2A5A-49CA-93E9-E4C7FA456CF1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NServiceBus.Azure.AcceptenceTests</RootNamespace>
+    <AssemblyName>NServiceBus.Azure.AcceptenceTests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Data.Edm, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Edm\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.OData\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WindowsAzure.ServiceBus\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus">
+      <HintPath>..\packages\NServiceBus.Interfaces\lib\net40\NServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.AcceptanceTesting">
+      <HintPath>..\packages\NServiceBus.AcceptanceTesting\lib\net40\NServiceBus.AcceptanceTesting.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.Core">
+      <HintPath>..\packages\NServiceBus\lib\net40\NServiceBus.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.NHibernate">
+      <HintPath>..\packages\NServiceBus.NHibernate\lib\net40\NServiceBus.NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.ObjectBuilder.Autofac">
+      <HintPath>..\packages\NServiceBus.Autofac\lib\net40\NServiceBus.ObjectBuilder.Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.ObjectBuilder.CastleWindsor">
+      <HintPath>..\packages\NServiceBus.CastleWindsor\lib\net40\NServiceBus.ObjectBuilder.CastleWindsor.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.ObjectBuilder.Ninject">
+      <HintPath>..\packages\NServiceBus.Ninject\lib\net40\NServiceBus.ObjectBuilder.Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.ObjectBuilder.Spring">
+      <HintPath>..\packages\NServiceBus.Spring\lib\net40\NServiceBus.ObjectBuilder.Spring.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.ObjectBuilder.StructureMap">
+      <HintPath>..\packages\NServiceBus.StructureMap\lib\net40\NServiceBus.ObjectBuilder.StructureMap.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.ObjectBuilder.Unity">
+      <HintPath>..\packages\NServiceBus.Unity\lib\net40\NServiceBus.ObjectBuilder.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac">
+      <HintPath>..\packages\Autofac\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Configuration">
+      <HintPath>..\packages\Autofac\lib\net40\Autofac.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>..\packages\Castle.Core\lib\net40-client\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\packages\Castle.Windsor\lib\net40\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging">
+      <HintPath>..\packages\Common.Logging\lib\1.0\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\packages\Iesi.Collections\lib\Net35\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net\lib\2.0\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\packages\CommonServiceLocator\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity\lib\NET35\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\packages\Unity\lib\NET35\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception">
+      <HintPath>..\packages\Unity.Interception\lib\NET35\Microsoft.Practices.Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception.Configuration">
+      <HintPath>..\packages\Unity.Interception\lib\NET35\Microsoft.Practices.Unity.Interception.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\packages\NHibernate\lib\Net35\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\packages\Ninject\lib\net40\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.ContextPreservation">
+      <HintPath>..\packages\Ninject.Extensions.ContextPreservation\lib\net40\Ninject.Extensions.ContextPreservation.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.NamedScope">
+      <HintPath>..\packages\Ninject.Extensions.NamedScope\lib\net40\Ninject.Extensions.NamedScope.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Raven.Abstractions">
+      <HintPath>..\packages\RavenDB.Client\lib\net40\Raven.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Raven.Client.Lightweight">
+      <HintPath>..\packages\RavenDB.Client\lib\net40\Raven.Client.Lightweight.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>..\packages\Spring.Core\lib\net40\Spring.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="StructureMap">
+      <HintPath>..\packages\structuremap\lib\net40\StructureMap.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\NServiceBusAcceptanceTest.cs" />
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Audit\When_a_message_is_audited.cs">
+      <Link>Audit\When_a_message_is_audited.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Audit\When_using_auditing_as_a_feature.cs">
+      <Link>Audit\When_using_auditing_as_a_feature.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\BasicMessaging\When_registering_a_callback_for_a_local_message.cs">
+      <Link>BasicMessaging\When_registering_a_callback_for_a_local_message.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\BasicMessaging\When_sending_a_message_to_another_endpoint.cs">
+      <Link>BasicMessaging\When_sending_a_message_to_another_endpoint.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\BasicMessaging\When_using_a_custom_correlation_id.cs">
+      <Link>BasicMessaging\When_using_a_custom_correlation_id.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\BasicMessaging\When_using_callbacks_in_a_scaleout_scenario.cs">
+      <Link>BasicMessaging\When_using_callbacks_in_a_scaleout_scenario.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\BusStartStop\When_bus_start_and_stops_with_a_pending_message.cs">
+      <Link>BusStartStop\When_bus_start_and_stops_with_a_pending_message.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Configuration\When_a_config_override_is_found.cs">
+      <Link>Configuration\When_a_config_override_is_found.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\DataBus\When_sending_databus_properties.cs">
+      <Link>DataBus\When_sending_databus_properties.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Encryption\When_using_encryption.cs">
+      <Link>Encryption\When_using_encryption.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\EndpointTemplates\BusExtensions.cs">
+      <Link>EndpointTemplates\BusExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\EndpointTemplates\ConfigureExtensions.cs">
+      <Link>EndpointTemplates\ConfigureExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\EndpointTemplates\DefaultServer.cs">
+      <Link>EndpointTemplates\DefaultServer.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Gateway\When_doing_request_response_between_sites.cs">
+      <Link>Gateway\When_doing_request_response_between_sites.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Gateway\When_sending_a_message_via_the_gateway.cs">
+      <Link>Gateway\When_sending_a_message_via_the_gateway.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Gateway\When_using_a_custom_correlation_id.cs">
+      <Link>Gateway\When_using_a_custom_correlation_id.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Performance\Receive\Receive_performance.cs">
+      <Link>Performance\Receive\Receive_performance.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Performance\RequestResponse\Request_response_performance.cs">
+      <Link>Performance\RequestResponse\Request_response_performance.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Performance\Sagas\Saga_performance.cs">
+      <Link>Performance\Sagas\Saga_performance.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Performance\NServiceBusPerformanceTest.cs">
+      <Link>Performance\NServiceBusPerformanceTest.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\PubSub\PubSubAcceptanceTest.cs">
+      <Link>PubSub\PubSubAcceptanceTest.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\PubSub\When_publishing_an_event.cs">
+      <Link>PubSub\When_publishing_an_event.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\PubSub\When_publishing_an_event_using_a_broker_transport_with_centralized_routing.cs">
+      <Link>PubSub\When_publishing_an_event_using_a_broker_transport_with_centralized_routing.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\PubSub\When_publishing_an_event_with_only_local_messagehandlers.cs">
+      <Link>PubSub\When_publishing_an_event_with_only_local_messagehandlers.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\PubSub\When_publishing_an_event_with_the_subscriber_scaled_out.cs">
+      <Link>PubSub\When_publishing_an_event_with_the_subscriber_scaled_out.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\PubSub\When_subscribing_to_a_polymorphic_event.cs">
+      <Link>PubSub\When_subscribing_to_a_polymorphic_event.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Retries\When_doing_flr_with_default_settings.cs">
+      <Link>Retries\When_doing_flr_with_default_settings.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Retries\When_message_fails_with_retries_set_to_0.cs">
+      <Link>Retries\When_message_fails_with_retries_set_to_0.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Retries\When_messages_fails_flr.cs">
+      <Link>Retries\When_messages_fails_flr.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Retries\When_sending_a_message_off_to_slr.cs">
+      <Link>Retries\When_sending_a_message_off_to_slr.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_a_saga_is_started_by_an_event_published_by_another_saga.cs">
+      <Link>Sagas\When_a_saga_is_started_by_an_event_published_by_another_saga.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_a_saga_message_goes_through_the_slr.cs">
+      <Link>Sagas\When_a_saga_message_goes_through_the_slr.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_an_endpoint_replies_to_a_saga.cs">
+      <Link>Sagas\When_an_endpoint_replies_to_a_saga.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_doing_request_response_between_sagas.cs">
+      <Link>Sagas\When_doing_request_response_between_sagas.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_receiving_a_message_that_is_mapped_to_an_existing_saga_instance.cs">
+      <Link>Sagas\When_receiving_a_message_that_is_mapped_to_an_existing_saga_instance.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_receiving_a_message_that_should_complete_saga.cs">
+      <Link>Sagas\When_receiving_a_message_that_should_complete_saga.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_receiving_a_message_that_should_start_a_saga.cs">
+      <Link>Sagas\When_receiving_a_message_that_should_start_a_saga.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_sending_from_a_saga_handle.cs">
+      <Link>Sagas\When_sending_from_a_saga_handle.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_sending_from_a_saga_timeout.cs">
+      <Link>Sagas\When_sending_from_a_saga_timeout.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_two_sagas_subscribe_to_the_same_event.cs">
+      <Link>Sagas\When_two_sagas_subscribe_to_the_same_event.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_using_a_received_message_for_timeout.cs">
+      <Link>Sagas\When_using_a_received_message_for_timeout.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Sagas\When_using_containSagaData.cs">
+      <Link>Sagas\When_using_containSagaData.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\AllBuilders.cs">
+      <Link>ScenarioDescriptors\AllBuilders.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\AllSagaPersisters.cs">
+      <Link>ScenarioDescriptors\AllSagaPersisters.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\AllSerializers.cs">
+      <Link>ScenarioDescriptors\AllSerializers.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\AllSubscriptionStorages.cs">
+      <Link>ScenarioDescriptors\AllSubscriptionStorages.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\AllTransports.cs">
+      <Link>ScenarioDescriptors\AllTransports.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\Builders.cs">
+      <Link>ScenarioDescriptors\Builders.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\SagaPersisters.cs">
+      <Link>ScenarioDescriptors\SagaPersisters.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\Serializers.cs">
+      <Link>ScenarioDescriptors\Serializers.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\SubscriptionStorages.cs">
+      <Link>ScenarioDescriptors\SubscriptionStorages.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\ScenarioDescriptors\Transports.cs">
+      <Link>ScenarioDescriptors\Transports.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Scheduling\When_scheduling_a_recurring_task.cs">
+      <Link>Scheduling\When_scheduling_a_recurring_task.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Transactions\FakePromotableResourceManager.cs">
+      <Link>Transactions\FakePromotableResourceManager.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Transactions\When_receiving_a_message_with_dtc_disabled.cs">
+      <Link>Transactions\When_receiving_a_message_with_dtc_disabled.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Transactions\When_receiving_a_message_with_dtc_enabled.cs">
+      <Link>Transactions\When_receiving_a_message_with_dtc_enabled.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Transactions\When_receiving_a_message_with_the_default_settings.cs">
+      <Link>Transactions\When_receiving_a_message_with_the_default_settings.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Transactions\When_receiving_a_message_with_transactions_disabled.cs">
+      <Link>Transactions\When_receiving_a_message_with_transactions_disabled.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Transactions\When_sending_a_message_from_a_non_transactional_endpoint_with_a_ambient_transaction_enabled.cs">
+      <Link>Transactions\When_sending_a_message_from_a_non_transactional_endpoint_with_a_ambient_transaction_enabled.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Transactions\When_sending_messages_within_an_ambient_transaction.cs">
+      <Link>Transactions\When_sending_messages_within_an_ambient_transaction.cs</Link>
+    </Compile>
+    <Compile Include="..\packages\NServiceBus.AcceptanceTests\content\net40\AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs">
+      <Link>Versioning\When_multiple_versions_of_a_message_is_published.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ripple.dependencies.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
+      <Project>{12f1d9f1-0a2c-4442-8d18-67dd096c6300}</Project>
+      <Name>NServiceBus.Azure</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

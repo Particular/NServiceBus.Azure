@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace NServiceBus.Azure.Tests
+namespace NServiceBus.Azure.QuickTests
 {
     using Config;
 

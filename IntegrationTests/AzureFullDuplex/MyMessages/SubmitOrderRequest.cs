@@ -2,10 +2,9 @@
 
 namespace MyMessages
 {
-    [Serializable]
-    public class SubmitOrderRequest : IDefineMessages
+    public interface SubmitOrderRequest : IDefineMessages
     {
-        public Guid Id { get; set; }
-        public int Quantity { get; set; }
+        Guid Id { get; set; }
+        int Quantity { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Azure.Tests
+﻿namespace NServiceBus.Azure.QuickTests
 {
     using System;
     using NUnit.Framework;

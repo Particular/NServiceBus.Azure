@@ -19,12 +19,11 @@ namespace OrderWebSite
 
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
+            var msg = Global.Bus.CreateInstance<SubmitOrderRequest>();
+            msg.Id = Guid.NewGuid();
+            msg.Quantity = Convert.ToInt32(txtQuatity.Text);
             Global.Bus
-                .Send(new SubmitOrderRequest
-                {
-                    Id = Guid.NewGuid(),
-                    Quantity = Convert.ToInt32(txtQuatity.Text)
-                });
+                .Send(msg);
         }
 
         public void Handle(SubmitOrderResponse message)
