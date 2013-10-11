@@ -19,7 +19,7 @@
 	  <dependency id="Fody" version="1.15.0.0" />
       <dependency id="Microsoft.Data.Edm" version="5.2.0.0" />
       <dependency id="Microsoft.Data.OData" version="5.2.0.0" />
-      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="2.1.0.0" />
+      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="2.0.1.0" />
       <dependency id="NServiceBus" version="4.1.0-Unstable0506" />
       <dependency id="NServiceBus.Interfaces" version="4.1.0-Unstable0506" />
       <dependency id="CommonServiceLocator" version="1.0" />
