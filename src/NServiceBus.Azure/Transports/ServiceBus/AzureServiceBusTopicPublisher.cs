@@ -25,7 +25,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         
         public bool Publish(TransportMessage message, IEnumerable<Type> eventTypes)
         {
-            var sender = GetTopicClientForDestination(AzureServiceBusPublisherAddressConvention.Create(Address.Local));
+            var sender = GetTopicClientForDestination(Address.Local);
 
             if (sender == null) return false;
 
@@ -93,19 +93,20 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         }
 
         // todo, factor out...
-        private TopicClient GetTopicClientForDestination(string destination)
+        private TopicClient GetTopicClientForDestination(Address destination)
         {
+            var key = destination.ToString();
             TopicClient sender;
-            if (!senders.TryGetValue(destination, out sender))
+            if (!senders.TryGetValue(key, out sender))
             {
                 lock (SenderLock)
                 {
-                    if (!senders.TryGetValue(destination, out sender))
+                    if (!senders.TryGetValue(key, out sender))
                     {
                         try
                         {
-                            sender = TopicClientCreator.Create(Address.Parse(destination));
-                            senders[destination] = sender;
+                            sender = TopicClientCreator.Create(destination);
+                            senders[key] = sender;
                         }
                         catch (MessagingEntityNotFoundException)
                         {
