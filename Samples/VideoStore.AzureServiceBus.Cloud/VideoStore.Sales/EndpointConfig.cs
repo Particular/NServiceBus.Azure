@@ -1,3 +1,5 @@
+using NServiceBus.Features;
+
 namespace VideoStore.Sales
 {
     using System;
@@ -23,6 +25,15 @@ namespace VideoStore.Sales
         public void Stop()
         {
             
+        }
+    }
+
+    // We don't need it, so instead of configuring it, we disable it
+    public class DisableTimeoutManager : INeedInitialization
+    {
+        public void Init()
+        {
+            Feature.Disable<TimeoutManager>();
         }
     }
 }

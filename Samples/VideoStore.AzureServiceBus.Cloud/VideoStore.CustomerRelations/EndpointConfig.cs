@@ -1,4 +1,5 @@
 ﻿using NServiceBus.Config;
+using NServiceBus.Features;
 using NServiceBus.Unicast.Queuing.Azure.ServiceBus;
 
 namespace VideoStore.CustomerRelations
@@ -31,6 +32,15 @@ namespace VideoStore.CustomerRelations
             var topicCreator = new AzureServicebusTopicCreator();
 
             topicCreator.Create(Address.Parse("VideoStore.Sales"));
+        }
+    }
+
+    // We don't need it, so instead of configuring it, we disable it
+    public class DisableTimeoutManager : INeedInitialization
+    {
+        public void Init()
+        {
+            Feature.Disable<TimeoutManager>();
         }
     }
 }

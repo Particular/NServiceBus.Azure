@@ -79,6 +79,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Profiles" />
     <Folder Include="VideoStore.ContentManagementContent\" />
     <Folder Include="VideoStore.CustomerRelationsContent\" />
     <Folder Include="VideoStore.ECommerceContent\" />
@@ -101,6 +102,9 @@
     <Content Include="VideoStore.SalesContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishProfile Include="Profiles\nservicebusProduction.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

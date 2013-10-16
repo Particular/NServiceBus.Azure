@@ -3,31 +3,31 @@
   <Role name="VideoStore.ECommerce">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=goeleven;AccountKey=1oDijwgfeYuatz98bG+3a8uSBYW9BoZRmeiTN+0L+aVREm99Gr5Jg6WLGBuOZomJIFnPVS6G61FHRqGdkJxB7w==" />
     </ConfigurationSettings>
   </Role>
   <Role name="VideoStore.Sales">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=goeleven;AccountKey=1oDijwgfeYuatz98bG+3a8uSBYW9BoZRmeiTN+0L+aVREm99Gr5Jg6WLGBuOZomJIFnPVS6G61FHRqGdkJxB7w==" />
     </ConfigurationSettings>
   </Role>
   <Role name="VideoStore.ContentManagement">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=goeleven;AccountKey=1oDijwgfeYuatz98bG+3a8uSBYW9BoZRmeiTN+0L+aVREm99Gr5Jg6WLGBuOZomJIFnPVS6G61FHRqGdkJxB7w==" />
     </ConfigurationSettings>
   </Role>
   <Role name="VideoStore.CustomerRelations">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=goeleven;AccountKey=1oDijwgfeYuatz98bG+3a8uSBYW9BoZRmeiTN+0L+aVREm99Gr5Jg6WLGBuOZomJIFnPVS6G61FHRqGdkJxB7w==" />
     </ConfigurationSettings>
   </Role>
   <Role name="VideoStore.Operations">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=goeleven;AccountKey=1oDijwgfeYuatz98bG+3a8uSBYW9BoZRmeiTN+0L+aVREm99Gr5Jg6WLGBuOZomJIFnPVS6G61FHRqGdkJxB7w==" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
