@@ -5,6 +5,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
     using Settings;
     using Timeout.Core;
     using Transports;
+    using Unicast.Subscriptions.MessageDrivenSubscriptions;
 
     public class DefaultStorageForHost : IWantToRunBeforeConfigurationIsFinalized
     {
@@ -17,7 +18,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
 
             if (selectedTransport == null || selectedTransport is AzureStorageQueue)
             {
-                InfrastructureServices.SetDefaultFor<IPersistTimeouts>(() => Configure.Instance.UseAzureTimeoutPersister());
+                InfrastructureServices.SetDefaultFor<ISubscriptionStorage>(() => Configure.Instance.AzureSubscriptionStorage());
             }
             
         }

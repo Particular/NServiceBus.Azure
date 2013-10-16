@@ -1,5 +1,3 @@
-using NServiceBus.Azure;
-using NServiceBus.Config;
 using NServiceBus.Unicast.Queuing.Azure;
 
 namespace NServiceBus
