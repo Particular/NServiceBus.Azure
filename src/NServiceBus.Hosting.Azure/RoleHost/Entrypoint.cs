@@ -56,7 +56,7 @@ namespace NServiceBus.Hosting.Azure
             else
             {
                 host = new GenericHost(specifier, requestedProfiles,
-                    new List<Type> {typeof(Development), typeof(OnAzureTableStorage)}, endpointName);
+                    new List<Type> {typeof(Development)}, endpointName);
             }
 
             return true;
