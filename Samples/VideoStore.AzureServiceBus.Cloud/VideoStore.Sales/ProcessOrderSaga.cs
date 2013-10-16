@@ -1,4 +1,6 @@
-﻿namespace VideoStore.Sales
+﻿using System.Linq;
+
+namespace VideoStore.Sales
 {
     using System;
     using System.Diagnostics;
@@ -21,7 +23,7 @@
             }
 
             Data.OrderNumber = message.OrderNumber;
-            Data.VideoIds = message.VideoIds;
+            Data.VideoIds = string.Join(",", message.VideoIds);
             Data.ClientId = message.ClientId;
 
             RequestTimeout(TimeSpan.FromSeconds(20), new BuyersRemorseIsOver());
@@ -38,7 +40,7 @@
             Bus.Publish<OrderAccepted>(e =>
                 {
                     e.OrderNumber = Data.OrderNumber;
-                    e.VideoIds = Data.VideoIds;
+                    e.VideoIds =  Data.VideoIds.Split(',');
                     e.ClientId = Data.ClientId;
                 });
 
@@ -73,11 +75,17 @@
                 .ToSaga(s=>s.OrderNumber);
         }
 
+        // Note: azure table storage is not a relational database and is limited in it's support for complex saga data structures
+        // If you need more complexity, you may want to swap it out for sql server (against sql azure)
         public class OrderData : ContainSagaData
         {
-            [Unique]
+            //[Unique] // not supported by the azure table storage saga persister at the moment
             public int OrderNumber { get; set; }
-            public string[] VideoIds { get; set; }
+            
+            //string[] is not supported by the azure table storage saga persister at the moment
+            //public string[] VideoIds { get; set; }
+            public string VideoIds { get; set; }
+
             public string ClientId { get; set; }
         }
 
