@@ -16,7 +16,7 @@
             {
                 Debugger.Break();
             }
-            Console.WriteLine("Handler WhenCustomerIsPreferredSendWelcomeEmail invoked for CustomerId: {0}", message.ClientId);
+            Trace.WriteLine(string.Format("Handler WhenCustomerIsPreferredSendWelcomeEmail invoked for CustomerId: {0}", message.ClientId));
 
             // Don't write code to do the smtp send here, instead do a Bus.Send. If this handler fails, then 
             // the message to send email will not be sent.

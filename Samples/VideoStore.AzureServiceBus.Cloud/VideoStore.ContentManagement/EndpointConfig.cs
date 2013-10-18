@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NServiceBus.Config;
 using NServiceBus.Features;
 using NServiceBus.Unicast.Queuing.Azure.ServiceBus;
@@ -13,7 +14,7 @@ namespace VideoStore.ContentManagement
     {
         public void Start()
         {
-            Console.Out.WriteLine("The VideoStore.ContentManagement endpoint is now started and subscribed to OrderAccepted events from VideoStore.Sales");
+            Trace.WriteLine("The VideoStore.ContentManagement endpoint is now started and subscribed to OrderAccepted events from VideoStore.Sales");
         }
 
         public void Stop()

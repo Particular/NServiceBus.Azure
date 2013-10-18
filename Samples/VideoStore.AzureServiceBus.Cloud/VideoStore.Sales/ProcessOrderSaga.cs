@@ -27,7 +27,7 @@ namespace VideoStore.Sales
             Data.ClientId = message.ClientId;
 
             RequestTimeout(TimeSpan.FromSeconds(20), new BuyersRemorseIsOver());
-            Console.Out.WriteLine("Starting cool down period for order #{0}.", Data.OrderNumber);
+            Trace.WriteLine(string.Format("Starting cool down period for order #{0}.", Data.OrderNumber));
         }
 
         public void Timeout(BuyersRemorseIsOver state)
@@ -46,7 +46,7 @@ namespace VideoStore.Sales
 
             MarkAsComplete();
 
-            Console.Out.WriteLine("Cooling down period for order #{0} has elapsed.", Data.OrderNumber);
+            Trace.WriteLine(string.Format("Cooling down period for order #{0} has elapsed.", Data.OrderNumber));
         }
 
         public void Handle(CancelOrder message)
@@ -64,7 +64,7 @@ namespace VideoStore.Sales
                     o.ClientId = message.ClientId;
                 }));
 
-            Console.Out.WriteLine("Order #{0} was cancelled.", message.OrderNumber);
+            Trace.WriteLine(string.Format("Order #{0} was cancelled.", message.OrderNumber));
         }
 
         public override void ConfigureHowToFindSaga()

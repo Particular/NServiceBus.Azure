@@ -1,3 +1,5 @@
+using NServiceBus.Features;
+
 namespace VideoStore.ECommerce
 {
     using System.Web;
@@ -21,6 +23,8 @@ namespace VideoStore.ECommerce
         {
             Configure.ScaleOut(s => s.UseSingleBrokerQueue());
 
+            Feature.Disable<TimeoutManager>();
+
             startableBus = Configure.With()
                 .DefaultBuilder()
                 .AzureDiagnosticsLogger()
@@ -32,6 +36,7 @@ namespace VideoStore.ECommerce
                 .CreateBus();
 
             Configure.Instance.ForInstallationOn<Windows>().Install();
+            
 
             bus = startableBus.Start();
 

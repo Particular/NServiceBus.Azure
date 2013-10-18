@@ -10,7 +10,7 @@
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<OrdersHub>();
 
-            context.Clients.Client(message.ClientId).orderReceived(new
+            context.Clients.Group(message.ClientId).orderReceived(new
                 {
                     message.OrderNumber,
                     message.VideoIds

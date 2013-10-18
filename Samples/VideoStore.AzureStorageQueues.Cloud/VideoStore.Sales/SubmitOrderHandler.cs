@@ -18,12 +18,12 @@
                 Debugger.Break();
             }
 
-            Console.Out.WriteLine("We have received an order #{0} for [{1}] video(s).", message.OrderNumber,
-                                  String.Join(", ", message.VideoIds));
+            Trace.WriteLine(string.Format("We have received an order #{0} for [{1}] video(s).", message.OrderNumber,
+                                  String.Join(", ", message.VideoIds)));
 
-            Console.Out.WriteLine("The credit card values will be encrypted when looking at the messages in the queues");
-            Console.Out.WriteLine("CreditCard Number is {0}", message.EncryptedCreditCardNumber);
-            Console.Out.WriteLine("CreditCard Expiration Date is {0}", message.EncryptedExpirationDate);
+            Trace.WriteLine("The credit card values will be encrypted when looking at the messages in the queues");
+            Trace.WriteLine(string.Format("CreditCard Number is {0}", message.EncryptedCreditCardNumber));
+            Trace.WriteLine(string.Format("CreditCard Expiration Date is {0}", message.EncryptedExpirationDate));
 
             //tell the client that we received the order
             Bus.Publish(Bus.CreateInstance<OrderPlaced>(o =>

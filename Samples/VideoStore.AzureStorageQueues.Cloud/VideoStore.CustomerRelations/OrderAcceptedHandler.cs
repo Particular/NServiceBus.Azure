@@ -16,7 +16,7 @@
                 Debugger.Break();
             }
 
-            Console.WriteLine("Customer: {0} is now a preferred customer -- raising in-memory event, & publishing for other service concerns", message.ClientId);
+            Trace.WriteLine(string.Format("Customer: {0} is now a preferred customer -- raising in-memory event, & publishing for other service concerns", message.ClientId));
             // Call the domain object to do the raising of the event based on the relevant condition
             Bus.InMemory.Raise<ClientBecamePreferred>(m =>
             {

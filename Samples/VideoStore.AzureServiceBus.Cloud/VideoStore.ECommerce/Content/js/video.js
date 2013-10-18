@@ -1,7 +1,7 @@
 ﻿function VideoCtrl($scope) {
     $scope.debug = false;
     $scope.errorMessage = null;
-
+    $scope.clientId = guid();
     $scope.videos = [
       { id: 'intro1', title: 'Introduction to NServiceBus - Part I', description: 'In this 2-hour presentation, Udi Dahan covers the architectural ramifications of using a service bus, and how the Bus pattern differs from RPC, as well as how to use the basic features of NServiceBus: one-way messaging, request/reply, publish/subscribe, and configuring NServiceBus.', selected: false },
       { id: 'intro2', title: 'Introduction to NServiceBus - Part II', description: 'Continuation of Introduction to NServiceBus - Part I', selected: false },
@@ -73,7 +73,14 @@
         });
     };
     
-    $.connection.hub.start();
+    $.connection.hub.reconnected(function () {
+        ordersHub.server.join($scope.clientId);
+    });
+    
+    $.connection.hub.start(function () {
+        ordersHub.server.join($scope.clientId);
+    });
+    
     
     $scope.cancelOrder = function (number) {
         $scope.errorMessage = null;
@@ -84,7 +91,7 @@
         }
 
         ordersHub.state.debug = $scope.debug;
-        ordersHub.server.cancelOrder(number)
+        ordersHub.server.cancelOrder(number, $scope.clientId, $scope.debug)
             .fail(function () {
                 $scope.errorMessage = "We couldn't cancel you order, ensure all endpoints are running and try again!";
             });
@@ -106,7 +113,7 @@
         }
         
         ordersHub.state.debug = $scope.debug;
-        ordersHub.server.placeOrder(selectedVideos)
+        ordersHub.server.placeOrder(selectedVideos, $scope.clientId, $scope.debug)
             .done(function () {
                 angular.forEach($scope.videos, function (video) {
                     video.selected = false;
@@ -127,5 +134,12 @@
         }
 
         return -1;
+    }
+
+    function guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
 }

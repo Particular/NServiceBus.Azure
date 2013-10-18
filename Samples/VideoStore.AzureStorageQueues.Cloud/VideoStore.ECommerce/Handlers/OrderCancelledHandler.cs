@@ -10,7 +10,7 @@
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<OrdersHub>();
 
-            context.Clients.Client(message.ClientId).orderCancelled(new
+            context.Clients.Group(message.ClientId).orderCancelled(new
                 {
                     message.OrderNumber,
                 });

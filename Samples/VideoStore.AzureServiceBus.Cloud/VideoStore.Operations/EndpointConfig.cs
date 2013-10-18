@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NServiceBus.Features;
 
 namespace VideoStore.Operations
@@ -13,7 +14,7 @@ namespace VideoStore.Operations
     {
         public void Start()
         {
-            Console.Out.WriteLine("The VideoStore.Operations endpoint is now started and ready to accept messages");
+            Trace.WriteLine(string.Format("The VideoStore.Operations endpoint is now started and ready to accept messages"));
         }
 
         public void Stop()

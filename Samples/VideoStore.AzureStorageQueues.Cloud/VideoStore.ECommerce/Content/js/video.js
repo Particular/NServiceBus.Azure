@@ -1,7 +1,7 @@
 ﻿function VideoCtrl($scope) {
     $scope.debug = false;
     $scope.errorMessage = null;
-
+    $scope.clientId = guid();
     $scope.videos = [
       { id: 'intro1', title: 'Introduction to NServiceBus - Part I', description: 'In this 2-hour presentation, Udi Dahan covers the architectural ramifications of using a service bus, and how the Bus pattern differs from RPC, as well as how to use the basic features of NServiceBus: one-way messaging, request/reply, publish/subscribe, and configuring NServiceBus.', selected: false },
       { id: 'intro2', title: 'Introduction to NServiceBus - Part II', description: 'Continuation of Introduction to NServiceBus - Part I', selected: false },
@@ -13,7 +13,7 @@
     ];
 
     $scope.orders = [];
-    
+
     $scope.ordersReceived = [];
 
     var ordersHub = $.connection.ordersHub;
@@ -30,28 +30,28 @@
                 }
             }
         }
-        
-        $scope.$apply(function(scope) {
+
+        $scope.$apply(function (scope) {
             scope.orders.push({ number: data.OrderNumber, titles: selectedVideoTitles, status: 'Pending' });
         });
-        
+
         $('#userWarning')
             .css({ opacity: 0 })
             .animate({ opacity: 1 }, 700);
     };
-    
+
     ordersHub.client.orderCancelled = function (data) {
-        $scope.$apply(function(scope) {
+        $scope.$apply(function (scope) {
             var idx = retrieveOrderIndex(scope, data.OrderNumber);
             if (idx >= 0) {
                 scope.orders[idx].status = 'Cancelled';
             }
         });
     };
-    
+
     ordersHub.client.orderReady = function (data) {
         var items = [];
-        
+
         for (var i = 0; i < data.VideoUrls.length; i++) {
             var item = data.VideoUrls[i];
 
@@ -63,7 +63,7 @@
                 }
             }
         }
-        
+
         $scope.$apply(function (scope) {
             var idx = retrieveOrderIndex(scope, data.OrderNumber);
             if (idx >= 0) {
@@ -72,24 +72,31 @@
             scope.ordersReceived.push({ number: data.OrderNumber, items: items });
         });
     };
-    
-    $.connection.hub.start();
-    
+
+    $.connection.hub.reconnected(function () {
+        ordersHub.server.join($scope.clientId);
+    });
+
+    $.connection.hub.start(function () {
+        ordersHub.server.join($scope.clientId);
+    });
+
+
     $scope.cancelOrder = function (number) {
         $scope.errorMessage = null;
-        
+
         var idx = retrieveOrderIndex($scope, number);
         if (idx >= 0) {
             $scope.orders[idx].status = 'Cancelling';
         }
 
         ordersHub.state.debug = $scope.debug;
-        ordersHub.server.cancelOrder(number)
+        ordersHub.server.cancelOrder(number, $scope.clientId, $scope.debug)
             .fail(function () {
                 $scope.errorMessage = "We couldn't cancel you order, ensure all endpoints are running and try again!";
             });
     };
-    
+
     $scope.placeOrder = function () {
 
         $scope.errorMessage = null;
@@ -104,22 +111,22 @@
         if (selectedVideos.length === 0) {
             return;
         }
-        
+
         ordersHub.state.debug = $scope.debug;
-        ordersHub.server.placeOrder(selectedVideos)
+        ordersHub.server.placeOrder(selectedVideos, $scope.clientId, $scope.debug)
             .done(function () {
                 angular.forEach($scope.videos, function (video) {
                     video.selected = false;
                 });
             })
-            .fail(function() {
+            .fail(function () {
                 $scope.errorMessage = "We couldn't place you order, ensure all endpoints are running and try again!";
             });
     };
-    
+
     function retrieveOrderIndex(scope, orderNumber) {
         var idx = 0;
-        
+
         for (; idx < scope.orders.length; idx++) {
             if (scope.orders[idx].number === orderNumber) {
                 return idx;
@@ -127,5 +134,12 @@
         }
 
         return -1;
+    }
+
+    function guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
 }

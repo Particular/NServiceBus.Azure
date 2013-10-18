@@ -1,4 +1,5 @@
-﻿using NServiceBus.Config;
+﻿using System.Diagnostics;
+using NServiceBus.Config;
 using NServiceBus.Features;
 using NServiceBus.Unicast.Queuing.Azure.ServiceBus;
 
@@ -13,7 +14,7 @@ namespace VideoStore.CustomerRelations
     {
         public void Start()
         {
-            Console.Out.WriteLine("The VideoStore.CustomerRelations endpoint is now started and subscribed to events from VideoStore.Sales");
+           Trace.WriteLine("The VideoStore.CustomerRelations endpoint is now started and subscribed to events from VideoStore.Sales");
         }
 
         public void Stop()

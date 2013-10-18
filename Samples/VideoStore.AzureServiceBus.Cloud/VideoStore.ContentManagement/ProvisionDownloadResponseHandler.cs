@@ -29,7 +29,7 @@
                 Debugger.Break();
             }
 
-            Console.WriteLine("Download for Order # {0} has been provisioned, Publishing Download ready event", message.OrderNumber);
+            Trace.WriteLine(string.Format("Download for Order # {0} has been provisioned, Publishing Download ready event", message.OrderNumber));
          
             Bus.Publish<DownloadIsReady>(e =>
             {
@@ -43,7 +43,7 @@
                 }
             });
 
-            Console.Out.WriteLine("Downloads for Order #{0} is ready, publishing it.", message.OrderNumber);
+            Trace.WriteLine(string.Format("Downloads for Order #{0} is ready, publishing it.", message.OrderNumber));
         }
     }
 }

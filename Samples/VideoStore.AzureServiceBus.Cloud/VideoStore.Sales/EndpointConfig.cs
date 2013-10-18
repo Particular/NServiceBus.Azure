@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NServiceBus.Features;
 
 namespace VideoStore.Sales
@@ -19,7 +20,7 @@ namespace VideoStore.Sales
     {
         public void Start()
         {
-            Console.Out.WriteLine("The VideoStore.Sales endpoint is now started and ready to accept messages");
+            Trace.WriteLine("The VideoStore.Sales endpoint is now started and ready to accept messages");
         }
 
         public void Stop()
@@ -28,12 +29,4 @@ namespace VideoStore.Sales
         }
     }
 
-    // We don't need it, so instead of configuring it, we disable it
-    public class DisableTimeoutManager : INeedInitialization
-    {
-        public void Init()
-        {
-            Feature.Disable<TimeoutManager>();
-        }
-    }
 }

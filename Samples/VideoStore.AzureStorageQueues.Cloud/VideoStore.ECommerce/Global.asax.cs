@@ -1,3 +1,6 @@
+using System.Threading;
+using NServiceBus.Features;
+
 namespace VideoStore.ECommerce
 {
     using System.Web;
@@ -19,6 +22,8 @@ namespace VideoStore.ECommerce
 
         protected void Application_Start()
         {
+            Feature.Disable<TimeoutManager>();
+
             startableBus = Configure.With()
                 .DefaultBuilder()
                 .AzureDiagnosticsLogger()

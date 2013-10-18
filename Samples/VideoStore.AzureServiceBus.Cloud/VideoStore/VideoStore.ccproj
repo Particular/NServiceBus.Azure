@@ -43,7 +43,7 @@
       <Private>True</Private>
       <RoleType>Worker</RoleType>
       <RoleName>VideoStore.ContentManagement</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+      <UpdateDiagnosticsConnectionStringOnPublish>False</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
     <ProjectReference Include="..\VideoStore.CustomerRelations\VideoStore.CustomerRelations.csproj">
       <Name>VideoStore.CustomerRelations</Name>
@@ -51,7 +51,7 @@
       <Private>True</Private>
       <RoleType>Worker</RoleType>
       <RoleName>VideoStore.CustomerRelations</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+      <UpdateDiagnosticsConnectionStringOnPublish>False</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
     <ProjectReference Include="..\VideoStore.ECommerce\VideoStore.ECommerce.csproj">
       <Name>VideoStore.ECommerce</Name>
@@ -59,7 +59,7 @@
       <Private>True</Private>
       <RoleType>Web</RoleType>
       <RoleName>VideoStore.ECommerce</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+      <UpdateDiagnosticsConnectionStringOnPublish>False</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
     <ProjectReference Include="..\VideoStore.Operations\VideoStore.Operations.csproj">
       <Name>VideoStore.Operations</Name>
@@ -67,7 +67,7 @@
       <Private>True</Private>
       <RoleType>Worker</RoleType>
       <RoleName>VideoStore.Operations</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+      <UpdateDiagnosticsConnectionStringOnPublish>False</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
     <ProjectReference Include="..\VideoStore.Sales\VideoStore.Sales.csproj">
       <Name>VideoStore.Sales</Name>
@@ -75,7 +75,7 @@
       <Private>True</Private>
       <RoleType>Worker</RoleType>
       <RoleName>VideoStore.Sales</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+      <UpdateDiagnosticsConnectionStringOnPublish>False</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

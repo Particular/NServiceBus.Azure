@@ -14,7 +14,7 @@
             {
                 Debugger.Break();
             }
-            Console.WriteLine("Handler WhenCustomerIsPreferredSendLimitedTimeOffer invoked for CustomerId: {0}", message.ClientId);
+            Trace.WriteLine(string.Format("Handler WhenCustomerIsPreferredSendLimitedTimeOffer invoked for CustomerId: {0}", message.ClientId));
         }
     }
 }
