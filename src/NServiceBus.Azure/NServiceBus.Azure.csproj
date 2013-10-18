@@ -103,7 +103,7 @@
     <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Logging\Azure\Diagnostics.cs" />
     <Compile Include="Transports\DeterministicGuidBuilder.cs" />
-    <Compile Include="Transports\ServiceBus\Config\DeterminesBestConnectionString.cs" />
+    <Compile Include="Transports\ServiceBus\Config\DeterminesBestConnectionStringForAzureServiceBus.cs" />
     <Compile Include="Transports\ServiceBus\Creation\AutoCreateTopic.cs" />
     <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusQueueNamingConvention.cs" />
     <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusPublisherAddressConvention.cs" />
@@ -113,6 +113,7 @@
     <Compile Include="Transports\ServiceBus\Creation\AzureServicebusTopicCreator.cs" />
     <Compile Include="Transports\IsHostedIn.cs" />
     <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusTopicNameConvention.cs" />
+    <Compile Include="Transports\StorageQueues\Config\DeterminesBestConnectionStringForStorageQueues.cs" />
     <Compile Include="Transports\StorageQueues\NamingConventions\AzureQueueNamingConvention.cs" />
     <Compile Include="Transports\ServiceBus\Creation\CreatesMessagingFactories.cs" />
     <Compile Include="Transports\ServiceBus\Creation\CreatesNamespaceManagers.cs" />

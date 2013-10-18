@@ -17,7 +17,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         {
             var connectionstring = potentialConnectionstring != RuntimeEnvironment.MachineName
                                       ? potentialConnectionstring
-                                      : new DeterminesBestConnectionString().Determine();
+                                      : new DeterminesBestConnectionStringForAzureServiceBus().Determine();
 
             NamespaceManager manager;
             if (!NamespaceManagers.TryGetValue(connectionstring, out manager))

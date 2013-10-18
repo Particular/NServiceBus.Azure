@@ -6,6 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
+    using NServiceBus.Azure.Transports.ServiceBus;
     using Settings;
     using Transports;
 
@@ -74,9 +75,10 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
                         brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
                         brokeredMessage.MessageId = message.Id;
+
                         if (message.ReplyToAddress != null)
                         {
-                            brokeredMessage.ReplyTo = message.ReplyToAddress.ToString();
+                            brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(message.ReplyToAddress);
                         }
 
                         sender.Send(brokeredMessage);

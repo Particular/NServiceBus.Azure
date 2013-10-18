@@ -4,7 +4,7 @@
     using Config;
     using Settings;
 
-    public class DeterminesBestConnectionString
+    public class DeterminesBestConnectionStringForAzureServiceBus
     {
         public string Determine()
         {
@@ -23,6 +23,25 @@
             }
 
             return connectionString;
+        }
+
+        public bool IsPotentialServiceBusConnectionString(string potentialConnectionString)
+        {
+            return potentialConnectionString.StartsWith("Endpoint=sb://");
+        }
+
+        public string Determine(Address replyToAddress)
+        {
+            if (IsPotentialServiceBusConnectionString(replyToAddress.Machine))
+            {
+                return replyToAddress.ToString();
+            }
+            else
+            {
+                var replyQueue = replyToAddress.Queue;
+                var @namespace = Determine();
+                return replyQueue + "@" + @namespace;
+            }
         }
     }
 }

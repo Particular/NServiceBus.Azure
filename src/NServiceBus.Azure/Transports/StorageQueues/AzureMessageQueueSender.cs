@@ -8,6 +8,7 @@ namespace NServiceBus.Unicast.Queuing.Azure
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
+    using NServiceBus.Azure.Transports.StorageQueues;
     using Settings;
     using Transports;
     using Transports.StorageQueues;
@@ -63,6 +64,12 @@ namespace NServiceBus.Unicast.Queuing.Azure
                     {
                         CloudStorageAccount account;
 
+                        var validation = new DeterminesBestConnectionStringForStorageQueues();
+                        if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
+                        {
+                            connectionString = validation.Determine();
+                        }
+
                         if (CloudStorageAccount.TryParse(connectionString, out account))
                         {
                             sendClient = account.CreateCloudQueueClient();
@@ -84,13 +91,16 @@ namespace NServiceBus.Unicast.Queuing.Azure
         {
             using (var stream = new MemoryStream())
             {
+                var validation = new DeterminesBestConnectionStringForStorageQueues();
+                var replyToAddress = validation.Determine( message.ReplyToAddress ?? Address.Local );
+
                 var toSend = new MessageWrapper
                     {
                         Id = message.Id,
                         Body = message.Body,
                         CorrelationId = message.CorrelationId,
                         Recoverable = message.Recoverable,
-                        ReplyToAddress = message.ReplyToAddress == null ? Address.Self.ToString() : message.ReplyToAddress.ToString(),
+                        ReplyToAddress = replyToAddress,
                         TimeToBeReceived = message.TimeToBeReceived,
                         Headers = message.Headers,
                         MessageIntent = message.MessageIntent

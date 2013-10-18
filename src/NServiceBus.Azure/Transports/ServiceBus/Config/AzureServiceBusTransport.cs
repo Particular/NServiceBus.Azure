@@ -49,7 +49,7 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = configSection == null ? ConnectivityMode.Tcp : (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = new DeterminesBestConnectionString().Determine();
+            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine();
 
             var namespaceClient = NamespaceManager.CreateFromConnectionString(connectionString);
             var factory = MessagingFactory.CreateFromConnectionString(connectionString);
