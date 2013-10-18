@@ -56,6 +56,12 @@ namespace NServiceBus.Unicast.Queuing.Azure
         {
             CloudQueueClient sendClient;
 
+            var validation = new DeterminesBestConnectionStringForStorageQueues();
+            if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
+            {
+                connectionString = validation.Determine();
+            }
+
             if (!destinationQueueClients.TryGetValue(connectionString, out sendClient))
             {
                 lock (SenderLock)
@@ -63,12 +69,6 @@ namespace NServiceBus.Unicast.Queuing.Azure
                     if (!destinationQueueClients.TryGetValue(connectionString, out sendClient))
                     {
                         CloudStorageAccount account;
-
-                        var validation = new DeterminesBestConnectionStringForStorageQueues();
-                        if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
-                        {
-                            connectionString = validation.Determine();
-                        }
 
                         if (CloudStorageAccount.TryParse(connectionString, out account))
                         {
