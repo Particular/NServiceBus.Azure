@@ -182,6 +182,10 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                 {
                     return false;
                 }
+                catch (TimeoutException)
+                {
+                    return false;
+                }
             }
             return true;
         }

@@ -105,6 +105,24 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
+                // connection lost
+                catch (MessagingCommunicationException)
+                {
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                }
+                // took to long, maybe we lost connection
+                catch (TimeoutException)
+                {
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                }
             }
         }
 
