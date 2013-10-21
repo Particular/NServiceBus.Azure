@@ -17,5 +17,6 @@
   </metadata>
   <files>
     <file src="..\..\src\binaries\NServiceBus.Hosting.Azure.HostProcess.???" target="lib\net40" />
+	<file src="..\..\src\lib\Topshelf\Topshelf.Zip.dll" target="lib\net40" />
   </files>
 </package>
