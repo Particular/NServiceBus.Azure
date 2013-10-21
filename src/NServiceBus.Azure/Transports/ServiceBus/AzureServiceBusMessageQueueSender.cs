@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Transactions;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
+    using NServiceBus.Azure.Transports.ServiceBus;
+    using Settings;
     using Transports;
 
     /// <summary>
@@ -17,31 +18,11 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         public const int DefaultBackoffTimeInSeconds = 10;
 
         private readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
+        
         private static readonly object SenderLock = new Object();
 
-        public TimeSpan LockDuration { get; set; }
-        public long MaxSizeInMegabytes { get; set; }
-        public bool RequiresDuplicateDetection { get; set; }
-        public bool RequiresSession { get; set; }
-        public TimeSpan DefaultMessageTimeToLive { get; set; }
-        public bool EnableDeadLetteringOnMessageExpiration { get; set; }
-        public TimeSpan DuplicateDetectionHistoryTimeWindow { get; set; }
         public int MaxDeliveryCount { get; set; }
-        public bool EnableBatchedOperations { get; set; }
-
-        public MessagingFactory Factory { get; set; }
-        public NamespaceManager NamespaceClient { get; set; }
-
-        public void Init(string address, bool transactional)
-        {
-            Init(Address.Parse(address), transactional);
-        }
-
-        public void Init(Address address, bool transactional)
-        {
-
-        }
-
+  
         public void Send(TransportMessage message, string destination)
         {
             Send(message, Address.Parse(destination));
@@ -50,6 +31,7 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
         public void Send(TransportMessage message, Address address)
         {
             var destination = address.Queue;
+            var @namespace = address.Machine;
 
             QueueClient sender;
             if (!senders.TryGetValue(destination, out sender))
@@ -58,13 +40,14 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                 {
                     if (!senders.TryGetValue(destination, out sender))
                     {
-                        sender = Factory.CreateQueueClient(destination);
+                        var factory = new CreatesMessagingFactories().Create(@namespace);
+                        sender = factory.CreateQueueClient(destination);
                         senders[destination] = sender;
                     }
                 }
             }
 
-            if (Transaction.Current == null)
+            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Send(message, sender,address);
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender, address)), EnlistmentOptions.None);
@@ -92,9 +75,10 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
                         brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
                         brokeredMessage.MessageId = message.Id;
+
                         if (message.ReplyToAddress != null)
                         {
-                            brokeredMessage.ReplyTo = message.ReplyToAddress.ToString();
+                            brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(message.ReplyToAddress);
                         }
 
                         sender.Send(brokeredMessage);
@@ -123,8 +107,27 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
+                // connection lost
+                catch (MessagingCommunicationException)
+                {
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                }
+                // took to long, maybe we lost connection
+                catch (TimeoutException)
+                {
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                }
             }
         }
 
-    }
+      
+   }
 }

@@ -174,7 +174,15 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                 {
                     brokeredMessage.RenewLock();
                 }
-                catch (Exception)
+                catch (MessageLockLostException)
+                {
+                    return false;
+                }
+                catch (SessionLockLostException)
+                {
+                    return false;
+                }
+                catch (TimeoutException)
                 {
                     return false;
                 }

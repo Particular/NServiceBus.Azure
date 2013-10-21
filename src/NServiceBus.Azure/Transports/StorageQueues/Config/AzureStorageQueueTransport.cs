@@ -1,9 +1,7 @@
 ﻿namespace NServiceBus.Features
 {
-    using System;
     using Azure;
     using Config;
-    using Microsoft.WindowsAzure.ServiceRuntime;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using Settings;
@@ -21,17 +19,13 @@
             EnableByDefault<TimeoutManager>();
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            if (IsRoleEnvironmentAvailable())
+            if (SafeRoleEnvironment.IsAvailable)
             {
                 EnableByDefault<QueueAutoCreation>();
 
                 if (!IsHostedIn.ChildHostProcess())
                     config.AzureConfigurationSource();
             }
-
-
-
-            AzureStoragePersistence.UseAsDefault();
 
             var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
 
@@ -72,24 +66,9 @@
             NServiceBus.Configure.Component<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             NServiceBus.Configure.Component<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
-
+            var queuename = AzureQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
             SettingsHolder.ApplyTo<AzureMessageQueueReceiver>();
-
-            if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
-            {
-                var queueName = configSection.QueueName;
-
-                if (SettingsHolder.GetOrDefault<bool>("AzureMessageQueueReceiver.QueuePerInstance"))
-                    queueName = QueueIndividualizer.Individualize(queueName);
-
-                NServiceBus.Configure.Instance.DefineEndpointName(queueName);
-            }
-            else if (IsRoleEnvironmentAvailable())
-            {
-                NServiceBus.Configure.Instance.DefineEndpointName(RoleEnvironment.CurrentRoleInstance.Role.Name);
-            }
-            Address.InitializeLocalAddress(NServiceBus.Configure.EndpointName);
-
+            Address.InitializeLocalAddress(queuename);
         }
 
         static string TryGetConnectionString(AzureQueueConfig configSection)
@@ -117,17 +96,5 @@
             get { return "todo - refactor the transport to use a connection string instead of a custom section"; }
         }
 
-
-        static bool IsRoleEnvironmentAvailable()
-        {
-            try
-            {
-                return RoleEnvironment.IsAvailable;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
     }
 }

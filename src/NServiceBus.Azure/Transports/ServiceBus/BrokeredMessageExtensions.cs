@@ -39,6 +39,10 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             {
                 // 
             }
+            catch (TimeoutException)
+            {
+                // took to long
+            }
             return false;
         }
 
@@ -71,6 +75,10 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             catch (TransactionException)
             {
                 // 
+            }
+            catch (TimeoutException)
+            {
+                // took to long
             }
             return false;
         }

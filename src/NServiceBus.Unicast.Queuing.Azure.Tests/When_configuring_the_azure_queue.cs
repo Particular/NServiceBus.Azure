@@ -25,7 +25,7 @@
 //                .CustomConfigurationSource(new NullSource())
 //                .AzureMessageQueue();
 
-//            Assert.AreEqual(Configure.Instance.Builder.Build<CloudQueueClient>().Credentials.AccountName,"devstoreaccount1");
+//            Assert.AreEqual(Configure.Instance.Builder.Build<CloudQueueClient>().Credentials.AccountName, "devstoreaccount1");
 
 //        }
 
@@ -38,7 +38,7 @@
 
 //            var storage = Configure.Instance.Builder.Build<CloudQueueClient>();
 
-//            Assert.AreEqual(storage.Credentials.AccountName,"myaccount");
+//            Assert.AreEqual(storage.Credentials.AccountName, "myaccount");
 //        }
 
 //        [Test]
@@ -58,4 +58,4 @@
 //            return null;
 //        }
 //    }
-//} 
+//}

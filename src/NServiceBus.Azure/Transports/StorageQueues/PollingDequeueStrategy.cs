@@ -118,10 +118,10 @@ namespace NServiceBus.Unicast.Queuing.Azure
                 catch (EnvelopeDeserializationFailed ex)
                 {
                     //if we failed to deserialize the envlope there isn't much we can do so we just swallow the message to avoid a infinite loop
-                    message = new TransportMessage(ex.Message.Id,new Dictionary<string, string>());
+                    message = new TransportMessage(ex.FailedMessage.Id,new Dictionary<string, string>());
                     exception = ex;
 
-                    Logger.Error("Failed to deserialize the envelope of the incoming message. Message will be discarded. MessageId: " + ex.Message.Id,exception);
+                    Logger.Error("Failed to deserialize the envelope of the incoming message. Message will be discarded. MessageId: " + ex.FailedMessage.Id,exception);
                 }
                 catch (Exception ex)
                 {

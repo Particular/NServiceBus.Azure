@@ -1,14 +1,12 @@
 ﻿namespace NServiceBus.Features
 {
     using System;
-    using System.Configuration;
     using System.Transactions;
     using Azure;
+    using Azure.Transports.ServiceBus;
     using Config;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    using Microsoft.WindowsAzure.ServiceRuntime;
-    using Settings;
     using Transports;
     using Unicast.Queuing.Azure.ServiceBus;
 
@@ -18,7 +16,7 @@
         {
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            if (IsRoleEnvironmentAvailable())
+            if (SafeRoleEnvironment.IsAvailable)
             {
                 EnableByDefault<QueueAutoCreation>();
 
@@ -26,21 +24,13 @@
                     config.AzureConfigurationSource();
             }
 
-            var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
+            var queuename = AzureServiceBusQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
 
-            if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
-            {
-                NServiceBus.Configure.Instance.DefineEndpointName(configSection.QueuePerInstance ? QueueIndividualizer.Individualize(configSection.QueueName) : configSection.QueueName);
-                Address.InitializeLocalAddress(NServiceBus.Configure.EndpointName);
-            }
-            else if (IsRoleEnvironmentAvailable())
-            {
-                NServiceBus.Configure.Instance.DefineEndpointName(RoleEnvironment.CurrentRoleInstance.Role.Name);
-                Address.InitializeLocalAddress(NServiceBus.Configure.EndpointName);
-            }
+            Address.InitializeLocalAddress(queuename);
 
             var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;
 
+            var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection != null)
                 serverWaitTime = configSection.ServerWaitTime;
 
@@ -50,21 +40,7 @@
 
             Enable<AzureServiceBusTransport>();
             EnableByDefault<TimeoutManager>();
-            AzureServiceBusPersistence.UseAsDefault();
-        }
-
-
-
-        static bool IsRoleEnvironmentAvailable()
-        {
-            try
-            {
-                return RoleEnvironment.IsAvailable;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            
         }
 
         public override void Initialize()
@@ -73,34 +49,12 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = configSection == null ? ConnectivityMode.Tcp : (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
+            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine();
 
-            if (string.IsNullOrEmpty(connectionString) && configSection != null)
-                connectionString = configSection.ConnectionString;
-
-            if (string.IsNullOrEmpty(connectionString) && (configSection == null || string.IsNullOrEmpty(configSection.IssuerKey) || string.IsNullOrEmpty(configSection.ServiceNamespace)))
-            {
-                throw new ConfigurationErrorsException("No Servicebus Connection information specified, either set the ConnectionString or set the IssuerKey and ServiceNamespace properties");
-            }
-
-            NamespaceManager namespaceClient;
-            MessagingFactory factory;
-            Uri serviceUri;
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                namespaceClient = NamespaceManager.CreateFromConnectionString(connectionString);
-                serviceUri = namespaceClient.Address;
-                factory = MessagingFactory.CreateFromConnectionString(connectionString);
-            }
-            else
-            {
-                var credentials = TokenProvider.CreateSharedSecretTokenProvider(configSection.IssuerName, configSection.IssuerKey);
-                serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", configSection.ServiceNamespace, string.Empty);
-                namespaceClient = new NamespaceManager(serviceUri, credentials);
-                factory = MessagingFactory.Create(serviceUri, credentials);
-            }
-            Address.OverrideDefaultMachine(serviceUri.ToString());
-
+            var namespaceClient = NamespaceManager.CreateFromConnectionString(connectionString);
+            var factory = MessagingFactory.CreateFromConnectionString(connectionString);
+            
+            Address.OverrideDefaultMachine(connectionString);
 
             NServiceBus.Configure.Instance.Configurer.RegisterSingleton<NamespaceManager>(namespaceClient);
             NServiceBus.Configure.Instance.Configurer.RegisterSingleton<MessagingFactory>(factory);
@@ -145,7 +99,8 @@
                 config.Configurer.ConfigureComponent<AzureServiceBusTopicSubscriptionManager>(DependencyLifecycle.InstancePerCall);
                 config.Configurer.ConfigureComponent<AzureServiceBusTopicPublisher>(DependencyLifecycle.InstancePerCall);
                 config.Configurer.ConfigureComponent<AzureServiceBusTopicNotifier>(DependencyLifecycle.InstancePerCall);
-
+                config.Configurer.ConfigureComponent<AzureServicebusTopicClientCreator>(DependencyLifecycle.InstancePerCall);
+                
                 config.Configurer.ConfigureProperty<AzureServiceBusTopicPublisher>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
                 config.Configurer.ConfigureProperty<AzureServicebusSubscriptionClientCreator>(t => t.LockDuration, TimeSpan.FromMilliseconds(configSection.LockDuration));
                 config.Configurer.ConfigureProperty<AzureServicebusSubscriptionClientCreator>(t => t.RequiresSession, configSection.RequiresSession);
@@ -158,6 +113,8 @@
                 config.Configurer.ConfigureProperty<AzureServiceBusTopicNotifier>(t => t.BatchSize, configSection.BatchSize);
                 config.Configurer.ConfigureProperty<AzureServiceBusTopicNotifier>(t => t.BackoffTimeInSeconds, configSection.BackoffTimeInSeconds);
             }
+
+           
         }
 
         protected override bool RequiresConnectionString

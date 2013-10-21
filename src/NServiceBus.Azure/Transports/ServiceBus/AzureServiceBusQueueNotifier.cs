@@ -1,8 +1,6 @@
 using System;
 using System.Threading;
 using Microsoft.ServiceBus.Messaging;
-using NServiceBus.Unicast.Transport.Transactional;
-using NServiceBus.Utils;
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
@@ -81,6 +79,16 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
                 if (cancelRequested) return;
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
+            }
+            catch (MessagingCommunicationException)
+            {
+                if (cancelRequested) return;
+
+                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
+            }
+            catch (TimeoutException)
+            {
+                // time's up, just continue and retry
             }
 
             _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);

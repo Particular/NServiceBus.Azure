@@ -1,4 +1,3 @@
-using NServiceBus.Config;
 using NServiceBus.Unicast.Queuing.Azure;
 
 namespace NServiceBus
@@ -69,9 +68,10 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "6.0", TreatAsErrorFromVersion = "5.0", Replacement = "Scaleout")] 
         public static Configure QueuePerInstance(this Configure config)
         {
-            SettingsHolder.Set("AzureMessageQueueReceiver.QueuePerInstance", true);
+            SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", true);
             return config;
         }
     }

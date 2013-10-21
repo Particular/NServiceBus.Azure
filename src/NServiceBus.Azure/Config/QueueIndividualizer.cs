@@ -7,41 +7,20 @@ namespace NServiceBus.Config
     {
         public static string Individualize(string queueName)
         {
+            var parser = new ConnectionStringParser();
             var individualQueueName = queueName;
-            if (RoleEnvironment.IsAvailable)
+            if (SafeRoleEnvironment.IsAvailable)
             {
-                var index = ParseIndexFrom(RoleEnvironment.CurrentRoleInstance.Id);
-                individualQueueName = ParseQueueNameFrom(queueName)
+                var index = parser.ParseIndexFrom(RoleEnvironment.CurrentRoleInstance.Id);
+                individualQueueName = parser.ParseQueueNameFrom(queueName)
                                           + (index > 0 ? "-" : "")
                                           + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
 
                 if (queueName.Contains("@"))
-                    individualQueueName += "@" + ParseMachineNameFrom(queueName);
+                    individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
             }
 
             return individualQueueName;
-        }
-
-        private static string ParseMachineNameFrom(string inputQueue)
-        {
-            return inputQueue.Contains("@") ? inputQueue.Substring(inputQueue.IndexOf("@", System.StringComparison.Ordinal) + 1) : string.Empty;
-        }
-
-        private static object ParseQueueNameFrom(string inputQueue)
-        {
-            return inputQueue.Contains("@") ? inputQueue.Substring(0, inputQueue.IndexOf("@", System.StringComparison.Ordinal)) : inputQueue;
-        }
-
-        private static int ParseIndexFrom(string id)
-        {
-            var idArray = id.Split('.');
-            int index;
-            if (!int.TryParse((idArray[idArray.Length - 1]), out index))
-            {
-                idArray = id.Split('_');
-                index = int.Parse((idArray[idArray.Length - 1]));
-            }
-            return index;
         }
     }
 }

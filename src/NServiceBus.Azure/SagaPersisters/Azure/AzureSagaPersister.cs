@@ -149,22 +149,14 @@
         /// <param name="saga">The saga entity that will be deleted.</param>
         public void Complete(IContainSagaData saga)
         {
-            try
-            {
-                var tableName = saga.GetType().Name;
-                var table = client.GetTableReference(tableName);
+            var tableName = saga.GetType().Name;
+            var table = client.GetTableReference(tableName);
 
-                var query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, saga.Id.ToString()));
+            var query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, saga.Id.ToString()));
 
-                var entity = table.ExecuteQuery(query).FirstOrDefault();
+            var entity = table.ExecuteQuery(query).FirstOrDefault();
 
-                table.Execute(TableOperation.Delete(entity));
-            }
-            catch (StorageException)
-            {
-                throw;
-            }
-           
+            table.Execute(TableOperation.Delete(entity));
         }
 
         void Persist(IContainSagaData saga)

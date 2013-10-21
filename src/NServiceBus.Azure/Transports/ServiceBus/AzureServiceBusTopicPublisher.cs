@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Transactions;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 
 namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 {
+    using NServiceBus.Azure.Transports.ServiceBus;
+    using Settings;
     using Transports;
 
     /// <summary>
@@ -17,19 +18,19 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
     {
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
+        
+        public ICreateTopicClients TopicClientCreator { get; set; }
 
-        public MessagingFactory Factory { get; set; }
-        public NamespaceManager NamespaceClient { get; set; }
         private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
         private static readonly object SenderLock = new Object();
-
+        
         public bool Publish(TransportMessage message, IEnumerable<Type> eventTypes)
         {
-            var sender = GetTopicClientForDestination(AzureServiceBusPublisherAddressConvention.Create(Address.Local));
+            var sender = GetTopicClientForDestination(Address.Local);
 
             if (sender == null) return false;
 
-            if (Transaction.Current == null)
+            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Send(message, sender);
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender)), EnlistmentOptions.None);
@@ -68,6 +69,24 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
+                // took to long, maybe we lost connection
+                catch (TimeoutException)
+                {
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                }
+                // connection lost
+                catch (MessagingCommunicationException)
+                {
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                }
             }
         }
 
@@ -86,28 +105,32 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
 
                 brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
                 brokeredMessage.MessageId = message.Id;
-                brokeredMessage.ReplyTo = message.ReplyToAddress.ToString();
+                
+                if (message.ReplyToAddress != null)
+                {
+                    brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(message.ReplyToAddress);
+                }
 
                 sender.Send(brokeredMessage);
+                
             }
         }
 
         // todo, factor out...
-        private TopicClient GetTopicClientForDestination(string destination)
+        private TopicClient GetTopicClientForDestination(Address destination)
         {
+            var key = destination.ToString();
             TopicClient sender;
-            if (!senders.TryGetValue(destination, out sender))
+            if (!senders.TryGetValue(key, out sender))
             {
                 lock (SenderLock)
                 {
-                    if (!senders.TryGetValue(destination, out sender))
+                    if (!senders.TryGetValue(key, out sender))
                     {
                         try
                         {
-                            sender = Factory.CreateTopicClient(destination);
-                            senders[destination] = sender;
-
-                            NamespaceClient.CreateTopic(destination);
+                            sender = TopicClientCreator.Create(destination);
+                            senders[key] = sender;
                         }
                         catch (MessagingEntityNotFoundException)
                         {

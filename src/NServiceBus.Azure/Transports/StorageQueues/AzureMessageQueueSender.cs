@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Transactions;
-using Microsoft.WindowsAzure;
 using NServiceBus.Serialization;
 
 namespace NServiceBus.Unicast.Queuing.Azure
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
+    using NServiceBus.Azure.Transports.StorageQueues;
+    using Settings;
     using Transports;
     using Transports.StorageQueues;
 
@@ -19,22 +20,13 @@ namespace NServiceBus.Unicast.Queuing.Azure
     {
         private readonly Dictionary<string, CloudQueueClient> destinationQueueClients = new Dictionary<string, CloudQueueClient>();
         private static readonly object SenderLock = new Object();
+
         /// <summary>
         /// Gets or sets the message serializer
         /// </summary>
         public IMessageSerializer MessageSerializer { get; set; }
 
         public CloudQueueClient Client { get; set; }
-
-        public void Init(string address, bool transactional)
-        {
-            Init(Address.Parse(address), transactional);
-        }
-
-        public void Init(Address address, bool transactional)
-        {
-            
-        }
 
         public void Send(TransportMessage message, string destination)
         {
@@ -52,7 +44,7 @@ namespace NServiceBus.Unicast.Queuing.Azure
 
             var rawMessage = SerializeMessage(message);
 
-            if (Transaction.Current == null)
+            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
                 sendQueue.AddMessage(rawMessage);
             }
@@ -63,6 +55,12 @@ namespace NServiceBus.Unicast.Queuing.Azure
         private CloudQueueClient GetClientForConnectionString(string connectionString)
         {
             CloudQueueClient sendClient;
+
+            var validation = new DeterminesBestConnectionStringForStorageQueues();
+            if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
+            {
+                connectionString = validation.Determine();
+            }
 
             if (!destinationQueueClients.TryGetValue(connectionString, out sendClient))
             {
@@ -93,13 +91,16 @@ namespace NServiceBus.Unicast.Queuing.Azure
         {
             using (var stream = new MemoryStream())
             {
+                var validation = new DeterminesBestConnectionStringForStorageQueues();
+                var replyToAddress = validation.Determine( message.ReplyToAddress ?? Address.Local );
+
                 var toSend = new MessageWrapper
                     {
                         Id = message.Id,
                         Body = message.Body,
                         CorrelationId = message.CorrelationId,
                         Recoverable = message.Recoverable,
-                        ReplyToAddress = message.ReplyToAddress == null ? Address.Self.ToString() : message.ReplyToAddress.ToString(),
+                        ReplyToAddress = replyToAddress,
                         TimeToBeReceived = message.TimeToBeReceived,
                         Headers = message.Headers,
                         MessageIntent = message.MessageIntent

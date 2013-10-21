@@ -9,16 +9,31 @@ using NServiceBus.Logging;
 namespace NServiceBus.Integration.Azure
 {
     using System.Security;
-    
+    using Config;
+    using Config.ConfigurationSource;
+    using NServiceBus.Azure;
+
     /// <summary>
     /// 
     /// </summary>
     public class AzureDiagnosticsLoggerFactory : ILoggerFactory
     {
-        private const string ConnectionStringKey = "Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString";
-        private const string LevelKey = "Microsoft.WindowsAzure.Plugins.Diagnostics.Level";
-        private const string ScheduledTransferPeriodKey = "Microsoft.WindowsAzure.Plugins.Diagnostics.ScheduledTransferPeriod";
-        private const string EventLogsKey = "Microsoft.WindowsAzure.Plugins.Diagnostics.EventLogs";
+        const string Prefix = "Microsoft.WindowsAzure.Plugins";
+        private const string ConnectionStringKey = "ConnectionString";
+        private const string LevelKey = "Level";
+        private const string ScheduledTransferPeriodKey = "ScheduledTransferPeriod";
+        private const string EventLogsKey = "EventLogs";
+
+        readonly Diagnostics config;
+
+        public AzureDiagnosticsLoggerFactory()
+        {
+            IConfigurationSource internalConfigurationSource = new AzureConfigurationSource(new AzureConfigurationSettings())
+            {
+                ConfigurationPrefix = Prefix
+            };
+            config = internalConfigurationSource.GetConfiguration<Diagnostics>() ?? new Diagnostics();
+        }
 
         public int ScheduledTransferPeriod { get; set; }
 
@@ -70,7 +85,7 @@ namespace NServiceBus.Integration.Azure
                 if (!exists) Trace.Listeners.Add(new ConsoleTraceListener());
             }
 
-            if (!RoleEnvironment.IsAvailable || !InitializeDiagnostics) return;
+            if (!SafeRoleEnvironment.IsAvailable || !InitializeDiagnostics) return;
 
             var roleInstanceDiagnosticManager = CloudAccountDiagnosticMonitorExtensions.CreateRoleInstanceDiagnosticManager(
                 GetConnectionString(),
@@ -86,7 +101,7 @@ namespace NServiceBus.Integration.Azure
                 
                 ConfigureDiagnostics(configuration);
 
-                DiagnosticMonitor.Start(ConnectionStringKey, configuration);
+                DiagnosticMonitor.Start(Prefix + ".Diagnostics." + ConnectionStringKey, configuration);
             }
            
         }
@@ -108,7 +123,7 @@ namespace NServiceBus.Integration.Azure
             dmc.WindowsEventLog.ScheduledTransferPeriod = transferPeriod;
         }
 
-        private static void ConfigureWindowsEventLogsToBeTransferred(DiagnosticMonitorConfiguration dmc)
+        private void ConfigureWindowsEventLogsToBeTransferred(DiagnosticMonitorConfiguration dmc)
         {
             var eventLogs = GetEventLogs().Split(';');
             foreach (var log in eventLogs)
@@ -117,52 +132,24 @@ namespace NServiceBus.Integration.Azure
             }
         }
 
-        private static string GetConnectionString()
+        private string GetConnectionString()
         {
-            try
-            {
-                return RoleEnvironment.GetConfigurationSettingValue(ConnectionStringKey);
-            }
-            catch (Exception)
-            {
-                return "UseDevelopmentStorage=true";
-            }
+            return config.ConnectionString;
         }
 
-        private static LogLevel GetLevel()
+        private LogLevel GetLevel()
         {
-            try
-            {
-                return (LogLevel)Enum.Parse(typeof(LogLevel), RoleEnvironment.GetConfigurationSettingValue(LevelKey));
-            }
-            catch (Exception)
-            {
-                return LogLevel.Information;
-            }
+            return (LogLevel)Enum.Parse(typeof(LogLevel), config.Level);
         }
 
-        private static int GetScheduledTransferPeriod()
+        private int GetScheduledTransferPeriod()
         {
-            try
-            {
-                return int.Parse(RoleEnvironment.GetConfigurationSettingValue(ScheduledTransferPeriodKey));
-            }
-            catch (Exception)
-            {
-                return 10;
-            }
+            return config.ScheduledTransferPeriod;
         }
 
-        private static string GetEventLogs()
+        private string GetEventLogs()
         {
-            try
-            {
-                return RoleEnvironment.GetConfigurationSettingValue(EventLogsKey);
-            }
-            catch (Exception)
-            {
-                return "Application!*;System!*";
-            }
+            return config.EventLogs;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace NServiceBus.Hosting
 {
     using System.Linq;
 
-    class DynamicEndpointRunner
+    internal class DynamicEndpointRunner
     {
         private readonly ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 

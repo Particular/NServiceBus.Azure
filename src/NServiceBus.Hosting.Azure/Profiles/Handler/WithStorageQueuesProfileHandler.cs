@@ -8,7 +8,7 @@ namespace NServiceBus.Hosting.Azure.Profiles.Handlers
     {
         void IHandleProfile.ProfileActivated()
         {
-            throw new NotSupportedException("Registering the transport using a profile is no longer supported, please use UsingTransport<WindowsAzureStorageQueue> or UseTransport<WindowsAzureStorageQueue> instead.");
+            throw new NotSupportedException("Registering the transport using a profile is no longer supported, please use UsingTransport<AzureStorageQueue> or UseTransport<AzureStorageQueue> instead.");
         }
     }
 }
