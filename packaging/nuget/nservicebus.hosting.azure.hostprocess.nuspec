@@ -13,7 +13,15 @@
     <description>The process used when sharing an azure instance between multiple NServicebus endpoints</description>
     <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
-    <dependencies/>
+     <dependencies>		 
+		 <dependency id="Newtonsoft.Json" version="[4.5.11]" />
+		 <dependency id="Microsoft.Data.Edm" version="[5.2.0]" />
+		 <dependency id="Microsoft.Data.OData" version="[5.2.0]" />
+		 <dependency id="System.Spatial" version="[5.2.0]" />
+		 <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[2.0.1.0]" />
+		 <dependency id="WindowsAzure.ServiceBus" version="[2.1.2.0]" />
+		 <dependency id="WindowsAzure.Storage" version="[2.1.0.0]" />
+	</dependencies>
   </metadata>
   <files>
     <file src="..\..\src\binaries\NServiceBus.Hosting.Azure.HostProcess.???" target="lib\net40" />
