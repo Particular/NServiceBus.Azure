@@ -10,7 +10,7 @@
     <projectUrl>http://particular.net/</projectUrl>
     <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>The process used when sharing an azure instance between multiple NServicebus endpoints</description>
+    <description>The process used when sharing an azure instance between multiple NServicebus endpoints (SDK 2.2)</description>
     <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
      <dependencies>		 
