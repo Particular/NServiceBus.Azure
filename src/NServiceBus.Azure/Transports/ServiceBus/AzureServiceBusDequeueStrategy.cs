@@ -211,10 +211,6 @@ namespace NServiceBus.Unicast.Queuing.Azure.ServiceBus
             TrackNotifier(address, notifier);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="notifier"></param>
         public void TrackNotifier(Address address, INotifyReceivedMessages notifier)
         {
             notifier.Start(address, EnqueueMessage);
