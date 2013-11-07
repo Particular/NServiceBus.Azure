@@ -1,8 +1,6 @@
-using Microsoft.WindowsAzure.ServiceRuntime;
 using NServiceBus.Config;
 using NServiceBus.Hosting.Helpers;
 using NServiceBus.Integration.Azure;
-using System.Threading;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -11,29 +9,17 @@ using System.Diagnostics;
 
 namespace NServiceBus.Hosting.Azure
 {
-    /// <summary>
-    /// A host implementation for the Azure cloud platform
-    /// </summary>
-    public class RoleEntryPoint : Microsoft.WindowsAzure.ServiceRuntime.RoleEntryPoint
+
+    public class NServiceBusRoleEntrypoint
     {
         const string ProfileSetting = "AzureProfileConfig.Profiles";
         const string EndpointConfigurationType = "EndpointConfigurationType";
         IHost host;
-        readonly ManualResetEvent waitForStop = new ManualResetEvent(false);
-        bool doNotReturnFromRun = true;
 
-        public RoleEntryPoint() : this(true)
+        public NServiceBusRoleEntrypoint()
         {
-        }
-
-        public RoleEntryPoint(bool doNotReturnFromRun)
-        {
-            this.doNotReturnFromRun = doNotReturnFromRun;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainUnhandledException;
-        }
 
-        public override bool OnStart()
-        {
             var azureSettings = new AzureConfigurationSettings();
 
             var requestedProfiles = GetRequestedProfiles(azureSettings);
@@ -41,25 +27,23 @@ namespace NServiceBus.Hosting.Azure
 
             AssertThatEndpointConfigurationTypeHasDefaultConstructor(endpointConfigurationType);
 
-            var specifier = (IConfigureThisEndpoint) Activator.CreateInstance(endpointConfigurationType);
-
+            var specifier = (IConfigureThisEndpoint)Activator.CreateInstance(endpointConfigurationType);
 
             var endpointName = SafeRoleEnvironment.IsAvailable
-                ? RoleEnvironment.CurrentRoleInstance.Role.Name
+                ? SafeRoleEnvironment.CurrentRoleName
                 : GetType().Name;
 
             if (specifier is AsA_Host)
             {
-                host = new DynamicHostController(specifier, requestedProfiles, new List<Type> {typeof(Development)},
+                host = new DynamicHostController(specifier, requestedProfiles, new List<Type> { typeof(Development) },
                     endpointName);
             }
             else
             {
                 host = new GenericHost(specifier, requestedProfiles,
-                    new List<Type> {typeof(Development)}, endpointName);
+                    new List<Type> { typeof(Development) }, endpointName);
             }
 
-            return true;
         }
 
         static void CurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -67,16 +51,14 @@ namespace NServiceBus.Hosting.Azure
             Trace.WriteLine("Unhandled exception occured: " + e.ExceptionObject.ToString());
         }
 
-        public override void Run()
+        public void Start()
         {
             host.Start();
-            if (doNotReturnFromRun) waitForStop.WaitOne();
         }
 
-        public override void OnStop()
+        public void Stop()
         {
             host.Stop();
-            waitForStop.Set();
         }
 
         static void AssertThatEndpointConfigurationTypeHasDefaultConstructor(Type type)
@@ -127,7 +109,7 @@ namespace NServiceBus.Hosting.Azure
             var assemblyScanner = new AssemblyScanner();
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(RoleEntryPoint).Assembly);
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(NServiceBusRoleEntrypoint).Assembly);
 
             return assemblyScanner.GetScannableAssemblies().Assemblies.SelectMany(
                 assembly => assembly.GetTypes().Where(
@@ -175,7 +157,5 @@ namespace NServiceBus.Hosting.Azure
 
             return list.ToArray();
         }
-
-        
     }
 }

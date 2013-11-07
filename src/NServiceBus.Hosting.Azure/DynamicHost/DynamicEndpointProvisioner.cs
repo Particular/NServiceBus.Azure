@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.WindowsAzure.ServiceRuntime;
 using NServiceBus.Logging;
 
 namespace NServiceBus.Hosting
 {
+    using Config;
+
     internal class DynamicEndpointProvisioner
     {
         public string LocalResource { get; set; }
@@ -18,31 +19,32 @@ namespace NServiceBus.Hosting
         {
             try
             {
-                var localResource = RoleEnvironment.GetLocalResource(LocalResource);
+                string localResource = SafeRoleEnvironment.GetRootPath(LocalResource);
 
                 foreach (var endpoint in endpoints)
                 {
-                    endpoint.ExtractTo(localResource.RootPath);
+                    endpoint.ExtractTo(localResource);
 
-                    endpoint.EntryPoint = Path.Combine(localResource.RootPath, endpoint.EndpointName, "NServiceBus.Hosting.Azure.HostProcess.exe");
+                    endpoint.EntryPoint = Path.Combine(localResource, endpoint.EndpointName, "NServiceBus.Hosting.Azure.HostProcess.exe");
                 }
             }
             catch (Exception e)
             {
                 logger.Error(e.Message);
 
-                if (RecycleRoleOnError) RoleEnvironment.RequestRecycle();
+                if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
             }
             
         }
 
         public void Remove(IEnumerable<EndpointToHost> endpoints)
         {
-            var localResource = RoleEnvironment.GetLocalResource(LocalResource);
+            string localResource;
+            if (!SafeRoleEnvironment.TryGetRootPath(LocalResource, out localResource)) return;
 
             foreach (var endpoint in endpoints)
             {
-                var path = Path.Combine(localResource.RootPath, endpoint.EndpointName);
+                var path = Path.Combine(localResource, endpoint.EndpointName);
                 Directory.Delete(path, true);
             }
         }

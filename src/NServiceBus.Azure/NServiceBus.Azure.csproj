@@ -55,14 +55,6 @@
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Azure\Microsoft.WindowsAzure.Diagnostics.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Azure\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage">
       <HintPath>..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
@@ -102,8 +94,10 @@
   <ItemGroup>
     <Compile Include="ConfigureAzureBlobStorageDataBus.cs" />
     <Compile Include="Config\ConnectionStringParser.cs" />
+    <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
-    <Compile Include="Logging\Azure\Diagnostics.cs" />
+    <Compile Include="Logging\Azure\TraceLogger.cs" />
+    <Compile Include="Logging\Azure\TraceLoggerFactory.cs" />
     <Compile Include="Transports\DeterministicGuidBuilder.cs" />
     <Compile Include="Transports\ServiceBus\Config\DeterminesBestConnectionStringForAzureServiceBus.cs" />
     <Compile Include="Transports\ServiceBus\Creation\AutoCreateTopic.cs" />
@@ -142,8 +136,6 @@
     <Compile Include="DataBus\Azure\BlobStorage\Block.cs" />
     <Compile Include="ConfigurationSource\Azure\AzureConfigurationSettings.cs" />
     <Compile Include="ConfigurationSource\Azure\AzureConfigurationSource.cs" />
-    <Compile Include="Logging\Azure\AzureDiagnosticsLogger.cs" />
-    <Compile Include="Logging\Azure\AzureDiagnosticsLoggerFactory.cs" />
     <Compile Include="ConfigurationSource\Azure\IAzureConfigurationSettings.cs" />
     <Compile Include="Logging\Azure\SetLoggingLibrary.cs" />
     <Compile Include="Config\AzureTimeoutPersisterConfig.cs" />
