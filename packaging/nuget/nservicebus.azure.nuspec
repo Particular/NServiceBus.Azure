@@ -25,7 +25,5 @@
   </metadata>
   <files>
     <file src="..\..\src\binaries\NServiceBus.Azure.???" target="lib\net40" />
-    <file src="..\..\src\lib\azure\Microsoft.WindowsAzure.Diagnostics.dll" target="lib\net40" />
-    <file src="..\..\src\lib\azure\Microsoft.WindowsAzure.ServiceRuntime.dll" target="lib\net40" />
   </files>
 </package>
