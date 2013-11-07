@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure", "NServiceBus.Azure\NServiceBus.Azure.csproj", "{12F1D9F1-0A2C-4442-8D18-67DD096C6300}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure", "NServiceBus.Hosting.Azure\NServiceBus.Hosting.Azure.csproj", "{6591ED91-F9A1-4CC3-813E-A33E07439D49}"

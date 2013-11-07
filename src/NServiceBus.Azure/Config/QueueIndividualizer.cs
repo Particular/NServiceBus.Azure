@@ -1,8 +1,7 @@
 namespace NServiceBus.Config
 {
     using System.Globalization;
-    using Microsoft.WindowsAzure.ServiceRuntime;
-
+    
     internal class QueueIndividualizer
     {
         public static string Individualize(string queueName)
@@ -11,7 +10,7 @@ namespace NServiceBus.Config
             var individualQueueName = queueName;
             if (SafeRoleEnvironment.IsAvailable)
             {
-                var index = parser.ParseIndexFrom(RoleEnvironment.CurrentRoleInstance.Id);
+                var index = parser.ParseIndexFrom(SafeRoleEnvironment.CurrentRoleInstanceId);
                 individualQueueName = parser.ParseQueueNameFrom(queueName)
                                           + (index > 0 ? "-" : "")
                                           + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
