@@ -203,7 +203,6 @@ namespace NServiceBus.Config
         {
             try
             {
-// ReSharper disable once CSharpWarnings::CS0618
                 var ass = Assembly.LoadWithPartialName("Microsoft.WindowsAzure.ServiceRuntime");
                 isAvailable = ass != null;
                 return ass;
