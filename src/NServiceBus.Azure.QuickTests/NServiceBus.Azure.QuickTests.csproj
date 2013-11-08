@@ -91,6 +91,10 @@
     <None Include="ripple.dependencies.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj">
+      <Project>{607c3f29-58d4-4eec-bffb-668976cbb5b8}</Project>
+      <Name>NServiceBus.Azure.Transports.WindowsAzureServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
       <Project>{12f1d9f1-0a2c-4442-8d18-67dd096c6300}</Project>
       <Name>NServiceBus.Azure</Name>

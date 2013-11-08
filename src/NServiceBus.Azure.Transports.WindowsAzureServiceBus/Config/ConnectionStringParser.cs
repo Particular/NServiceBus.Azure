@@ -1,4 +1,4 @@
-namespace NServiceBus.Azure
+namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     public class ConnectionStringParser
     {

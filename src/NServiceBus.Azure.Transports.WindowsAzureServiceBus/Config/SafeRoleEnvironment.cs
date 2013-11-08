@@ -1,4 +1,4 @@
-namespace NServiceBus.Config
+namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using System.Diagnostics;
