@@ -1,4 +1,4 @@
-namespace NServiceBus.Unicast.Queuing.Azure
+namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
     using System.Collections.Concurrent;
@@ -11,7 +11,6 @@ namespace NServiceBus.Unicast.Queuing.Azure
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using Serialization;
-    using Transports.StorageQueues;
 
     public class AzureMessageQueueReceiver
     {

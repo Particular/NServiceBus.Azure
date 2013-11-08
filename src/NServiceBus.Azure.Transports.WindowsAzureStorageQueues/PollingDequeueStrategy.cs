@@ -1,4 +1,4 @@
-namespace NServiceBus.Unicast.Queuing.Azure
+namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
     using System.Collections.Generic;
@@ -7,8 +7,8 @@ namespace NServiceBus.Unicast.Queuing.Azure
     using System.Transactions;
     using CircuitBreakers;
     using Logging;
-    using Transport;
-    using Transports;
+    using NServiceBus.Transports;
+    using Unicast.Transport;
 
     /// <summary>
     /// A polling implementation of <see cref="IDequeueMessages"/>.

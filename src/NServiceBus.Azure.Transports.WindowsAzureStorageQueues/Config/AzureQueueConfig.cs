@@ -1,7 +1,7 @@
 namespace NServiceBus.Config
 {
     using System.Configuration;
-    using Unicast.Queuing.Azure;
+    using Azure.Transports.WindowsAzureStorageQueues;
 
     public class AzureQueueConfig : ConfigurationSection
     {

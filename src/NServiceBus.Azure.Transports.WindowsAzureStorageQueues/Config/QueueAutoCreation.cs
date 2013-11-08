@@ -1,9 +1,10 @@
-﻿namespace NServiceBus.Features
+﻿namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
     using System.Linq;
     using Config;
-    using Transports;
+    using Features;
+    using NServiceBus.Transports;
     using Unicast.Queuing;
 
     /// <summary>

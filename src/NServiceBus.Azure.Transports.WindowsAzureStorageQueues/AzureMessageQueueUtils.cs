@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Transports.StorageQueues
+﻿namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
     using System.Security.Cryptography;

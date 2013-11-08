@@ -1,13 +1,11 @@
 ﻿namespace NServiceBus.Features
 {
-    using Azure;
+    using Azure.Transports.WindowsAzureStorageQueues;
     using Config;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using Settings;
     using Transports;
-    using Transports.StorageQueues;
-    using Unicast.Queuing.Azure;
 
     public class AzureStorageQueueTransport : ConfigureTransport<AzureStorageQueue>
     {
@@ -22,9 +20,6 @@
             if (SafeRoleEnvironment.IsAvailable)
             {
                 EnableByDefault<QueueAutoCreation>();
-
-                if (!IsHostedIn.ChildHostProcess())
-                    config.AzureConfigurationSource();
             }
 
             var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();

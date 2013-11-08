@@ -1,7 +1,7 @@
 ﻿using NServiceBus.Config;
 using NServiceBus.Settings;
 
-namespace NServiceBus.Azure
+namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
 

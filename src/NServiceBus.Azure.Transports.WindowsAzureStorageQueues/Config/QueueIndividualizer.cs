@@ -1,7 +1,6 @@
-namespace NServiceBus.Config
+namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System.Globalization;
-    using Azure;
 
     internal class QueueIndividualizer
     {

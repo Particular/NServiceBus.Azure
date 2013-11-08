@@ -1,4 +1,4 @@
-using NServiceBus.Unicast.Queuing.Azure;
+using NServiceBus.Azure.Transports.WindowsAzureStorageQueues;
 
 namespace NServiceBus
 {

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NServiceBus.Unicast.Queuing.Azure
+namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     [Serializable]
     internal class MessageWrapper : IMessage

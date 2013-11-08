@@ -93,27 +93,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigureAzureBlobStorageDataBus.cs" />
-    <Compile Include="Config\ConnectionStringParser.cs" />
+    <Compile Include="Config\IsHostedIn.cs" />
     <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Config\SetDefaultConfigurationSource.cs" />
     <Compile Include="Logging\Azure\TraceLogger.cs" />
     <Compile Include="Logging\Azure\TraceLoggerFactory.cs" />
-    <Compile Include="Transports\DeterministicGuidBuilder.cs" />
-    <Compile Include="Transports\IsHostedIn.cs" />
-    <Compile Include="Transports\StorageQueues\Config\DeterminesBestConnectionStringForStorageQueues.cs" />
-    <Compile Include="Transports\StorageQueues\NamingConventions\AzureQueueNamingConvention.cs" />
-    <Compile Include="Transports\StorageQueues\Config\ConfigureAzureMessageQueue.cs" />
     <Compile Include="ConfigureAzureSagaPersister.cs" />
     <Compile Include="ConfigureAzureSubscriptionStorage.cs" />
     <Compile Include="Config\AzureDataBusConfig.cs" />
-    <Compile Include="Transports\StorageQueues\Config\AzureQueueConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
     <Compile Include="ConfigureAzureIntegration.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueUtils.cs" />
-    <Compile Include="Transports\StorageQueues\Config\AzureStorageQueueTransport.cs" />
-    <Compile Include="Config\QueueIndividualizer.cs" />
     <Compile Include="DataBus\Azure\BlobStorage\BlobStorageDataBus.cs" />
     <Compile Include="DataBus\Azure\BlobStorage\Block.cs" />
     <Compile Include="ConfigurationSource\Azure\AzureConfigurationSettings.cs" />
@@ -130,20 +121,10 @@
     <Compile Include="Timeout\TimeoutLogic\ServiceContext.cs" />
     <Compile Include="Timeout\TimeoutLogic\TimeoutDataEntity.cs" />
     <Compile Include="Timeout\TimeoutLogic\TimeoutPersister.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueCreator.cs" />
-    <Compile Include="Config\QueueAutoCreation.cs" />
-    <Compile Include="Transports\StorageQueues\EnvelopeDeserializationFailed.cs" />
-    <Compile Include="Transports\StorageQueues\PollingDequeueStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueReceiver.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueSender.cs" />
-    <Compile Include="Transports\StorageQueues\MessageWrapper.cs" />
-    <Compile Include="Transports\StorageQueues\ReceiveResourceManager.cs" />
-    <Compile Include="Transports\StorageQueues\SendResourceManager.cs" />
     <Compile Include="Subscriptions\Azure\AzureSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\Azure\Subscription.cs" />
     <Compile Include="Subscriptions\Azure\SubscriptionServiceContext.cs" />
-    <Compile Include="Transports\StorageQueues\AzureStorageQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

@@ -16,7 +16,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
             InfrastructureServices.SetDefaultFor<ISagaPersister>(() => Configure.Instance.AzureSagaPersister());
             InfrastructureServices.SetDefaultFor<IPersistTimeouts>(() => Configure.Instance.UseAzureTimeoutPersister());
 
-            if (selectedTransport == null || selectedTransport is AzureStorageQueue)
+            if (selectedTransport == null || !selectedTransport.HasNativePubSubSupport)
             {
                 InfrastructureServices.SetDefaultFor<ISubscriptionStorage>(() => Configure.Instance.AzureSubscriptionStorage());
             }

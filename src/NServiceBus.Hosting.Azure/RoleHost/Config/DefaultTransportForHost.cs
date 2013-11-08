@@ -18,7 +18,8 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
                 return;
             }
 
-            Configure.Instance.UseTransport<AzureStorageQueue>();
+           // is this really required ???
+           // Configure.Instance.UseTransport<AzureStorageQueue>();
         }
     }
 }

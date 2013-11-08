@@ -4,14 +4,13 @@ using System.IO;
 using System.Transactions;
 using NServiceBus.Serialization;
 
-namespace NServiceBus.Unicast.Queuing.Azure
+namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
-    using NServiceBus.Azure.Transports.StorageQueues;
+    using NServiceBus.Transports;
     using Settings;
-    using Transports;
-    using Transports.StorageQueues;
+    using Unicast.Queuing;
 
     /// <summary>
     /// 

@@ -1,18 +1,17 @@
-namespace NServiceBus.Unicast.Queuing.Azure
+namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System.Transactions;
-    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     
-    public class ReceiveResourceManager : IEnlistmentNotification
+    public class SendResourceManager : IEnlistmentNotification
     {
         private readonly CloudQueue queue;
-        private readonly CloudQueueMessage receivedMessage;
+        private readonly CloudQueueMessage message;
 
-        public ReceiveResourceManager(CloudQueue queue, CloudQueueMessage receivedMessage)
+        public SendResourceManager(CloudQueue queue, CloudQueueMessage message)
         {
             this.queue = queue;
-            this.receivedMessage = receivedMessage;
+            this.message = message;
         }
 
         public void Prepare(PreparingEnlistment preparingEnlistment)
@@ -22,14 +21,7 @@ namespace NServiceBus.Unicast.Queuing.Azure
 
         public void Commit(Enlistment enlistment)
         {
-            try
-            {
-                queue.DeleteMessage(receivedMessage);
-            }
-            catch (StorageException ex)
-            {
-                if (ex.RequestInformation.HttpStatusCode != 404) throw;
-            }
+            queue.AddMessage(message);
             enlistment.Done();
         }
 
@@ -42,7 +34,5 @@ namespace NServiceBus.Unicast.Queuing.Azure
         {
             enlistment.Done();
         }
-
-
     }
 }
