@@ -3,14 +3,14 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>NServiceBus.Azure</id>
     <title>NServiceBus Azure</title>
-    <version>4.1.0-alpha0</version>
+    <version>5.0.0</version>
     <authors>NServiceBus Ltd</authors>
     <owners>Udi Dahan, Andreas Ohlund, John Simons</owners>
     <licenseUrl>http://particular.net/LicenseAgreement</licenseUrl>
     <projectUrl>http://particular.net/</projectUrl>
     <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Azure (SDK 2.2) support for NServicebus</description>
+    <description>Azure support for NServicebus</description>
     <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
     <dependencies>		 
@@ -19,7 +19,6 @@
 		 <dependency id="Microsoft.Data.OData" version="[5.2.0]" />
 		 <dependency id="System.Spatial" version="[5.2.0]" />
 		 <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[2.0.1.0]" />
-		 <dependency id="WindowsAzure.ServiceBus" version="[2.1.0.0, 2.2.0.0)" />
 		 <dependency id="WindowsAzure.Storage" version="[2.1.0.0]" />
 	</dependencies>
   </metadata>
