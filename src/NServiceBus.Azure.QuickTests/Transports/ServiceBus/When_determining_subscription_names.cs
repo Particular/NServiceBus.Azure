@@ -2,7 +2,7 @@
 {
     using System;
     using NUnit.Framework;
-    using Unicast.Queuing.Azure.ServiceBus;
+    using Transports.WindowsAzureServiceBus;
 
     [TestFixture]
     [Category("Azure")]

@@ -1,9 +1,8 @@
-using NServiceBus.Logging;
-using NServiceBus.Logging.Loggers;
-
 namespace NServiceBus
 {
-    using Integration.Azure;
+    using System;
+    using Logging;
+    using Logging.Loggers;
 
     public static class SetLoggingLibraryForAzure
     {
@@ -13,12 +12,17 @@ namespace NServiceBus
             return config;
         }
 
-        public static Configure AzureDiagnosticsLogger(this Configure config, bool enable = true, bool initialize = true)
+        public static Configure TraceLogger(this Configure config)
         {
-            var factory = new AzureDiagnosticsLoggerFactory {Enable = enable, InitializeDiagnostics = initialize};
-            factory.ConfigureAzureDiagnostics();
-            LogManager.LoggerFactory = factory;
+            LogManager.LoggerFactory = new TraceLoggerFactory();
             return config;
         }
+
+        [ObsoleteEx(RemoveInVersion = "6.0", TreatAsErrorFromVersion = "5.0", Replacement = "TraceLogger")] 
+        public static Configure AzureDiagnosticsLogger(this Configure config, bool enable = true, bool initialize = true)
+        {
+            throw new NotSupportedException("Azure Diagnostics Logger is not supported anymore, setup logging using the .wadcfg file and use TraceLogger instead.");
+        }
     }
+
 }

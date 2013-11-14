@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using NServiceBus.Logging;
-using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace NServiceBus.Hosting
 {
     using System.Linq;
+    using Config;
 
     internal class DynamicEndpointRunner
     {
@@ -39,7 +39,7 @@ namespace NServiceBus.Hosting
                                                      {
                                                          logger.Error(args.Data);
 
-                                                         if (RecycleRoleOnError) RoleEnvironment.RequestRecycle();
+                                                         if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
                                                      };
                     process.Exited += (o, args) =>
                                           {
@@ -47,7 +47,7 @@ namespace NServiceBus.Hosting
                                               if (process.ExitCode != 0)
                                               {
                                                   logger.Error(output);
-                                                  if (RecycleRoleOnError) RoleEnvironment.RequestRecycle();
+                                                  if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
                                               }
                                               else
                                               {
@@ -64,7 +64,7 @@ namespace NServiceBus.Hosting
                 {
                     logger.Error(e.Message);
 
-                    if (RecycleRoleOnError) RoleEnvironment.RequestRecycle();
+                    if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
                 }
             }
         }

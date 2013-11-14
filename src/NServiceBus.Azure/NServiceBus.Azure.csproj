@@ -25,8 +25,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\binaries\NServiceBus.Azure.XML</DocumentationFile>
-    <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
+    <DocumentationFile>..\binaries\NServiceBus.Azure.xml</DocumentationFile>
+    <NoWarn>1591, 0618</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,8 +36,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\binaries\NServiceBus.Azure.XML</DocumentationFile>
-    <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
+    <DocumentationFile>..\binaries\NServiceBus.Azure.xml</DocumentationFile>
+    <NoWarn>1591, 0618</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Data.Edm">
@@ -52,14 +54,6 @@
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Azure\Microsoft.WindowsAzure.Diagnostics.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Azure\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage">
       <HintPath>..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
@@ -99,49 +93,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigureAzureBlobStorageDataBus.cs" />
-    <Compile Include="Config\ConnectionStringParser.cs" />
+    <Compile Include="Config\IsHostedIn.cs" />
+    <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
-    <Compile Include="Logging\Azure\Diagnostics.cs" />
-    <Compile Include="Transports\DeterministicGuidBuilder.cs" />
-    <Compile Include="Transports\ServiceBus\Config\DeterminesBestConnectionStringForAzureServiceBus.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\AutoCreateTopic.cs" />
-    <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusQueueNamingConvention.cs" />
-    <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusPublisherAddressConvention.cs" />
-    <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusPublisherAddressConventionForSubscriptions.cs" />
-    <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusSubscriptionNamingConvention.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\AzureServicebusTopicClientCreator.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\AzureServicebusTopicCreator.cs" />
-    <Compile Include="Transports\IsHostedIn.cs" />
-    <Compile Include="Transports\ServiceBus\NamingConventions\AzureServiceBusTopicNameConvention.cs" />
-    <Compile Include="Transports\StorageQueues\Config\DeterminesBestConnectionStringForStorageQueues.cs" />
-    <Compile Include="Transports\StorageQueues\NamingConventions\AzureQueueNamingConvention.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\CreatesMessagingFactories.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\CreatesNamespaceManagers.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\ICreateMessagingFactories.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\ICreateNamespaceManagers.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\ICreateTopicClients.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\ICreateTopics.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\ServicebusSubscriptionFilterBuilder.cs" />
-    <Compile Include="Transports\StorageQueues\Config\ConfigureAzureMessageQueue.cs" />
+    <Compile Include="Config\SetDefaultConfigurationSource.cs" />
+    <Compile Include="Logging\Azure\TraceLogger.cs" />
+    <Compile Include="Logging\Azure\TraceLoggerFactory.cs" />
     <Compile Include="ConfigureAzureSagaPersister.cs" />
-    <Compile Include="Transports\ServiceBus\Config\ConfigureAzureServiceBusMessageQueue.cs" />
     <Compile Include="ConfigureAzureSubscriptionStorage.cs" />
     <Compile Include="Config\AzureDataBusConfig.cs" />
-    <Compile Include="Transports\StorageQueues\Config\AzureQueueConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
-    <Compile Include="Transports\ServiceBus\Config\AzureServiceBusQueueConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
     <Compile Include="ConfigureAzureIntegration.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueUtils.cs" />
-    <Compile Include="Transports\StorageQueues\Config\AzureStorageQueueTransport.cs" />
-    <Compile Include="Config\QueueIndividualizer.cs" />
-    <Compile Include="Transports\ServiceBus\Config\AzureServiceBusTransport.cs" />
     <Compile Include="DataBus\Azure\BlobStorage\BlobStorageDataBus.cs" />
     <Compile Include="DataBus\Azure\BlobStorage\Block.cs" />
     <Compile Include="ConfigurationSource\Azure\AzureConfigurationSettings.cs" />
     <Compile Include="ConfigurationSource\Azure\AzureConfigurationSource.cs" />
-    <Compile Include="Logging\Azure\AzureDiagnosticsLogger.cs" />
-    <Compile Include="Logging\Azure\AzureDiagnosticsLoggerFactory.cs" />
     <Compile Include="ConfigurationSource\Azure\IAzureConfigurationSettings.cs" />
     <Compile Include="Logging\Azure\SetLoggingLibrary.cs" />
     <Compile Include="Config\AzureTimeoutPersisterConfig.cs" />
@@ -154,38 +121,10 @@
     <Compile Include="Timeout\TimeoutLogic\ServiceContext.cs" />
     <Compile Include="Timeout\TimeoutLogic\TimeoutDataEntity.cs" />
     <Compile Include="Timeout\TimeoutLogic\TimeoutPersister.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\AzureServiceBusQueueCreator.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueCreator.cs" />
-    <Compile Include="Config\QueueAutoCreation.cs" />
-    <Compile Include="Transports\StorageQueues\EnvelopeDeserializationFailed.cs" />
-    <Compile Include="Transports\StorageQueues\PollingDequeueStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueReceiver.cs" />
-    <Compile Include="Transports\StorageQueues\AzureMessageQueueSender.cs" />
-    <Compile Include="Transports\StorageQueues\MessageWrapper.cs" />
-    <Compile Include="Transports\StorageQueues\ReceiveResourceManager.cs" />
-    <Compile Include="Transports\StorageQueues\SendResourceManager.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServicebusDefaults.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServiceBusDequeueStrategy.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\AzureServicebusSubscriptionClientCreator.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\ICreateQueueClients.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServiceBusMessageQueueSender.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServiceBusQueueNotifier.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServiceBusTopicNotifier.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServiceBusTopicPublisher.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServiceBusTopicSubscriptionManager.cs" />
-    <Compile Include="Transports\ServiceBus\BrokeredMessageConverter.cs" />
-    <Compile Include="Transports\ServiceBus\BrokeredMessageExtensions.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\ICreateSubscriptionClients.cs" />
-    <Compile Include="Transports\ServiceBus\INotifyReceivedMessages.cs" />
-    <Compile Include="Transports\ServiceBus\Creation\QueueClientCreator.cs" />
-    <Compile Include="Transports\ServiceBus\ReceiveResourceManager.cs" />
-    <Compile Include="Transports\ServiceBus\SendResourceManager.cs" />
     <Compile Include="Subscriptions\Azure\AzureSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\Azure\Subscription.cs" />
     <Compile Include="Subscriptions\Azure\SubscriptionServiceContext.cs" />
-    <Compile Include="Transports\ServiceBus\AzureServiceBus.cs" />
-    <Compile Include="Transports\StorageQueues\AzureStorageQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

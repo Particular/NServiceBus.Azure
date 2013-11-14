@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Data.Edm">
@@ -42,14 +44,6 @@
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Azure\Microsoft.WindowsAzure.Diagnostics.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Azure\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage">
       <HintPath>..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
@@ -97,6 +91,14 @@
     <None Include="ripple.dependencies.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj">
+      <Project>{607c3f29-58d4-4eec-bffb-668976cbb5b8}</Project>
+      <Name>NServiceBus.Azure.Transports.WindowsAzureServiceBus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureStorageQueues\NServiceBus.Azure.Transports.WindowsAzureStorageQueues.csproj">
+      <Project>{b6d6406f-f5a4-46d7-a882-4a831128065e}</Project>
+      <Name>NServiceBus.Azure.Transports.WindowsAzureStorageQueues</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
       <Project>{12f1d9f1-0a2c-4442-8d18-67dd096c6300}</Project>
       <Name>NServiceBus.Azure</Name>

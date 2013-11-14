@@ -8,7 +8,7 @@ namespace NServiceBus.Hosting.Roles.Handlers
 
 
     /// <summary>
-    /// Configuring the right transport based on  UsingTransport<T> role on the endpoint config
+    /// Configuring the right transport based on  <see cref="UsingTransport{T}"/> role on the endpoint config
     /// </summary>
     public class TransportRoleHandler : IConfigureRole<UsingTransport<TransportDefinition>>
     {

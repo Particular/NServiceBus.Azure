@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>NServiceBus.Azure.Transports.WindowsAzureServiceBus</id>
+    <title>NServiceBus Azure Transports WindowsAzureServiceBus</title>
+    <version>4.1.0-alpha0</version>
+    <authors>NServiceBus Ltd</authors>
+    <owners>Udi Dahan, Andreas Ohlund, John Simons</owners>
+    <licenseUrl>http://particular.net/LicenseAgreement</licenseUrl>
+    <projectUrl>http://particular.net/</projectUrl>
+    <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>NServiceBus Transport for the Windows Azure Servicebus (SDK 2.1)</description>
+    <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
+    <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
+    <dependencies>		 
+		 <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[2.0.1.0]" />
+		 <dependency id="WindowsAzure.ServiceBus" version="[2.1.0.0, 2.2.0.0)" />
+	</dependencies>
+  </metadata>
+  <files>
+    <file src="..\..\src\binaries\NServiceBus.Azure.Transports.WindowsAzureServiceBus.???" target="lib\net40" />
+  </files>
+</package>
