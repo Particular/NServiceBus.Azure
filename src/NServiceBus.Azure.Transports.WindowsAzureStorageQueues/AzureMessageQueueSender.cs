@@ -39,7 +39,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             var sendQueue = sendClient.GetQueueReference(AzureMessageQueueUtils.GetQueueName(address));
 
             if (!sendQueue.Exists())
-                throw new QueueNotFoundException();
+                throw new QueueNotFoundException { Queue = address };
 
             var rawMessage = SerializeMessage(message);
 
