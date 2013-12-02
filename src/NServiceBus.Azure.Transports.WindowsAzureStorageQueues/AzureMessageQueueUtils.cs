@@ -36,7 +36,7 @@
 
         public static bool IsValidQueueName(string name)
         {
-            return new Regex(@"^[a-z][-a-z]{1,61}[a-z]$").IsMatch(name);
+            return new Regex(@"^(?=.{3,63}$)[a-z0-9](-?[a-z0-9])+$").IsMatch(name);
         }
 
         static Guid DeterministicGuidBuilder(string input)
