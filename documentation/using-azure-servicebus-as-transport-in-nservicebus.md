@@ -83,5 +83,5 @@ Using this configuration setting you can change the following values. It's impor
 Sample
 ------
 
-Want to see this transport in action? Checkout the [Video storage sample.](https://github.com/Particular/NServiceBus.Azure.Samples/tree/master/VideoStore.AzureServiceBus.Cloud)
+Want to see this transport in action? Checkout the [Video store sample.](https://github.com/Particular/NServiceBus.Azure.Samples/tree/master/VideoStore.AzureServiceBus.Cloud)
 
