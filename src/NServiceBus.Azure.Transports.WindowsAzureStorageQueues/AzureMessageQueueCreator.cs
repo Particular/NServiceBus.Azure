@@ -25,7 +25,7 @@
             }
             catch (Exception ex)
             {
-                throw new StorageException(string.Format("Failed to create queue: {0}. Rules for naming queues can be found at http://msdn.microsoft.com/en-us/library/windowsazure/dd179349.aspx", queueName), ex);
+                throw new StorageException(string.Format("Failed to create queue: {0}, because {1}.", queueName, ex.Message), ex);
             }
         }
     }

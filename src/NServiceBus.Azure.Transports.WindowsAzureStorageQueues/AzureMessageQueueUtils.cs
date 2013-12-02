@@ -1,8 +1,10 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
+    using System.Configuration;
     using System.Security.Cryptography;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Helper class 
@@ -24,7 +26,17 @@
                 name = name.Substring(0, 63 - nameGuid.Length - 1) + "-" + nameGuid;
             }
 
+            if (! IsValidQueueName(name))
+            {
+                throw new ConfigurationErrorsException(string.Format("Invalid Queuename {0}, rules for naming queues can be found at http://msdn.microsoft.com/en-us/library/windowsazure/dd179349.aspx", name));
+            }
+
             return name;
+        }
+
+        public static bool IsValidQueueName(string name)
+        {
+            return new Regex(@"^[a-z][-a-z]{1,61}[a-z]$").IsMatch(name);
         }
 
         static Guid DeterministicGuidBuilder(string input)
