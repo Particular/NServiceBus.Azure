@@ -1,8 +1,8 @@
 ﻿namespace NServiceBus.Azure.QuickTests
 {
     using System;
+    using Azure.Transports.WindowsAzureServiceBus;
     using NUnit.Framework;
-    using Transports.WindowsAzureServiceBus;
 
     [TestFixture]
     [Category("Azure")]
