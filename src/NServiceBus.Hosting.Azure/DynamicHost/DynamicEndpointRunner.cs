@@ -34,28 +34,28 @@ namespace NServiceBus.Hosting
                                                };
                     
                     var process = new Process {StartInfo = processStartInfo, EnableRaisingEvents = true};
-                    
-                    process.ErrorDataReceived += (o, args) =>
-                                                     {
-                                                         logger.Error(args.Data);
 
-                                                         if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
-                                                     };
+                    process.ErrorDataReceived += (o, args) =>
+                    {
+                        logger.Error(args.Data);
+
+                        if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
+                    };
+
+                    process.OutputDataReceived += (o, args) => logger.Debug(args.Data);
+
                     process.Exited += (o, args) =>
-                                          {
-                                              var output = process.StandardOutput.ReadToEnd();
-                                              if (process.ExitCode != 0)
-                                              {
-                                                  logger.Error(output);
-                                                  if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
-                                              }
-                                              else
-                                              {
-                                                  logger.Debug(output);
-                                              }
-                                          };
+                    {
+                        if (process.ExitCode != 0)
+                        {
+                            if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
+                        }
+                    };
 
                     process.Start();
+
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
 
                     service.ProcessId = process.Id;
                     
