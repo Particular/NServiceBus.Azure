@@ -17,14 +17,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
                 if ((bool) configSection.QueuePerInstance)
                 {
-                    SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", true);
+                    SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", false);
                 }
             }
 
             if (queueName.Length >= 253) // 260 - a spot for the "." & 6 digits for the individualizer
                 queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
-            if (SettingsHolder.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+            if (!SettingsHolder.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
                 queueName = QueueIndividualizer.Individualize(queueName);
 
             return queueName;

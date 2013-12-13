@@ -25,7 +25,7 @@
 
             Configure.Features.Enable<Features.Sagas>();
 
-            SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", true);
+            SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
 
             var config = Configure.With(types)
                             .DefineEndpointName(endpointConfiguration.EndpointName)
