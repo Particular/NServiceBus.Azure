@@ -27,7 +27,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public SubscriptionClient Create(Type eventType, Address topic, string subscriptionname)
         {
-            if (Feature.IsEnabled<TopicAutoCreation>())
+            if (QueueAutoCreation.ShouldAutoCreate)
             {
                 subscriptionCreator.Create(topic, eventType, subscriptionname);
             }
@@ -37,7 +37,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void Delete(Address topic, string subscriptionname)
         {
-            if (Feature.IsEnabled<TopicAutoCreation>())
+            if (QueueAutoCreation.ShouldAutoCreate)
             {
                 subscriptionCreator.Delete(topic, subscriptionname);
             }

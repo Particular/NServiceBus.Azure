@@ -18,7 +18,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public QueueClient Create(Address address)
         {
-            if (Feature.IsEnabled<QueueAutoCreation>() && !ConfigureQueueCreation.DontCreateQueues)
+            if (QueueAutoCreation.ShouldAutoCreate)
             {
                 queueCreator.CreateQueueIfNecessary(address, null);
             }

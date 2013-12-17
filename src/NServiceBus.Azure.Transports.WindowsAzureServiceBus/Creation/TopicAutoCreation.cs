@@ -5,7 +5,7 @@
     using NServiceBus.Transports;
     using Settings;
 
-    public class TopicAutoCreation: Feature, IWantToRunWhenConfigurationIsComplete
+    public class TopicAutoCreation: IWantToRunWhenConfigurationIsComplete
     {
         readonly ICreateTopics topicCreator;
 
@@ -16,7 +16,7 @@
 
         public void Run()
         {
-            if (!IsEnabled<TopicAutoCreation>())
+            if (!QueueAutoCreation.ShouldAutoCreate)
                 return;
 
             var selectedTransport = SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");

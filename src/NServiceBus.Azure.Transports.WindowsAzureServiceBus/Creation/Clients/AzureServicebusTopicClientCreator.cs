@@ -18,7 +18,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public TopicClient Create(Address address)
         {
             address = AzureServiceBusPublisherAddressConvention.Apply(address);
-            if (Feature.IsEnabled<TopicAutoCreation>())
+            if (QueueAutoCreation.ShouldAutoCreate)
             {
                 topicCreator.CreateIfNecessary(address);
             }

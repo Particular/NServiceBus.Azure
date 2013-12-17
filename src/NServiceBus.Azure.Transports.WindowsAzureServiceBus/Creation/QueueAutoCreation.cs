@@ -16,7 +16,7 @@
 
         public void Run()
         {
-            if (!IsEnabled<QueueAutoCreation>() || ConfigureQueueCreation.DontCreateQueues)
+            if (!ShouldAutoCreate)
                 return;
 
             var wantQueueCreatedInstances = Configure.Instance.Builder.BuildAll<IWantQueueCreated>().ToList();
@@ -29,6 +29,23 @@
                 }
 
                 QueueCreator.CreateQueueIfNecessary(wantQueueCreatedInstance.Address, null);
+            }
+        }
+
+        internal static bool ShouldAutoCreate
+        {
+            get
+            {
+                var shouldNotAutoCreate = !IsEnabled<QueueAutoCreation>() || ConfigureQueueCreation.DontCreateQueues;
+
+                if (shouldNotAutoCreate)
+                {
+                    // force both to be false, as this is currently not guaranteed
+                    Disable<QueueAutoCreation>();
+                    Configure.Instance.DoNotCreateQueues();
+                }
+
+                return !shouldNotAutoCreate;
             }
         }
     }
