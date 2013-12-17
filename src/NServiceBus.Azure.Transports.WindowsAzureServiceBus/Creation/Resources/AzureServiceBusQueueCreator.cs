@@ -1,9 +1,10 @@
-using System;
-using Microsoft.ServiceBus.Messaging;
-
-namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
+﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    public class AzureServicebusQueueClientCreator : ICreateQueueClients
+    using System;
+    using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Transports;
+
+    public class AzureServiceBusQueueCreator : ICreateQueues
     {
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }
@@ -15,23 +16,23 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public int MaxDeliveryCount { get; set; }
         public bool EnableBatchedOperations { get; set; }
 
-        public QueueClient Create(Address address)
+        readonly ICreateNamespaceManagers createNamespaceManagers;
+
+        public AzureServiceBusQueueCreator() : this(new CreatesNamespaceManagers())
         {
-            var queueName = CreateQueue(address);
-
-
-            var factory = new CreatesMessagingFactories().Create(address.Machine);
-            var client = factory.CreateQueueClient(queueName, ReceiveMode.PeekLock);
-            client.PrefetchCount = 100; // todo make configurable
-            return client;
         }
 
-        public string CreateQueue(Address address)
+        public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers)
+        {
+            this.createNamespaceManagers = createNamespaceManagers;
+        }
+
+        public void Create(Address address)
         {
             var queueName = address.Queue;
             try
             {
-                var namespaceClient = new CreatesNamespaceManagers().Create(address.Machine);
+                var namespaceClient = createNamespaceManagers.Create(address.Machine);
                 if (!namespaceClient.QueueExists(queueName))
                 {
                     var description = new QueueDescription(queueName)
@@ -54,7 +55,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 // the queue already exists or another node beat us to it, which is ok
             }
-            return queueName;
+        }
+
+        public void CreateQueueIfNecessary(Address address, string account)
+        {
+            Create(address);
         }
     }
+
 }

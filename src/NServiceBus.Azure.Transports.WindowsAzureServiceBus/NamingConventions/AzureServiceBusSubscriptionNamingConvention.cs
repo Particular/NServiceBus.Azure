@@ -1,7 +1,6 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using NServiceBus.Azure.Transports.WindowsAzureServiceBus;
 
     public static class AzureServiceBusSubscriptionNamingConvention
     {

@@ -1,4 +1,4 @@
-namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
+namespace NServiceBus.Transports
 {
     /// <summary>
     /// 
@@ -10,6 +10,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        string Create(Address address);
+        void CreateIfNecessary(Address address);
     }
 }

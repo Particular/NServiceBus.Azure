@@ -7,36 +7,31 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusTopicNotifier : INotifyReceivedMessages
+    public class AzureServiceBusQueueNotifier : INotifyReceivedMessages
     {
-        private SubscriptionClient _subscriptionClient;
+        private QueueClient _queueClient;
         private Action<BrokeredMessage> _tryProcessMessage;
-        private bool _cancelRequested;
+        private bool cancelRequested;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public ICreateQueueClients QueueClientCreator { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         public int ServerWaitTime { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
         public int BatchSize { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
         public int BackoffTimeInSeconds { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public ICreateSubscriptionClients SubscriptionClientCreator { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public Type EventType { get; set; }
+        public Address Address { get; private set; }
 
         /// <summary>
         /// 
@@ -45,13 +40,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="tryProcessMessage"></param>
         public void Start(Address address, Action<BrokeredMessage> tryProcessMessage)
         {
-            _cancelRequested = false;
+            Address = address;
+
+            cancelRequested = false;
 
             _tryProcessMessage = tryProcessMessage;
+            
+            _queueClient = QueueClientCreator.Create(address);
 
-            _subscriptionClient = SubscriptionClientCreator.Create(address, EventType);
-
-            if (_subscriptionClient != null) _subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
 
         /// <summary>
@@ -59,16 +56,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         public void Stop()
         {
-            _cancelRequested = true;
+            cancelRequested = true;
         }
 
         private void OnMessage(IAsyncResult ar)
         {
             try
             {
-                var receivedMessages = _subscriptionClient.EndReceiveBatch(ar);
+                var receivedMessages = _queueClient.EndReceiveBatch(ar);
 
-                if (_cancelRequested) return;
+                if (cancelRequested) return;
 
                 foreach (var receivedMessage in receivedMessages)
                 {
@@ -77,19 +74,19 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             catch (MessagingEntityDisabledException)
             {
-                if (_cancelRequested) return;
+                if (cancelRequested) return;
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
             catch (ServerBusyException)
             {
-                if (_cancelRequested) return;
+                if (cancelRequested) return;
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
             catch (MessagingCommunicationException)
             {
-                if (_cancelRequested) return;
+                if (cancelRequested) return;
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
@@ -98,7 +95,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 // time's up, just continue and retry
             }
 
-            _subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
     }
 }

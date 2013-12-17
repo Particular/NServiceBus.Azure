@@ -16,7 +16,7 @@
 
         public void Run()
         {
-            if (!IsEnabled<QueueAutoCreation>())
+            if (!IsEnabled<QueueAutoCreation>() || ConfigureQueueCreation.DontCreateQueues)
                 return;
 
             var wantQueueCreatedInstances = Configure.Instance.Builder.BuildAll<IWantQueueCreated>().ToList();

@@ -1,5 +1,4 @@
 using System;
-using Microsoft.ServiceBus;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
@@ -9,15 +8,21 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public NamespaceManager NamespaceClient { get; set; }
+        AzureServiceBusDequeueStrategy strategy;
 
         /// <summary>
         /// 
         /// </summary>
         public ICreateSubscriptionClients ClientCreator { get; set; }
+
+        public AzureServiceBusTopicSubscriptionManager (UnicastBus bus)
+        {
+            var transport = bus.Transport as TransportReceiver;
+            if (transport == null) return;
+            strategy = transport.Receiver as AzureServiceBusDequeueStrategy;
+
+            if (strategy == null) throw new Exception("AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
+        }
 
         /// <summary>
         /// 
@@ -26,24 +31,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="original"></param>
         public void Subscribe(Type eventType, Address original)
         {
-            var publisherAddress = Address.Parse(AzureServiceBusPublisherAddressConventionForSubscriptions.Create(original));
+            var publisherAddress = AzureServiceBusPublisherAddressConventionForSubscriptions.Apply(original);
             var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
 
             ClientCreator.Create(eventType, publisherAddress, subscriptionname);
-
-            // how to make the correct strategy listen to this subscription
-
-            var theBus = Configure.Instance.Builder.Build<UnicastBus>();
-
-            var transport = theBus.Transport as TransportReceiver;
-
-            if (transport == null) return;
-
-            var strategy = transport.Receiver as AzureServiceBusDequeueStrategy;
-
-            if (strategy == null) return;
-            
-            var notifier = Configure.Instance.Builder.Build<AzureServiceBusTopicNotifier>();
+           
+            var notifier = Configure.Instance.Builder.Build<AzureServiceBusSubscriptionNotifier>();
             notifier.EventType = eventType;
             strategy.TrackNotifier(publisherAddress, notifier);
         }
@@ -55,15 +48,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="original"></param>
         public void Unsubscribe(Type eventType, Address original)
         {
-            var publisherAddress = Address.Parse(AzureServiceBusPublisherAddressConvention.Create(original));
+            var publisherAddress = AzureServiceBusPublisherAddressConvention.Apply(original);
             var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
 
-            if (NamespaceClient.SubscriptionExists(publisherAddress.Queue, subscriptionname))
-            {
-                NamespaceClient.DeleteSubscription(publisherAddress.Queue, subscriptionname);
-            }
+            ClientCreator.Delete(publisherAddress, subscriptionname);
 
-            // unhook the listener
+            strategy.RemoveNotifier(publisherAddress);
         }
     }
 }

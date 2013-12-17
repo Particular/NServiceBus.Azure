@@ -25,7 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\binaries\NServiceBus.Azure.xml</DocumentationFile>
+    <DocumentationFile>..\binaries\NServiceBus.Azure.Transports.WindowsAzureServiceBus.xml</DocumentationFile>
     <NoWarn>1591, 0618</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -36,7 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\binaries\NServiceBus.Azure.xml</DocumentationFile>
+    <DocumentationFile>..\binaries\NServiceBus.Azure.Transports.WindowsAzureServiceBus.xml</DocumentationFile>
     <NoWarn>1591, 0618</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -76,47 +76,49 @@
     <Compile Include="Config\QueueIndividualizer.cs" />
     <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
+    <Compile Include="Creation\Clients\ICreateMessagingFactories.cs" />
+    <Compile Include="Creation\Clients\ICreateSubscriptionClients.cs" />
+    <Compile Include="Creation\Clients\ICreateTopicClients.cs" />
+    <Compile Include="Creation\Resources\ICreateNamespaceManagers.cs" />
+    <Compile Include="Creation\Clients\ICreateQueueClients.cs" />
+    <Compile Include="Creation\Resources\AzureServicebusSubscriptionCreator.cs" />
     <Compile Include="Creation\QueueAutoCreation.cs" />
-    <Compile Include="DeterministicGuidBuilder.cs" />
-    <Compile Include="IsHostedIn.cs" />
+    <Compile Include="Creation\Resources\ICreateSubscriptions.cs" />
+    <Compile Include="Utils\DeterministicGuidBuilder.cs" />
+    <Compile Include="Utils\IsHostedIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AzureServiceBus.cs" />
-    <Compile Include="AzureServicebusDefaults.cs" />
+    <Compile Include="Config\AzureServicebusDefaults.cs" />
     <Compile Include="AzureServiceBusDequeueStrategy.cs" />
-    <Compile Include="AzureServiceBusMessageQueueSender.cs" />
-    <Compile Include="AzureServiceBusQueueNotifier.cs" />
-    <Compile Include="AzureServiceBusTopicNotifier.cs" />
-    <Compile Include="AzureServiceBusTopicPublisher.cs" />
-    <Compile Include="AzureServiceBusTopicSubscriptionManager.cs" />
-    <Compile Include="BrokeredMessageConverter.cs" />
-    <Compile Include="BrokeredMessageExtensions.cs" />
+    <Compile Include="Sending\AzureServiceBusMessageQueueSender.cs" />
+    <Compile Include="Receiving\AzureServiceBusQueueNotifier.cs" />
+    <Compile Include="Receiving\AzureServiceBusSubscriptionNotifier.cs" />
+    <Compile Include="Publishing\AzureServiceBusTopicPublisher.cs" />
+    <Compile Include="Subscribing\AzureServiceBusTopicSubscriptionManager.cs" />
+    <Compile Include="Utils\BrokeredMessageConverter.cs" />
+    <Compile Include="Utils\BrokeredMessageExtensions.cs" />
     <Compile Include="Config\AzureServiceBusQueueConfig.cs" />
     <Compile Include="Config\AzureServiceBusTransport.cs" />
     <Compile Include="Config\ConfigureAzureServiceBusMessageQueue.cs" />
     <Compile Include="Config\DeterminesBestConnectionStringForAzureServiceBus.cs" />
-    <Compile Include="Creation\AutoCreateTopic.cs" />
-    <Compile Include="Creation\AzureServiceBusQueueCreator.cs" />
-    <Compile Include="Creation\AzureServicebusSubscriptionClientCreator.cs" />
-    <Compile Include="Creation\AzureServicebusTopicClientCreator.cs" />
-    <Compile Include="Creation\AzureServicebusTopicCreator.cs" />
-    <Compile Include="Creation\CreatesMessagingFactories.cs" />
-    <Compile Include="Creation\CreatesNamespaceManagers.cs" />
-    <Compile Include="Creation\ICreateMessagingFactories.cs" />
-    <Compile Include="Creation\ICreateNamespaceManagers.cs" />
-    <Compile Include="Creation\ICreateQueueClients.cs" />
-    <Compile Include="Creation\ICreateSubscriptionClients.cs" />
-    <Compile Include="Creation\ICreateTopicClients.cs" />
+    <Compile Include="Creation\TopicAutoCreation.cs" />
+    <Compile Include="Creation\Resources\AzureServiceBusQueueCreator.cs" />
+    <Compile Include="Creation\Clients\AzureServicebusSubscriptionClientCreator.cs" />
+    <Compile Include="Creation\Clients\AzureServicebusTopicClientCreator.cs" />
+    <Compile Include="Creation\Resources\AzureServicebusTopicCreator.cs" />
+    <Compile Include="Creation\Clients\CreatesMessagingFactories.cs" />
+    <Compile Include="Creation\Resources\CreatesNamespaceManagers.cs" />
     <Compile Include="Creation\ICreateTopics.cs" />
-    <Compile Include="Creation\QueueClientCreator.cs" />
-    <Compile Include="Creation\ServicebusSubscriptionFilterBuilder.cs" />
-    <Compile Include="INotifyReceivedMessages.cs" />
+    <Compile Include="Creation\Clients\AzureServicebusQueueClientCreator.cs" />
+    <Compile Include="Creation\Resources\ServicebusSubscriptionFilterBuilder.cs" />
+    <Compile Include="Receiving\INotifyReceivedMessages.cs" />
     <Compile Include="NamingConventions\AzureServiceBusPublisherAddressConvention.cs" />
     <Compile Include="NamingConventions\AzureServiceBusPublisherAddressConventionForSubscriptions.cs" />
     <Compile Include="NamingConventions\AzureServiceBusQueueNamingConvention.cs" />
     <Compile Include="NamingConventions\AzureServiceBusSubscriptionNamingConvention.cs" />
     <Compile Include="NamingConventions\AzureServiceBusTopicNameConvention.cs" />
-    <Compile Include="ReceiveResourceManager.cs" />
-    <Compile Include="SendResourceManager.cs" />
+    <Compile Include="Receiving\ReceiveResourceManager.cs" />
+    <Compile Include="Sending\SendResourceManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Fody.targets" />

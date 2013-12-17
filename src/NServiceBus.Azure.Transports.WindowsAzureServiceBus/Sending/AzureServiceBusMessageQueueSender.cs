@@ -22,7 +22,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private static readonly object SenderLock = new Object();
 
         public int MaxDeliveryCount { get; set; }
-  
+
+        ICreateMessagingFactories createMessagingFactories;
+
+        public AzureServiceBusMessageQueueSender(ICreateMessagingFactories createMessagingFactories)
+        {
+            this.createMessagingFactories = createMessagingFactories;
+        }
+
         public void Send(TransportMessage message, string destination)
         {
             Send(message, Address.Parse(destination));
@@ -40,7 +47,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     if (!senders.TryGetValue(destination, out sender))
                     {
-                        var factory = new CreatesMessagingFactories().Create(@namespace);
+                        var factory = createMessagingFactories.Create(@namespace);
                         sender = factory.CreateQueueClient(destination);
                         senders[destination] = sender;
                     }

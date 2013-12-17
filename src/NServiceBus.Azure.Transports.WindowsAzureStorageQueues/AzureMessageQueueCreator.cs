@@ -21,7 +21,6 @@
                 var queue = Client.GetQueueReference(queueName);
 
                 queue.CreateIfNotExists();
-
             }
             catch (Exception ex)
             {

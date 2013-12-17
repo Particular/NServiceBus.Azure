@@ -7,29 +7,36 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusQueueNotifier : INotifyReceivedMessages
+    public class AzureServiceBusSubscriptionNotifier : INotifyReceivedMessages
     {
-        private QueueClient _queueClient;
-        private Action<BrokeredMessage> _tryProcessMessage;
+        private SubscriptionClient subscriptionClient;
+        private Action<BrokeredMessage> tryProcessMessage;
         private bool cancelRequested;
 
         /// <summary>
         /// 
         /// </summary>
-        public ICreateQueueClients QueueClientCreator { get; set; }
+        public int ServerWaitTime { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int ServerWaitTime { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
         public int BatchSize { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
         public int BackoffTimeInSeconds { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ICreateSubscriptionClients SubscriptionClientCreator { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Type EventType { get; set; }
 
         /// <summary>
         /// 
@@ -40,11 +47,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             cancelRequested = false;
 
-            _tryProcessMessage = tryProcessMessage;
-            
-            _queueClient = QueueClientCreator.Create(address);
+            this.tryProcessMessage = tryProcessMessage;
 
-            _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            subscriptionClient = SubscriptionClientCreator.Create(address, EventType);
+
+            if (subscriptionClient != null) subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
 
         /// <summary>
@@ -59,13 +66,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             try
             {
-                var receivedMessages = _queueClient.EndReceiveBatch(ar);
+                var receivedMessages = subscriptionClient.EndReceiveBatch(ar);
 
                 if (cancelRequested) return;
 
                 foreach (var receivedMessage in receivedMessages)
                 {
-                    _tryProcessMessage(receivedMessage);
+                    tryProcessMessage(receivedMessage);
                 }
             }
             catch (MessagingEntityDisabledException)
@@ -91,7 +98,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 // time's up, just continue and retry
             }
 
-            _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
     }
 }

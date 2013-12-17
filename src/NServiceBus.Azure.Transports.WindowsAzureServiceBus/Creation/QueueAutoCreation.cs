@@ -10,13 +10,13 @@
     /// <summary>
     /// Makes sure that all queues are created
     /// </summary>
-    public class QueueAutoCreation:Feature,IWantToRunWhenConfigurationIsComplete
+    public class QueueAutoCreation : Feature, IWantToRunWhenConfigurationIsComplete
     {
         public ICreateQueues QueueCreator { get; set; }
 
         public void Run()
         {
-            if (!IsEnabled<QueueAutoCreation>())
+            if (!IsEnabled<QueueAutoCreation>() || ConfigureQueueCreation.DontCreateQueues)
                 return;
 
             var wantQueueCreatedInstances = Configure.Instance.Builder.BuildAll<IWantQueueCreated>().ToList();

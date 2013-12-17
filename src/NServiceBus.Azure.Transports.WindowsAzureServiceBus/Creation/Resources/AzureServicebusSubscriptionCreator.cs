@@ -3,10 +3,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System;
     using Microsoft.ServiceBus.Messaging;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class AzureServicebusSubscriptionClientCreator : ICreateSubscriptionClients
+    public class AzureServicebusSubscriptionCreator : ICreateSubscriptions
     {
         public TimeSpan LockDuration { get; set; }
         public bool RequiresSession { get; set; }
@@ -16,22 +13,25 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public bool EnableBatchedOperations { get; set; }
         public bool EnableDeadLetteringOnFilterEvaluationExceptions { get; set; }
 
-        public SubscriptionClient Create(Address address, Type eventType)
+        readonly ICreateNamespaceManagers createNamespaceManagers;
+
+        public AzureServicebusSubscriptionCreator() : this(new CreatesNamespaceManagers())
         {
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
-            return Create(eventType, address, subscriptionname);
         }
 
-        public SubscriptionClient Create(Type eventType, Address topic, string subscriptionname)
+        public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers)
+        {
+            this.createNamespaceManagers = createNamespaceManagers;
+        }
+
+        public void Create(Address topic, Type eventType, string subscriptionname)
         {
             var topicPath = topic.Queue;
-            var namespaceClient = new CreatesNamespaceManagers().Create(topic.Machine);
+            var namespaceClient = createNamespaceManagers.Create(topic.Machine);
             if (namespaceClient.TopicExists(topicPath))
             {
                 try
                 {
-                    
-
                     if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
                     {
                         var description = new SubscriptionDescription(topicPath, subscriptionname)
@@ -42,8 +42,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                             EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
                             MaxDeliveryCount = MaxDeliveryCount,
                             EnableBatchedOperations = EnableBatchedOperations,
-                            EnableDeadLetteringOnFilterEvaluationExceptions =
-                                EnableDeadLetteringOnFilterEvaluationExceptions
+                            EnableDeadLetteringOnFilterEvaluationExceptions = EnableDeadLetteringOnFilterEvaluationExceptions
                         };
 
                         if (eventType != null)
@@ -62,14 +61,19 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     // the queue already exists or another node beat us to it, which is ok
                 }
-
-                var factory = new CreatesMessagingFactories().Create(topic.Machine);
-                return factory.CreateSubscriptionClient(topicPath, subscriptionname, ReceiveMode.PeekLock);
-               
             }
-           else
+            else
             {
                 throw new InvalidOperationException(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist", topicPath));
+            }
+        }
+
+        public void Delete(Address topic, string subscriptionname)
+        {
+            var namespaceClient = createNamespaceManagers.Create(topic.Machine);
+            if (namespaceClient.SubscriptionExists(topic.Queue, subscriptionname))
+            {
+                namespaceClient.DeleteSubscription(topic.Queue, subscriptionname);
             }
         }
     }

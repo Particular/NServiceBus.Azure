@@ -24,5 +24,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="subscriptionname"></param>
         /// <returns></returns>
         SubscriptionClient Create(Type eventType, Address topic, string subscriptionname);
+
+        void Delete(Address topic, string subscriptionname);
     }
 }

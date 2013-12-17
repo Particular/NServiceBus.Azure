@@ -4,6 +4,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public static class AzureServiceBusPublisherAddressConventionForSubscriptions
     {
-        public static Func<Address, string> Create = AzureServiceBusPublisherAddressConvention.Create;
+        public static Func<Address, Address> Apply = AzureServiceBusPublisherAddressConvention.Apply;
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System.Collections;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using CircuitBreakers;
@@ -224,6 +225,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow){return;}
 
             pendingMessages.Enqueue(brokeredMessage);
+        }
+
+        public void RemoveNotifier(Address publisherAddress)
+        {
+            var toRemove = notifiers.Cast<AzureServiceBusQueueNotifier>()
+                                    .FirstOrDefault(notifier => notifier.Address == publisherAddress);
+
+            if (toRemove == null) return;
+
+            toRemove.Stop();
+            notifiers.Remove(toRemove);
         }
     }
 }

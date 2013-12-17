@@ -17,7 +17,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     {
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
-        
+
         public ICreateTopicClients TopicClientCreator { get; set; }
 
         private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();

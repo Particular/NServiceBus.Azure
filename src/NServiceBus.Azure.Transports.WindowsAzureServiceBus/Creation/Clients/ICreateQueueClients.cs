@@ -13,12 +13,5 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="address"></param>
         /// <returns></returns>
         QueueClient Create(Address address);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
-        string CreateQueue(Address address);
     }
 }
