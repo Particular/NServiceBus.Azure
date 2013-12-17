@@ -8,21 +8,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
     {
-        AzureServiceBusDequeueStrategy strategy;
-
         /// <summary>
         /// 
         /// </summary>
         public ICreateSubscriptionClients ClientCreator { get; set; }
 
-        public AzureServiceBusTopicSubscriptionManager (UnicastBus bus)
-        {
-            var transport = bus.Transport as TransportReceiver;
-            if (transport == null) return;
-            strategy = transport.Receiver as AzureServiceBusDequeueStrategy;
-
-            if (strategy == null) throw new Exception("AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
-        }
 
         /// <summary>
         /// 
@@ -35,6 +25,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
 
             ClientCreator.Create(eventType, publisherAddress, subscriptionname);
+
+            // resolving manually as the bus also gets the subscription manager injected
+            // but this is the only way to get to the correct dequeue strategy
+            var bus = Configure.Instance.Builder.Build<UnicastBus>();
+            var transport = bus.Transport as TransportReceiver;
+            if (transport == null) throw new Exception("AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
+            var strategy = transport.Receiver as AzureServiceBusDequeueStrategy;
+            if (strategy == null) throw new Exception("AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
            
             var notifier = Configure.Instance.Builder.Build<AzureServiceBusSubscriptionNotifier>();
             notifier.EventType = eventType;
@@ -53,6 +51,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             ClientCreator.Delete(publisherAddress, subscriptionname);
 
+            // resolving manually as the bus also gets the subscription manager injected
+            // but this is the only way to get to the correct dequeue strategy
+            var bus = Configure.Instance.Builder.Build<UnicastBus>();
+            var transport = bus.Transport as TransportReceiver;
+            if (transport == null) throw new Exception("AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
+            var strategy = transport.Receiver as AzureServiceBusDequeueStrategy;
+            if (strategy == null) throw new Exception("AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
+           
             strategy.RemoveNotifier(publisherAddress);
         }
     }
