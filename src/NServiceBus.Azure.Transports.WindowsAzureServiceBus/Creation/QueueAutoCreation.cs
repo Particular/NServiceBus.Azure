@@ -36,16 +36,23 @@
         {
             get
             {
-                var shouldNotAutoCreate = !IsEnabled<QueueAutoCreation>() || ConfigureQueueCreation.DontCreateQueues;
+                return IsEnabled<QueueAutoCreation>() && ConfigureQueueCreation.DontCreateQueues;
+            }
+        }
 
-                if (shouldNotAutoCreate)
-                {
-                    // force both to be false, as this is currently not guaranteed
-                    Disable<QueueAutoCreation>();
-                    Configure.Instance.DoNotCreateQueues();
-                }
+    }
 
-                return !shouldNotAutoCreate;
+    public class AutoCreationEqualizer: IWantToRunBeforeConfigurationIsFinalized
+    {
+        public void Run()
+        {
+            var should = QueueAutoCreation.ShouldAutoCreate;
+
+            if (!should)
+            {
+                // force both to be false, as this is currently not guaranteed
+                Feature.Disable<QueueAutoCreation>();
+                Configure.Instance.DoNotCreateQueues();
             }
         }
     }
