@@ -61,7 +61,7 @@
 
         protected override string ExampleConnectionStringForErrorMessage
         {
-            get { return "todo - refactor the transport to use a connection string instead of a custom section"; }
+            get { return "Endpoint=sb://{yournamespace}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={yourkey}"; }
         }
     }
 }
