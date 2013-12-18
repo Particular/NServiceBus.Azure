@@ -26,8 +26,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void Rollback(Enlistment enlistment)
         {
-            receivedMessage.SafeAbandon();
-
             enlistment.Done();
         }
 
