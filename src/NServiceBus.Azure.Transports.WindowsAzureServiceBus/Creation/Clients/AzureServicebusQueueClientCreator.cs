@@ -2,7 +2,6 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using Features;
     using NServiceBus.Transports;
 
     public class AzureServicebusQueueClientCreator : ICreateQueueClients
