@@ -5,27 +5,27 @@
 
     public class OverrideMaxRetries : IProvideConfiguration<TransportConfig>
     {
-        readonly IConfigurationSource source;
-
-        public OverrideMaxRetries(IConfigurationSource source)
-        {
-            this.source = source;
-        }
-
         public TransportConfig GetConfiguration()
         {
+            var source = Configure.ConfigurationSource;
             var c = source.GetConfiguration<AzureServiceBusQueueConfig>();
             var t = source.GetConfiguration<TransportConfig>();
-            if (c != null && t != null && t.MaxRetries > c.MaxDeliveryCount - 2)
+
+            if (c == null)
             {
-                t = new TransportConfig()
-                {
-                    MaximumConcurrencyLevel = t.MaximumConcurrencyLevel,
-                    MaxRetries = c.MaxDeliveryCount - 2,
-                    MaximumMessageThroughputPerSecond = t.MaximumMessageThroughputPerSecond
-                };
+                c = new AzureServiceBusQueueConfig();
             }
-            return t;
+            if (t == null)
+            {
+                t = new TransportConfig();
+            }
+
+            return new TransportConfig
+                        {
+                            MaximumConcurrencyLevel = t.MaximumConcurrencyLevel,
+                            MaxRetries = c.MaxDeliveryCount - 2,
+                            MaximumMessageThroughputPerSecond = t.MaximumMessageThroughputPerSecond
+                        };
         }
     }
 }

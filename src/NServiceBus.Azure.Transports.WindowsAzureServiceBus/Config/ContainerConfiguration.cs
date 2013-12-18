@@ -31,7 +31,6 @@
         private void ConfigureReceiveInfrastructure(Configure config, AzureServiceBusQueueConfig configSection)
         {
             config.Configurer.ConfigureComponent<AzureServiceBusDequeueStrategy>(DependencyLifecycle.InstancePerCall);
-            config.Configurer.ConfigureProperty<TransportReceiver>(t => t.TransactionSettings.MaxRetries, configSection.MaxDeliveryCount - 2);
 
             config.Configurer.ConfigureComponent<AzureServiceBusQueueNotifier>(DependencyLifecycle.InstancePerCall);
             config.Configurer.ConfigureProperty<AzureServiceBusQueueNotifier>(t => t.ServerWaitTime, configSection.ServerWaitTime);
