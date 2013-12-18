@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Config\ConnectionStringParser.cs" />
     <Compile Include="Config\ContainerConfiguration.cs" />
+    <Compile Include="Config\OverrideMaxRetries.cs" />
     <Compile Include="Config\QueueIndividualizer.cs" />
     <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
