@@ -88,6 +88,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                             brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(message.ReplyToAddress);
                         }
 
+                        if (message.TimeToBeReceived < TimeSpan.MaxValue)
+                        {
+                            brokeredMessage.TimeToLive = message.TimeToBeReceived;
+                        }
+
                         sender.Send(brokeredMessage);
                         sent = true;
                     }
