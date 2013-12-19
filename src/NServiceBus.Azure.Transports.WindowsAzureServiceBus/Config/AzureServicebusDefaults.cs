@@ -89,5 +89,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// 
         /// </summary>
         public const int DefaultBatchSize = 1000;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const bool DefaultEnablePartitioning = true;
     }
 }

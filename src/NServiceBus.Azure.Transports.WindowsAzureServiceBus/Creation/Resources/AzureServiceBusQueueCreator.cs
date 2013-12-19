@@ -15,6 +15,7 @@
         public TimeSpan DuplicateDetectionHistoryTimeWindow { get; set; }
         public int MaxDeliveryCount { get; set; }
         public bool EnableBatchedOperations { get; set; }
+        public bool EnablePartitioning { get; set; }
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
 
@@ -45,7 +46,8 @@
                         EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
                         DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
                         MaxDeliveryCount = MaxDeliveryCount,
-                        EnableBatchedOperations = EnableBatchedOperations
+                        EnableBatchedOperations = EnableBatchedOperations,
+                        EnablePartitioning = EnablePartitioning
                     };
 
                     namespaceClient.CreateQueue(description);

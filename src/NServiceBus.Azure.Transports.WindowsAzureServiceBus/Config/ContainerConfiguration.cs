@@ -73,9 +73,11 @@
             config.Configurer.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.DuplicateDetectionHistoryTimeWindow, TimeSpan.FromMilliseconds(configSection.DuplicateDetectionHistoryTimeWindow));
             config.Configurer.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
             config.Configurer.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.EnableBatchedOperations, configSection.EnableBatchedOperations);
+            config.Configurer.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.EnablePartitioning, configSection.EnablePartitioning);
 
             config.Configurer.ConfigureComponent<AzureServicebusTopicClientCreator>(DependencyLifecycle.InstancePerCall);
             config.Configurer.ConfigureComponent<AzureServicebusTopicCreator>(DependencyLifecycle.InstancePerCall);
+            config.Configurer.ConfigureProperty<AzureServicebusTopicCreator>(t => t.EnablePartitioning, configSection.EnablePartitioning);
 
             config.Configurer.ConfigureComponent<AzureServicebusSubscriptionClientCreator>(DependencyLifecycle.InstancePerCall);
             config.Configurer.ConfigureComponent<AzureServicebusSubscriptionCreator>(DependencyLifecycle.InstancePerCall);
