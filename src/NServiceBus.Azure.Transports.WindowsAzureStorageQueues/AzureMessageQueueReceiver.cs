@@ -142,7 +142,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     batchQueue.Enqueue(receivedMessage);
                 }
             });
-            azureQueue.BeginGetMessages(BatchSize, TimeSpan.FromMilliseconds(MessageInvisibleTime * BatchSize), null, null, callback, null);
+            azureQueue.BeginGetMessages(BatchSize, TimeSpan.FromMilliseconds(MessageInvisibleTime), null, null, callback, null);
             return null;
         }
 
