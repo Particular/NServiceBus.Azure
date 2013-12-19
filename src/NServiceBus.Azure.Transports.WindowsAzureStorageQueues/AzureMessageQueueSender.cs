@@ -41,14 +41,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             if (!sendQueue.Exists())
                 throw new QueueNotFoundException { Queue = address };
 
+            var timeToBeReceived = message.TimeToBeReceived < TimeSpan.MaxValue ? message.TimeToBeReceived : (TimeSpan?)null;
+
             var rawMessage = SerializeMessage(message);
 
             if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
-                sendQueue.AddMessage(rawMessage);
+                sendQueue.AddMessage(rawMessage, timeToBeReceived);
             }
             else
-                Transaction.Current.EnlistVolatile(new SendResourceManager(sendQueue, rawMessage), EnlistmentOptions.None);
+                Transaction.Current.EnlistVolatile(new SendResourceManager(sendQueue, rawMessage, timeToBeReceived), EnlistmentOptions.None);
         }
 
         private CloudQueueClient GetClientForConnectionString(string connectionString)

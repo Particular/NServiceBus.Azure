@@ -1,5 +1,6 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
+    using System;
     using System.Transactions;
     using Microsoft.WindowsAzure.Storage.Queue;
     
@@ -7,11 +8,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     {
         private readonly CloudQueue queue;
         private readonly CloudQueueMessage message;
+        readonly TimeSpan? timeToBeReceived;
 
-        public SendResourceManager(CloudQueue queue, CloudQueueMessage message)
+        public SendResourceManager(CloudQueue queue, CloudQueueMessage message, TimeSpan? timeToBeReceived)
         {
             this.queue = queue;
             this.message = message;
+            this.timeToBeReceived = timeToBeReceived;
         }
 
         public void Prepare(PreparingEnlistment preparingEnlistment)
@@ -21,7 +24,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
         public void Commit(Enlistment enlistment)
         {
-            queue.AddMessage(message);
+            queue.AddMessage(message, timeToBeReceived);
             enlistment.Done();
         }
 
