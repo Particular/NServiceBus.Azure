@@ -7,8 +7,8 @@
     <ProjectGuid>{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.Azure.Transports.WindowsAzureServiceBus.Acceptance</RootNamespace>
-    <AssemblyName>NServiceBus.Azure.Transports.WindowsAzureServiceBus.Acceptance</AssemblyName>
+    <RootNamespace>NServiceBus.Azure.Transports.WindowsAzureServiceBus.AcceptanceTests</RootNamespace>
+    <AssemblyName>NServiceBus.Azure.Transports.WindowsAzureServiceBus.AcceptanceTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
