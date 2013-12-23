@@ -11,11 +11,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure.H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.QuickTests", "NServiceBus.Azure.QuickTests\NServiceBus.Azure.QuickTests.csproj", "{E25B5433-7166-4C10-A76E-C0546F9E2497}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.AcceptenceTests", "NServiceBus.Azure.AcceptenceTests\NServiceBus.Azure.AcceptenceTests.csproj", "{A2B266FB-2A5A-49CA-93E9-E4C7FA456CF1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Transports.WindowsAzureServiceBus", "NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj", "{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Transports.WindowsAzureStorageQueues", "NServiceBus.Azure.Transports.WindowsAzureStorageQueues\NServiceBus.Azure.Transports.WindowsAzureStorageQueues.csproj", "{B6D6406F-F5A4-46D7-A882-4A831128065E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.WindowsAzureServiceBus.AcceptanceTests", "NServiceBus.Azure.Transports.WindowsAzureServiceBus.AcceptanceTests\NServiceBus.Azure.WindowsAzureServiceBus.AcceptanceTests.csproj", "{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.WindowsAzureStorageQueues.AcceptanceTests", "NServiceBus.Azure.Transports.WindowsAzureStorageQueues.Acceptance\NServiceBus.Azure.WindowsAzureStorageQueues.AcceptanceTests.csproj", "{09996CDC-90AC-442F-A6CE-601F37CD1352}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +43,6 @@ Global
 		{E25B5433-7166-4C10-A76E-C0546F9E2497}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E25B5433-7166-4C10-A76E-C0546F9E2497}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E25B5433-7166-4C10-A76E-C0546F9E2497}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A2B266FB-2A5A-49CA-93E9-E4C7FA456CF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2B266FB-2A5A-49CA-93E9-E4C7FA456CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A2B266FB-2A5A-49CA-93E9-E4C7FA456CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A2B266FB-2A5A-49CA-93E9-E4C7FA456CF1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,8 +51,20 @@ Global
 		{B6D6406F-F5A4-46D7-A882-4A831128065E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6D6406F-F5A4-46D7-A882-4A831128065E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6D6406F-F5A4-46D7-A882-4A831128065E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
+		{09996CDC-90AC-442F-A6CE-601F37CD1352} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
 	EndGlobalSection
 EndGlobal
