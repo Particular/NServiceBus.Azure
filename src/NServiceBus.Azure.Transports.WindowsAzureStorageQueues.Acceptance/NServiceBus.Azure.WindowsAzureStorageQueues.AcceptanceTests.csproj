@@ -68,6 +68,12 @@
   <ItemGroup>
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\**\*.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureStorageQueues\NServiceBus.Azure.Transports.WindowsAzureStorageQueues.csproj">
+      <Project>{b6d6406f-f5a4-46d7-a882-4a831128065e}</Project>
+      <Name>NServiceBus.Azure.Transports.WindowsAzureStorageQueues</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
