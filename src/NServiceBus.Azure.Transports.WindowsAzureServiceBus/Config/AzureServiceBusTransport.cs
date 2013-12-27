@@ -13,11 +13,6 @@
         {
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            if (SafeRoleEnvironment.IsAvailable)
-            {
-                EnableByDefault<QueueAutoCreation>();
-            }
-
             var queuename = AzureServiceBusQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
 
             Address.InitializeLocalAddress(queuename);

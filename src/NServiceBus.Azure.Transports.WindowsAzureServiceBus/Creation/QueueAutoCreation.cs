@@ -28,7 +28,7 @@
                     throw new InvalidOperationException(string.Format("IWantQueueCreated implementation {0} returned a null address", wantQueueCreatedInstance.GetType().FullName));
                 }
 
-                QueueCreator.CreateQueueIfNecessary(wantQueueCreatedInstance.Address, null);
+                QueueCreator.CreateQueueIfNecessary(AzureServiceBusQueueAddressConvention.Apply(wantQueueCreatedInstance.Address), null);
             }
         }
 
@@ -36,8 +36,13 @@
         {
             get
             {
-                return IsEnabled<QueueAutoCreation>() && ConfigureQueueCreation.DontCreateQueues;
+                return IsEnabled<QueueAutoCreation>() && !ConfigureQueueCreation.DontCreateQueues;
             }
+        }
+
+        public override bool IsEnabledByDefault
+        {
+            get { return true; }
         }
 
     }

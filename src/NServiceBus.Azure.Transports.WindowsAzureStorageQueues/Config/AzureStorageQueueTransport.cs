@@ -17,11 +17,6 @@
             EnableByDefault<TimeoutManager>();
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            if (SafeRoleEnvironment.IsAvailable)
-            {
-                EnableByDefault<QueueAutoCreation>();
-            }
-
             var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
 
             if(configSection == null)

@@ -28,8 +28,13 @@
                     throw new InvalidOperationException(string.Format("IWantQueueCreated implementation {0} returned a null address", wantQueueCreatedInstance.GetType().FullName));
                 }
 
-                QueueCreator.CreateQueueIfNecessary(wantQueueCreatedInstance.Address, null);
+                QueueCreator.CreateQueueIfNecessary(AzureQueueAddressConvention.Apply(wantQueueCreatedInstance.Address), null);
             }
+        }
+
+        public override bool IsEnabledByDefault
+        {
+            get { return true; }
         }
     }
 }

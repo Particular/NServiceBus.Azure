@@ -22,7 +22,7 @@
             var selectedTransport = SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
             if (selectedTransport is AzureServiceBus)
             {
-                topicCreator.CreateIfNecessary(Address.Local);
+                topicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));
             }
         }
     }

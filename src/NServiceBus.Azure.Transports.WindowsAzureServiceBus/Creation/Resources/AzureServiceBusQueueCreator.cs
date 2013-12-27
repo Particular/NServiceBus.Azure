@@ -34,22 +34,23 @@
             try
             {
                 var namespaceClient = createNamespaceManagers.Create(address.Machine);
-                if (!namespaceClient.QueueExists(queueName))
-                {
-                    var description = new QueueDescription(queueName)
-                    {
-                        LockDuration = LockDuration,
-                        MaxSizeInMegabytes = MaxSizeInMegabytes,
-                        RequiresDuplicateDetection = RequiresDuplicateDetection,
-                        RequiresSession = RequiresSession,
-                        DefaultMessageTimeToLive = DefaultMessageTimeToLive,
-                        EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
-                        DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
-                        MaxDeliveryCount = MaxDeliveryCount,
-                        EnableBatchedOperations = EnableBatchedOperations,
-                        EnablePartitioning = EnablePartitioning
-                    };
 
+                var description = new QueueDescription(queueName)
+                {
+                    LockDuration = LockDuration,
+                    MaxSizeInMegabytes = MaxSizeInMegabytes,
+                    RequiresDuplicateDetection = RequiresDuplicateDetection,
+                    RequiresSession = RequiresSession,
+                    DefaultMessageTimeToLive = DefaultMessageTimeToLive,
+                    EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
+                    DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
+                    MaxDeliveryCount = MaxDeliveryCount,
+                    EnableBatchedOperations = EnableBatchedOperations,
+                    EnablePartitioning = EnablePartitioning
+                };
+
+                if (!namespaceClient.QueueExists(description.Path))
+                {
                     namespaceClient.CreateQueue(description);
                 }
             }
