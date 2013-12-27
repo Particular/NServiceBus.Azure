@@ -71,6 +71,9 @@
       <Name>NServiceBus.Azure.Transports.WindowsAzureServiceBus</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ripple.dependencies.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)..\BuildSupport\CopyAcceptanceTests.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

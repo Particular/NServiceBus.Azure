@@ -17,6 +17,7 @@
             SourceFiles="@(AcceptanceTestFiles)"
             DestinationFiles="@(AcceptanceTestFiles->'$(MSBuildProjectDirectory)\App_Packages\NServicebus.AcceptanceTests\%(RecursiveDir)%(Filename)%(Extension)')"
         />
+		<Exec Command="copy /b $(MSBuildProjectFullPath) +,,"/>
     </Target>
 
 </Project>
