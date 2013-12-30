@@ -12,7 +12,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public static TransportMessage ToTransportMessage(BrokeredMessage message)
         {
             TransportMessage t;
-            var rawMessage = message.GetBody<byte[]>();
+            var rawMessage = message.GetBody<byte[]>() ?? new byte[0];
 
             if (message.Properties.Count == 0)
             {
