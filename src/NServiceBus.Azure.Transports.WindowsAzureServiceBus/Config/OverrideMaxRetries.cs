@@ -23,7 +23,7 @@
             return new TransportConfig
                         {
                             MaximumConcurrencyLevel = t.MaximumConcurrencyLevel,
-                            MaxRetries = c.MaxDeliveryCount - 2,
+                            MaxRetries = t.MaxRetries > 0 ? c.MaxDeliveryCount - 2 : 0,
                             MaximumMessageThroughputPerSecond = t.MaximumMessageThroughputPerSecond
                         };
         }

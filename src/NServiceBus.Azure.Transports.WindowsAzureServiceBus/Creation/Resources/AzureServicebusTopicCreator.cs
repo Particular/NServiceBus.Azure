@@ -1,5 +1,6 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Transports;
 
@@ -21,9 +22,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public void Create(Address address)
         {
             var topicName = address.Queue;
+            var namespaceclient = createNamespaceManagers.Create(address.Machine);
             try
             {
-                var namespaceclient = createNamespaceManagers.Create(address.Machine);
+                
                 if (!namespaceclient.TopicExists(topicName))
                 {
                     var description = new TopicDescription(topicName)
@@ -38,6 +40,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             catch (MessagingEntityAlreadyExistsException)
             {
                 // the topic already exists or another node beat us to it, which is ok
+            }
+            catch (TimeoutException)
+            {
+                // there is a chance that the timeout occurs, but the queue is created still
+                // check for this
+                if (!namespaceclient.QueueExists(topicName))
+                    throw;
             }
         }
 

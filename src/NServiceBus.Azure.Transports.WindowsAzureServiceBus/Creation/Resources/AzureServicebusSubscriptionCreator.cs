@@ -61,6 +61,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     // the queue already exists or another node beat us to it, which is ok
                 }
+                catch (TimeoutException)
+                {
+                    // there is a chance that the timeout occurs, but the subscription is created still
+                    // check for this
+                    if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                        throw;
+                }
             }
             else
             {

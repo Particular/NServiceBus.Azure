@@ -10,6 +10,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         readonly ICreateQueues queueCreator;
         readonly ICreateMessagingFactories createMessagingFactories;
 
+        public int MaxRetries { get; set; }
+
         public AzureServicebusQueueClientCreator(ICreateQueues queueCreator, ICreateMessagingFactories createMessagingFactories)
         {
             this.queueCreator = queueCreator;
@@ -24,10 +26,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
 
             var factory = createMessagingFactories.Create(address.Machine);
-            var client = factory.CreateQueueClient(address.Queue, (bool) SettingsHolder.Get("Transactions.Enabled") ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
+            var client = factory.CreateQueueClient(address.Queue, ShouldRetry() ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
             client.PrefetchCount = 100; // todo make configurable
             return client;
         }
 
+        bool ShouldRetry()
+        {
+            return (bool) SettingsHolder.Get("Transactions.Enabled") && MaxRetries > 0;
+        }
     }
 }

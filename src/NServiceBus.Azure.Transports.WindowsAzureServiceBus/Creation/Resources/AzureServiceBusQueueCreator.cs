@@ -31,9 +31,10 @@
         public void Create(Address address)
         {
             var queueName = address.Queue;
+            var path = "";
+            var namespaceClient = createNamespaceManagers.Create(address.Machine);
             try
             {
-                var namespaceClient = createNamespaceManagers.Create(address.Machine);
 
                 var description = new QueueDescription(queueName)
                 {
@@ -49,7 +50,8 @@
                     EnablePartitioning = EnablePartitioning
                 };
 
-                if (!namespaceClient.QueueExists(description.Path))
+                path = description.Path;
+                if (!namespaceClient.QueueExists(path))
                 {
                     namespaceClient.CreateQueue(description);
                 }
@@ -57,6 +59,13 @@
             catch (MessagingEntityAlreadyExistsException)
             {
                 // the queue already exists or another node beat us to it, which is ok
+            }
+            catch (TimeoutException)
+            {
+                // there is a chance that the timeout occurs, but the queue is created still
+                // check for this
+                if (!namespaceClient.QueueExists(path))
+                    throw;
             }
         }
 

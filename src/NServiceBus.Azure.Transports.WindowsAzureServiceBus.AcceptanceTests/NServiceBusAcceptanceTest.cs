@@ -1,6 +1,6 @@
 namespace NServiceBus.AcceptanceTests
 {
-    using AcceptanceTesting.Customization;
+    using System;
     using Microsoft.ServiceBus;
     using NUnit.Framework;
 
@@ -14,26 +14,34 @@ namespace NServiceBus.AcceptanceTests
         [TearDown]
         public void TearDown()
         {
-           // var endpoint = Conventions.EndpointNamingConvention(GetType()).ToLower();
-
             var namespaceManager = NamespaceManager.CreateFromConnectionString(System.Environment.GetEnvironmentVariable("AzureServiceBus.ConnectionString"));
 
-            var queues = namespaceManager.GetQueues(
-                //TODO: figure out what queues have been created by the scenario that just ran
-                //string.Format("startswith(path, '{0}') eq true", endpoint)
-                );
+            
+            var queues = namespaceManager.GetQueues();
             foreach (var queue in queues)
             {
-                namespaceManager.DeleteQueue(queue.Path);
+                try
+                {
+                    namespaceManager.DeleteQueue(queue.Path);
+                }
+                catch (TimeoutException)
+                {
+                    // do not let the test fail becayse we couldn't clean up
+                }
+                
             }
 
-            var topics = namespaceManager.GetTopics(
-                //TODO: figure out what queues have been created by the scenario that just ran
-                //string.Format("startswith(path, '{0}') eq true", endpoint)
-                );
+            var topics = namespaceManager.GetTopics();
             foreach (var topic in topics)
             {
-                namespaceManager.DeleteTopic(topic.Path);
+                try
+                {
+                    namespaceManager.DeleteTopic(topic.Path);
+                }
+                catch (TimeoutException)
+                {
+                    // do not let the test fail becayse we couldn't clean up
+                }
             }
         }
     }

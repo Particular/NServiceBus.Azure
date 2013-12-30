@@ -41,12 +41,14 @@
                 configSection = new AzureServiceBusQueueConfig();
             }
 
+            var transportConfig = NServiceBus.Configure.GetConfigSection<TransportConfig>() ?? new TransportConfig();
+
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
             var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine();
             Address.OverrideDefaultMachine(connectionString);
 
-            new ContainerConfiguration().Configure(configSection);
+            new ContainerConfiguration().Configure(configSection, transportConfig);
         }
 
         protected override bool RequiresConnectionString
