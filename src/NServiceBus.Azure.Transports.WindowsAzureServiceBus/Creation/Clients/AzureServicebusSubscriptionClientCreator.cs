@@ -2,6 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
+    using Settings;
 
     /// <summary>
     /// 
@@ -31,7 +32,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 subscriptionCreator.Create(topic, eventType, subscriptionname);
             }
             var factory = createMessagingFactories.Create(topic.Machine);
-            return factory.CreateSubscriptionClient(topic.Queue, subscriptionname, ReceiveMode.PeekLock);
+            return factory.CreateSubscriptionClient(topic.Queue, subscriptionname, (bool) SettingsHolder.Get("Transactions.Enabled") ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
         }
 
         public void Delete(Address topic, string subscriptionname)

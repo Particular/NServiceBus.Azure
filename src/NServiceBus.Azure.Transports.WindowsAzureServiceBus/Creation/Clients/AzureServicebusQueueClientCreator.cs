@@ -3,6 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using NServiceBus.Transports;
+    using Settings;
 
     public class AzureServicebusQueueClientCreator : ICreateQueueClients
     {
@@ -23,7 +24,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
 
             var factory = createMessagingFactories.Create(address.Machine);
-            var client = factory.CreateQueueClient(address.Queue, ReceiveMode.PeekLock);
+            var client = factory.CreateQueueClient(address.Queue, (bool) SettingsHolder.Get("Transactions.Enabled") ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
             client.PrefetchCount = 100; // todo make configurable
             return client;
         }
