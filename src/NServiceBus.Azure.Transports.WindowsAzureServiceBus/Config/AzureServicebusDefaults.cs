@@ -93,6 +93,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        public const bool DefaultEnablePartitioning = true;
+        public const bool DefaultEnablePartitioning = false;
     }
 }
