@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="NServiceBusAcceptanceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="When_publishing_an_event.cs" />
     <Compile Include="When_two_sagas_subscribe_to_the_same_event.cs" />
   </ItemGroup>
   <ItemGroup>
