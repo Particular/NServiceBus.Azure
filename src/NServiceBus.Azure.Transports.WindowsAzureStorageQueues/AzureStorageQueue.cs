@@ -7,6 +7,9 @@ namespace NServiceBus
     /// </summary>
     public class AzureStorageQueue : TransportDefinition
     {
-
+        public AzureStorageQueue()
+        {
+            HasSupportForDistributedTransactions = false;
+        }
     }
 }
