@@ -167,27 +167,37 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         static bool RenewLockIfNeeded(BrokeredMessage brokeredMessage)
         {
-            if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow) return false;
-
-            if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow.AddSeconds(10))
+            try
             {
-                try
+                if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow) return false;
+
+                if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow.AddSeconds(10))
                 {
-                    brokeredMessage.RenewLock();
-                }
-                catch (MessageLockLostException)
-                {
-                    return false;
-                }
-                catch (SessionLockLostException)
-                {
-                    return false;
-                }
-                catch (TimeoutException)
-                {
-                    return false;
+                    try
+                    {
+                        brokeredMessage.RenewLock();
+                    }
+                    catch (MessageLockLostException)
+                    {
+                        return false;
+                    }
+                    catch (SessionLockLostException)
+                    {
+                        return false;
+                    }
+                    catch (TimeoutException)
+                    {
+                        return false;
+                    }
                 }
             }
+            catch (InvalidOperationException)
+            {
+                // if the message was received without a peeklock mechanism you're not allowed to call LockedUntilUtc
+                // sadly enough I can't find a public property that checks who the receiver was or if the locktoken has been set
+                // those are internal to the sdk
+            }
+            
             return true;
         }
 
@@ -222,7 +232,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             while (pendingMessages.Count > 2 * maximumConcurrencyLevel){Thread.Sleep(10);}
 
-            if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow){return;}
+            try
+            {
+                if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow) { return; }
+            }
+            catch (InvalidOperationException)
+            {
+               // if the message was received without a peeklock mechanism you're not allowed to call LockedUntilUtc
+               // sadly enough I can't find a public property that checks who the receiver was or if the locktoken has been set
+               // those are internal to the sdk
+            }
 
             pendingMessages.Enqueue(brokeredMessage);
         }
@@ -237,5 +256,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             toRemove.Stop();
             notifiers.Remove(toRemove);
         }
+
     }
+
+
 }
