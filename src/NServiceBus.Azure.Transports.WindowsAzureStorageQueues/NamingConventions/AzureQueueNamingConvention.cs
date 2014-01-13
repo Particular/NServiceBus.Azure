@@ -17,7 +17,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
                 if ((bool) configSection.QueuePerInstance)
                 {
-                    SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", false);
+                    SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
                 }
             }
 

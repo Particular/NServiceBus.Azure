@@ -17,7 +17,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 if (configSection.QueuePerInstance)
                 {
-                    SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", false);
+                    SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
                 }
             }
 
