@@ -33,7 +33,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         bool ShouldRetry()
         {
-            return (bool) SettingsHolder.Get("Transactions.Enabled") && MaxRetries > 0;
+            return (bool) SettingsHolder.Get("Transactions.Enabled");
         }
     }
 }
