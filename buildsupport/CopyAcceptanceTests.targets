@@ -13,6 +13,9 @@
     </ItemGroup>
 
     <Target Name="CopyFilesTarget">
+		<RemoveDir 
+            Directories="$(MSBuildProjectDirectory)\App_Packages\NServicebus.AcceptanceTests\"
+        />
         <Copy
             SourceFiles="@(AcceptanceTestFiles)"
             DestinationFiles="@(AcceptanceTestFiles->'$(MSBuildProjectDirectory)\App_Packages\NServicebus.AcceptanceTests\%(RecursiveDir)%(Filename)%(Extension)')"
