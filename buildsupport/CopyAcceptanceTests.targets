@@ -9,7 +9,7 @@
   </PropertyGroup>
   
    <ItemGroup>
-        <AcceptanceTestFiles Include="$(SolutionDir)\packages\NServiceBus.AcceptanceTests\AcceptanceTests\**\*.*"/>
+        <AcceptanceTestFiles Include="$(SolutionDir)\packages\NServiceBus.AcceptanceTests\content\**\*.*"/>
     </ItemGroup>
 
     <Target Name="CopyFilesTarget">
