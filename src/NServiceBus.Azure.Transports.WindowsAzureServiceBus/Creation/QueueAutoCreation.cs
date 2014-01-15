@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using Config;
     using Features;
     using NServiceBus.Transports;
@@ -28,7 +29,9 @@
                     throw new InvalidOperationException(string.Format("IWantQueueCreated implementation {0} returned a null address", wantQueueCreatedInstance.GetType().FullName));
                 }
 
-                QueueCreator.CreateQueueIfNecessary(AzureServiceBusQueueAddressConvention.Apply(wantQueueCreatedInstance.Address), null);
+                var username = Thread.CurrentPrincipal != null ? (Thread.CurrentPrincipal.Identity != null ? Thread.CurrentPrincipal.Identity.Name : null) : null;
+                QueueCreator.CreateQueueIfNecessary(AzureServiceBusQueueAddressConvention.Apply(wantQueueCreatedInstance.Address),
+                                                    username);
             }
         }
 
