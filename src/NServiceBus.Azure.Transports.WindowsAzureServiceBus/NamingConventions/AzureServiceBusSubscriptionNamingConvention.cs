@@ -13,5 +13,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             return subscriptionName;
         };
+
+        public static Func<Type, string> ApplyFullNameConvention = eventType =>
+        {
+            var subscriptionName = eventType != null ? Configure.EndpointName + "." + eventType.FullName : Configure.EndpointName;
+
+            if (subscriptionName.Length >= 50)
+                subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
+
+            return subscriptionName;
+        };
     }
 }

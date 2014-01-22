@@ -24,7 +24,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public SubscriptionClient Create(Address address, Type eventType)
         {
             var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
-            return Create(eventType, address, subscriptionname);
+
+            try
+            {
+                return Create(eventType, address, subscriptionname);
+            }
+            catch (SubscriptionAlreadyInUseException)
+            {
+                // if this occurs, it means that another endpoint is using the same eventtype name but in another namespace,
+                // so let's differenatiate including this namespace, odds are very likely that we will get a guid instead
+                // that's why we're not defaulting to this convention.
+
+                subscriptionname = AzureServiceBusSubscriptionNamingConvention.ApplyFullNameConvention(eventType);
+
+                return Create(eventType, address, subscriptionname);
+            }
+            
         }
 
         public SubscriptionClient Create(Type eventType, Address topic, string subscriptionname)

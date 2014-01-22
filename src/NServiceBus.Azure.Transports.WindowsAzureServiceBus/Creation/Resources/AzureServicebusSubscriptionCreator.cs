@@ -1,6 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
 
     public class AzureServicebusSubscriptionCreator : ICreateSubscriptions
@@ -28,6 +29,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var topicPath = topic.Queue;
             var namespaceClient = createNamespaceManagers.Create(topic.Machine);
+
+            var filter = string.Empty;
+
+            if (eventType != null)
+            {
+                filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
+            }
+
             if (namespaceClient.TopicExists(topicPath))
             {
                 try
@@ -45,10 +54,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                             EnableDeadLetteringOnFilterEvaluationExceptions = EnableDeadLetteringOnFilterEvaluationExceptions
                         };
 
-                        if (eventType != null)
+                        if (filter != string.Empty)
                         {
-                            var filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
-
                             namespaceClient.CreateSubscription(description, new SqlFilter(filter));
                         }
                         else
@@ -68,10 +75,27 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
                         throw;
                 }
+
+                GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
             }
             else
             {
                 throw new InvalidOperationException(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist", topicPath));
+            }
+        }
+
+        static void GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(string subscriptionname,
+            NamespaceManager namespaceClient, string topicPath, string filter)
+        {
+            var rules = namespaceClient.GetRules(topicPath, subscriptionname);
+            foreach (var rule in rules)
+            {
+                var sqlFilter = rule.Filter as SqlFilter;
+                if (sqlFilter != null && sqlFilter.SqlExpression != filter)
+                {
+                    throw new SubscriptionAlreadyInUseException(
+                        "Looks like this subscriptionname is already taken by another logical endpoint as the sql filter does not match the subscribed eventtype, please choose a different subscription name!");
+                }
             }
         }
 

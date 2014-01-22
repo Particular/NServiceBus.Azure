@@ -86,6 +86,7 @@
     <Compile Include="Creation\Resources\AzureServicebusSubscriptionCreator.cs" />
     <Compile Include="Creation\QueueAutoCreation.cs" />
     <Compile Include="Creation\Resources\ICreateSubscriptions.cs" />
+    <Compile Include="Creation\Resources\SubscriptionAlreadyInUseException.cs" />
     <Compile Include="NamingConventions\AzureServiceBusQueueAddressConvention.cs" />
     <Compile Include="Utils\DeterministicGuidBuilder.cs" />
     <Compile Include="Utils\IsHostedIn.cs" />

@@ -15,7 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        public ICreateSubscriptionClients ClientCreator { get; set; }
+        public ICreateSubscriptions SubscriptionCreator { get; set; }
 
         public IMessageMapper MessageMapper { get; set; }
         public StaticMessageRouter MessageRouter { get; set; }
@@ -44,10 +44,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         void SubscribeInternal(Type eventType, Address original)
         {
             var publisherAddress = AzureServiceBusPublisherAddressConventionForSubscriptions.Apply(original);
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
-
-            ClientCreator.Create(eventType, publisherAddress, subscriptionname);
-
+           
             // resolving manually as the bus also gets the subscription manager injected
             // but this is the only way to get to the correct dequeue strategy
             var bus = Configure.Instance.Builder.Build<UnicastBus>();
@@ -95,7 +92,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var publisherAddress = AzureServiceBusPublisherAddressConvention.Apply(original);
             var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
 
-            ClientCreator.Delete(publisherAddress, subscriptionname);
+            SubscriptionCreator.Delete(publisherAddress, subscriptionname);
 
             // resolving manually as the bus also gets the subscription manager injected
             // but this is the only way to get to the correct dequeue strategy
