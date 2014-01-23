@@ -23,7 +23,7 @@
             if (name.Length > 63)
             {
                 var nameGuid = DeterministicGuidBuilder(name).ToString();
-                name = name.Substring(0, 63 - nameGuid.Length - 1) + "-" + nameGuid;
+                name = name.Substring(0, 63 - nameGuid.Length - 1).Trim('-') + "-" + nameGuid;
             }
 
             if (! IsValidQueueName(name))
