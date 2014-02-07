@@ -9,7 +9,6 @@ using System.Diagnostics;
 
 namespace NServiceBus.Hosting.Azure
 {
-
     public class NServiceBusRoleEntrypoint
     {
         const string ProfileSetting = "AzureProfileConfig.Profiles";

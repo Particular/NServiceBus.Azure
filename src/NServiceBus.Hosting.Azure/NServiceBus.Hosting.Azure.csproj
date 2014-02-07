@@ -114,6 +114,7 @@
     <Compile Include="Profiles\Handler\ProductionProfileHandler.cs" />
     <Compile Include="Profiles\Production.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoleHost\SetHostInformation.cs" />
     <Compile Include="Roles\AsA_Host.cs" />
     <Compile Include="Roles\AsA_Worker.cs" />
     <Compile Include="RoleHost\Config\DefaultTransportForHost.cs" />
