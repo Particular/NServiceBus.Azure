@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using Config;
     using Features;
     using NServiceBus.Transports;
@@ -16,7 +17,7 @@
 
         public void Run()
         {
-            if (!IsEnabled<QueueAutoCreation>())
+            if (!IsEnabled<QueueAutoCreation>() || ConfigureQueueCreation.DontCreateQueues)
                 return;
 
             var wantQueueCreatedInstances = Configure.Instance.Builder.BuildAll<IWantQueueCreated>().ToList();
@@ -28,8 +29,14 @@
                     throw new InvalidOperationException(string.Format("IWantQueueCreated implementation {0} returned a null address", wantQueueCreatedInstance.GetType().FullName));
                 }
 
-                QueueCreator.CreateQueueIfNecessary(wantQueueCreatedInstance.Address, null);
+                var username = Thread.CurrentPrincipal != null ? (Thread.CurrentPrincipal.Identity != null ? Thread.CurrentPrincipal.Identity.Name : null) : null;
+                QueueCreator.CreateQueueIfNecessary(AzureQueueAddressConvention.Apply(wantQueueCreatedInstance.Address),username);
             }
+        }
+
+        public override bool IsEnabledByDefault
+        {
+            get { return true; }
         }
     }
 }

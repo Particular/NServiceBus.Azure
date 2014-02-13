@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using Config;
     using Features;
     using NServiceBus.Transports;
@@ -10,13 +11,13 @@
     /// <summary>
     /// Makes sure that all queues are created
     /// </summary>
-    public class QueueAutoCreation:Feature,IWantToRunWhenConfigurationIsComplete
+    public class QueueAutoCreation : Feature, IWantToRunWhenConfigurationIsComplete
     {
         public ICreateQueues QueueCreator { get; set; }
 
         public void Run()
         {
-            if (!IsEnabled<QueueAutoCreation>())
+            if (!ShouldAutoCreate)
                 return;
 
             var wantQueueCreatedInstances = Configure.Instance.Builder.BuildAll<IWantQueueCreated>().ToList();
@@ -28,7 +29,38 @@
                     throw new InvalidOperationException(string.Format("IWantQueueCreated implementation {0} returned a null address", wantQueueCreatedInstance.GetType().FullName));
                 }
 
-                QueueCreator.CreateQueueIfNecessary(wantQueueCreatedInstance.Address, null);
+                var username = Thread.CurrentPrincipal != null ? (Thread.CurrentPrincipal.Identity != null ? Thread.CurrentPrincipal.Identity.Name : null) : null;
+                QueueCreator.CreateQueueIfNecessary(AzureServiceBusQueueAddressConvention.Apply(wantQueueCreatedInstance.Address),
+                                                    username);
+            }
+        }
+
+        internal static bool ShouldAutoCreate
+        {
+            get
+            {
+                return IsEnabled<QueueAutoCreation>() && !ConfigureQueueCreation.DontCreateQueues;
+            }
+        }
+
+        public override bool IsEnabledByDefault
+        {
+            get { return true; }
+        }
+
+    }
+
+    public class AutoCreationEqualizer: IWantToRunBeforeConfigurationIsFinalized
+    {
+        public void Run()
+        {
+            var should = QueueAutoCreation.ShouldAutoCreate;
+
+            if (!should)
+            {
+                // force both to be false, as this is currently not guaranteed
+                Feature.Disable<QueueAutoCreation>();
+                Configure.Instance.DoNotCreateQueues();
             }
         }
     }

@@ -268,5 +268,18 @@ namespace NServiceBus.Config
                 this["BackoffTimeInSeconds"] = value;
             }
         }
+
+        [ConfigurationProperty("EnablePartitioning", IsRequired = false, DefaultValue = AzureServicebusDefaults.DefaultEnablePartitioning)]
+        public bool EnablePartitioning
+        {
+            get
+            {
+                return (bool)this["EnablePartitioning"];
+            }
+            set
+            {
+                this["EnablePartitioning"] = value;
+            }
+        }
    }
 }

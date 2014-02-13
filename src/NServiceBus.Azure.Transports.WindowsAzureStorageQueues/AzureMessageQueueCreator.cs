@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
+    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using NServiceBus.Transports;
 
@@ -20,11 +21,10 @@
                 var queue = Client.GetQueueReference(queueName);
 
                 queue.CreateIfNotExists();
-
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to create queue: " + queueName,ex);
+                throw new StorageException(string.Format("Failed to create queue: {0}, because {1}.", queueName, ex.Message), ex);
             }
         }
     }

@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
+    <Compile Include="Transports\AzureStorage\When_naming_queues_on_azure_storage.cs" />
     <Compile Include="Transports\ServiceBus\When_creating_subscriptions_on_servicebus_topics.cs" />
     <Compile Include="Hosting\When_killing_processes.cs" />
     <Compile Include="Configuration\When_parsing_connectionstrings.cs" />

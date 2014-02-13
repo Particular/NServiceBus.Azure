@@ -10,7 +10,8 @@ namespace NServiceBus
         public AzureServiceBus()
         {
             HasNativePubSubSupport = true;
-            HasSupportForCentralizedPubSub = true;
+            HasSupportForCentralizedPubSub = false;
+            HasSupportForDistributedTransactions = false;
         }
     }
 }

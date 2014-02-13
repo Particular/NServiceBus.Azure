@@ -4,8 +4,7 @@ using NServiceBus.Settings;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using Transports.WindowsAzureServiceBus;
-
+    
     public static class AzureServiceBusQueueNamingConvention
     {
         public static Func<string, string> Apply = queueName =>
@@ -18,14 +17,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 if (configSection.QueuePerInstance)
                 {
-                    SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", true);
+                    SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
                 }
             }
 
             if (queueName.Length >= 283) // 290 - a spot for the "-" & 6 digits for the individualizer
                 queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
-            if (SettingsHolder.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+            if (!SettingsHolder.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
                 queueName = QueueIndividualizer.Individualize(queueName);
 
             return queueName;

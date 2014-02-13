@@ -142,7 +142,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     batchQueue.Enqueue(receivedMessage);
                 }
             });
-            azureQueue.BeginGetMessages(BatchSize, TimeSpan.FromMilliseconds(MessageInvisibleTime * BatchSize), null, null, callback, null);
+            azureQueue.BeginGetMessages(BatchSize, TimeSpan.FromMilliseconds(MessageInvisibleTime), null, null, callback, null);
             return null;
         }
 
@@ -184,7 +184,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
                 return new TransportMessage(m.Id, m.Headers)
                 {
-                    Body = m.Body,
+                    Body = m.Body ?? new byte[0],
                     CorrelationId = m.CorrelationId,
                     Recoverable = m.Recoverable,
                     ReplyToAddress = Address.Parse(m.ReplyToAddress),

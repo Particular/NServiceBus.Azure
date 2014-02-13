@@ -4,6 +4,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public static class AzureServiceBusPublisherAddressConvention
     {
-        public static Func<Address, string> Create = address => AzureServiceBusTopicNamingConvention.Create(address.Queue + ".events");
+        public static Func<Address, Address> Apply = address => Address.Parse(AzureServiceBusTopicNamingConvention.Apply(address.Queue + ".events") + "@" + address.Machine);
     }
 }
