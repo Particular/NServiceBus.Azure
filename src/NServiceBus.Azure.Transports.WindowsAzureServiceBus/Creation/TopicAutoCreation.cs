@@ -5,15 +5,14 @@
     using NServiceBus.Transports;
     using Settings;
 
-    public class TopicAutoCreation: IWantToRunWhenConfigurationIsComplete
+    public class TopicAutoCreation : IWantToRunWhenConfigurationIsComplete
     {
-        readonly ICreateTopics topicCreator;
-
         public TopicAutoCreation()
         {
-            topicCreator = new AzureServicebusTopicCreator();
         }
 
+        public ICreateTopics TopicCreator { get; set; }
+        
         public void Run()
         {
             if (!QueueAutoCreation.ShouldAutoCreate)
@@ -22,7 +21,7 @@
             var selectedTransport = SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
             if (selectedTransport is AzureServiceBus)
             {
-                topicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));
+                TopicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));
             }
         }
     }
