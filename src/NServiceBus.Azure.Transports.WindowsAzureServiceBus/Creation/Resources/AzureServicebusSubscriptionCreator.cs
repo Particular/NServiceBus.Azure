@@ -30,7 +30,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var topicPath = topic.Queue;
             var namespaceClient = createNamespaceManagers.Create(topic.Machine);
 
-            var filter = string.Empty;
+            var filter = "1=1";
 
             if (eventType != null)
             {
