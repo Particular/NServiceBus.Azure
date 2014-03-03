@@ -5,24 +5,30 @@
     using NServiceBus.Transports;
     using Settings;
 
-    public class TopicAutoCreation: IWantToRunWhenConfigurationIsComplete
+    public class TopicAutoCreation : IWantToRunWhenConfigurationIsComplete
     {
-        readonly ICreateTopics topicCreator;
-
         public TopicAutoCreation()
         {
-            topicCreator = new AzureServicebusTopicCreator();
         }
 
+        public ICreateTopics TopicCreator { get; set; }
+        
         public void Run()
         {
             if (!QueueAutoCreation.ShouldAutoCreate)
                 return;
 
+            // to stay backward compat, this used to be autocreated the constructor but is now injected
+            // so if this class was manually instantiated, it could lead to a null ref otherwise.
+            if (TopicCreator == null)
+            {
+                TopicCreator = new AzureServicebusTopicCreator(); 
+            }
+
             var selectedTransport = SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
             if (selectedTransport is AzureServiceBus)
             {
-                topicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));
+                TopicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));
             }
         }
     }
