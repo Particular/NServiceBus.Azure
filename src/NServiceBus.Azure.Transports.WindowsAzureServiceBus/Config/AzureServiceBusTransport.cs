@@ -5,6 +5,7 @@
     using Azure.Transports.WindowsAzureServiceBus;
     using Config;
     using Microsoft.ServiceBus;
+    using Settings;
     using Transports;
 
     public class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
@@ -12,6 +13,8 @@
         protected override void InternalConfigure(Configure config)
         {
             Categories.Serializers.SetDefault<JsonSerialization>();
+
+            SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
             var queuename = AzureServiceBusQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
 

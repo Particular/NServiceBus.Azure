@@ -71,7 +71,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "6.0", TreatAsErrorFromVersion = "5.0", Replacement = "Scaleout")] 
         public static Configure QueuePerInstance(this Configure config)
         {
-            SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", true);
+            SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", false);
             return config;
         }
     }

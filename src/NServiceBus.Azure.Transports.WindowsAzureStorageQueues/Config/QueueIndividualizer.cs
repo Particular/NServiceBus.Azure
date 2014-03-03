@@ -11,10 +11,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             if (SafeRoleEnvironment.IsAvailable)
             {
                 var index = parser.ParseIndexFrom(SafeRoleEnvironment.CurrentRoleInstanceId);
-                individualQueueName = parser.ParseQueueNameFrom(queueName)
+
+                var currentQueue = parser.ParseQueueNameFrom(queueName);
+                if (!currentQueue.EndsWith("-" + index.ToString(CultureInfo.InvariantCulture))) //individualize can be applied multiple times
+                {
+                    individualQueueName = currentQueue
                                           + (index > 0 ? "-" : "")
                                           + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
-
+                }
                 if (queueName.Contains("@"))
                     individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
             }

@@ -11,10 +11,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             if (SafeRoleEnvironment.IsAvailable)
             {
                 var index = parser.ParseIndexFrom(SafeRoleEnvironment.CurrentRoleInstanceId);
-                individualQueueName = parser.ParseQueueNameFrom(queueName)
-                                          + (index > 0 ? "-" : "")
-                                          + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
 
+                var currentQueue = parser.ParseQueueNameFrom(queueName);
+                if (!currentQueue.EndsWith("-" + index.ToString(CultureInfo.InvariantCulture))) //individualize can be applied multiple times
+                {
+                    individualQueueName = currentQueue
+                                              + (index > 0 ? "-" : "")
+                                              + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
+                }
                 if (queueName.Contains("@"))
                     individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
             }
