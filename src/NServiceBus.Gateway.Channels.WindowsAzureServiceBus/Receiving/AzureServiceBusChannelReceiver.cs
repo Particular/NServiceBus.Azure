@@ -202,16 +202,12 @@
         void OnDataReceived(BrokeredMessage message)
         {
             var streamToReturn = message.GetBody<Stream>();
-            IDictionary<string, string> headers = message.Properties.ToDictionary(k => k.Key, k => k.Value.ToString());
+            IDictionary<string, string> headers = message.Properties.ToDictionary(k => k.Key, k => k.Value != null ? k.Value.ToString() : null);
 
             var pos = streamToReturn.Position;
             var r = new StreamReader(streamToReturn);
             var str = r.ReadToEnd();
             streamToReturn.Position = pos;
-
-            Debug.WriteLine(str);
-          
-            //streamToReturn.Position = 0;
 
             if (DataReceived != null)
             {
