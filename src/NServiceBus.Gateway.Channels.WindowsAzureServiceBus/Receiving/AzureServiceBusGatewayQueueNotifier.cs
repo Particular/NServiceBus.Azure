@@ -17,10 +17,6 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
         public AzureServiceBusGatewayQueueNotifier(ICreateGatewayQueueClients gatewayQueueClientCreator)
         {
             this.gatewayQueueClientCreator = gatewayQueueClientCreator;
-            //todo, needs to be configurable
-            ServerWaitTime = 300;
-            BatchSize = 1;
-            BackoffTimeInSeconds = 1;
         }
 
         /// <summary>

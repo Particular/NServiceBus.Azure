@@ -67,6 +67,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\AzureServiceBusGatewayChannel.cs" />
+    <Compile Include="Config\AzureServicebusGatewayDefaults.cs" />
+    <Compile Include="Config\AzureServiceBusGatewayQueueConfig.cs" />
     <Compile Include="Creation\Clients\AzureServicebusQueueClientCreator.cs" />
     <Compile Include="Creation\Clients\CreatesMessagingFactories.cs" />
     <Compile Include="Creation\Clients\ICreateMessagingFactories.cs" />

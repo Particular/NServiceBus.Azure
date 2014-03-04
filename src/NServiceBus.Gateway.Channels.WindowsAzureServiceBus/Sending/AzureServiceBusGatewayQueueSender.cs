@@ -15,13 +15,13 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
     /// </summary>
     internal class AzureServiceBusGatewayQueueSender : ISendGatewayMessages
     {
-        public const int DefaultBackoffTimeInSeconds = 10;
-
         private readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
         
         private static readonly object SenderLock = new Object();
 
         public int MaxDeliveryCount { get; set; }
+
+        public int BackoffTimeInSeconds { get; set; }
 
         ICreateMessagingFactories createMessagingFactories;
 
@@ -119,7 +119,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * BackoffTimeInSeconds));
                 }
                 // back off when we're being throttled
                 catch (ServerBusyException)
@@ -128,7 +128,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * BackoffTimeInSeconds));
                 }
                 // connection lost
                 catch (MessagingCommunicationException)
@@ -137,7 +137,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * BackoffTimeInSeconds));
                 }
                 // took to long, maybe we lost connection
                 catch (TimeoutException)
@@ -146,7 +146,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * BackoffTimeInSeconds));
                 }
             }
         }
