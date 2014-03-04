@@ -1,35 +1,39 @@
 ﻿namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 {
+    using System.Configuration;
     using Features;
     using NServiceBus.Config;
-    using Transports;
+    using Unicast.Transport;
 
     /// <summary>
     /// Makes sure that all queues are created
     /// </summary>
     public class GatewayQueueAutoCreation : Feature, IWantToRunWhenConfigurationIsComplete
     {
-        public ICreateQueues QueueCreator { get; set; }
-
+        public ICreateGatewayQueues QueueCreator { get; set; }
+   
         public void Run()
         {
             if (!ShouldAutoCreate)
                 return;
 
-            //todo loop through gateway config to find the queues to be created
+            var gatewayConfig = Configure.GetConfigSection<GatewayConfig>();
 
-            //var wantQueueCreatedInstances = Configure.Instance.Builder.BuildAll<IWantQueueCreated>().ToList();
+            foreach (var channel in gatewayConfig.GetChannels())
+            {
+                if (channel.Type.ToLower() == "azureservicebus")
+                {
+                    var address = channel.Address;
+                    var @namespace = TransportConnectionString.GetConnectionStringOrNull("NServiceBus/Gateway/" + address);
 
-            //foreach (var wantQueueCreatedInstance in wantQueueCreatedInstances.Where(wantQueueCreatedInstance => !wantQueueCreatedInstance.IsDisabled))
-            //{
-            //    if (wantQueueCreatedInstance.Address == null)
-            //    {
-            //        throw new InvalidOperationException(string.Format("IWantQueueCreated implementation {0} returned a null address", wantQueueCreatedInstance.GetType().FullName));
-            //    }
-
-            //    var username = Thread.CurrentPrincipal != null ? (Thread.CurrentPrincipal.Identity != null ? Thread.CurrentPrincipal.Identity.Name : null) : null;
-            //    QueueCreator.CreateQueueIfNecessary(wantQueueCreatedInstance.Address, username);
-            //}
+                    if (@namespace == null)
+                    {
+                        throw new ConfigurationErrorsException(string.Format("No connection string has been defined for the channel {0}", address));
+                    }
+                    
+                    QueueCreator.Create(address, @namespace);
+                }
+            }
         }
 
         internal static bool ShouldAutoCreate
