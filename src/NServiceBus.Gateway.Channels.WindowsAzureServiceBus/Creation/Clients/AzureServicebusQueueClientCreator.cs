@@ -11,7 +11,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
         readonly ICreateGatewayQueues queueCreator;
         readonly ICreateMessagingFactories createMessagingFactories;
 
-        public int MaxRetries { get; set; }
+        public int PrefetchCount { get; set; }
 
         public AzureServicebusGatewayGatewayQueueClientCreator(ICreateGatewayQueues queueCreator, ICreateMessagingFactories createMessagingFactories)
         {
@@ -35,7 +35,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 
             var factory = createMessagingFactories.Create(@namespace);
             var client = factory.CreateQueueClient(address, ShouldRetry() ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
-            client.PrefetchCount = 100; // todo make configurable
+            client.PrefetchCount = PrefetchCount; 
             return client;
         }
 
