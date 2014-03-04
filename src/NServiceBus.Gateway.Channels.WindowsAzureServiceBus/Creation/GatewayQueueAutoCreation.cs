@@ -1,12 +1,8 @@
 ﻿namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 {
-    using System;
-    using System.Linq;
-    using System.Threading;
-    using Config;
     using Features;
-    using NServiceBus.Transports;
-    using Unicast.Queuing;
+    using NServiceBus.Config;
+    using Transports;
 
     /// <summary>
     /// Makes sure that all queues are created

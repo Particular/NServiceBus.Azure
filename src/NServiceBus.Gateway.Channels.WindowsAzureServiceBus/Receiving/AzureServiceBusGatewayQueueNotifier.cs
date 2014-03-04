@@ -7,24 +7,21 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusQueueNotifier : INotifyReceivedMessages
+    internal class AzureServiceBusGatewayQueueNotifier : INotifyReceivedGatewayMessages
     {
+        readonly ICreateGatewayQueueClients gatewayQueueClientCreator;
         private QueueClient _queueClient;
         private Action<BrokeredMessage> _tryProcessMessage;
         private bool cancelRequested;
 
-        public AzureServiceBusQueueNotifier()
+        public AzureServiceBusGatewayQueueNotifier(ICreateGatewayQueueClients gatewayQueueClientCreator)
         {
+            this.gatewayQueueClientCreator = gatewayQueueClientCreator;
             //todo, needs to be configurable
             ServerWaitTime = 300;
             BatchSize = 1;
             BackoffTimeInSeconds = 1;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ICreateQueueClients QueueClientCreator { get; set; }
 
         /// <summary>
         /// 
@@ -39,8 +36,6 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
         /// </summary>
         public int BackoffTimeInSeconds { get; set; }
 
-        public Address Address { get; private set; }
-
         /// <summary>
         /// 
         /// </summary>
@@ -48,13 +43,11 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
         /// <param name="tryProcessMessage"></param>
         public void Start(string address, Action<BrokeredMessage> tryProcessMessage)
         {
-           // Address = address;
-
             cancelRequested = false;
 
             _tryProcessMessage = tryProcessMessage;
-            
-            _queueClient = QueueClientCreator.Create(address);
+
+            _queueClient = gatewayQueueClientCreator.Create(address);
 
             _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
