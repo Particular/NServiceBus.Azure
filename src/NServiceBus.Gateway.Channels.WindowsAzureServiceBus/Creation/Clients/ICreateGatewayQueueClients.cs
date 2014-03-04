@@ -5,7 +5,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public interface ICreateQueueClients
+    public interface ICreateGatewayQueueClients
     {
         /// <summary>
         /// 

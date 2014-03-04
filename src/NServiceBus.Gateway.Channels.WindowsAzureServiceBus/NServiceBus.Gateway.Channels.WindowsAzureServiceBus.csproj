@@ -66,23 +66,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\AzureServiceBusGatewayChannel.cs" />
     <Compile Include="Creation\Clients\AzureServicebusQueueClientCreator.cs" />
     <Compile Include="Creation\Clients\CreatesMessagingFactories.cs" />
     <Compile Include="Creation\Clients\ICreateMessagingFactories.cs" />
-    <Compile Include="Creation\Clients\ICreateQueueClients.cs" />
+    <Compile Include="Creation\Clients\ICreateGatewayQueueClients.cs" />
     <Compile Include="Creation\GatewayQueueAutoCreation.cs" />
-    <Compile Include="Creation\Resources\AzureServiceBusQueueCreator.cs" />
-    <Compile Include="Receiving\AzureServiceBusQueueNotifier.cs" />
-    <Compile Include="Receiving\INotifyReceivedMessages.cs" />
+    <Compile Include="Creation\Resources\AzureServiceBusGatewayQueueCreator.cs" />
+    <Compile Include="Creation\Resources\ICreateGatewayQueues.cs" />
+    <Compile Include="Receiving\AzureServiceBusGatewayQueueNotifier.cs" />
+    <Compile Include="Receiving\INotifyReceivedGatewayMessages.cs" />
     <Compile Include="Receiving\ReceiveResourceManager.cs" />
     <Compile Include="Creation\Resources\CreatesNamespaceManagers.cs" />
     <Compile Include="Creation\Resources\ICreateNamespaceManagers.cs" />
-    <Compile Include="Sending\AzureServiceBusMessageQueueSender.cs" />
+    <Compile Include="Sending\AzureServiceBusGatewayQueueSender.cs" />
+    <Compile Include="Sending\ISendGatewayMessages.cs" />
     <Compile Include="Sending\SendResourceManager.cs" />
     <Compile Include="Receiving\AzureServiceBusChannelReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sending\AzureServiceBusChannelSender.cs" />
-    <Compile Include="Utils\BrokeredMessageConverter.cs" />
     <Compile Include="Utils\BrokeredMessageExtensions.cs" />
     <Compile Include="Utils\DeterministicGuidBuilder.cs" />
   </ItemGroup>
@@ -97,6 +99,7 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="Fody.targets" />
   <Import Project="$(SolutionDir)..\BuildSupport\RippleRestoreTask.targets" />

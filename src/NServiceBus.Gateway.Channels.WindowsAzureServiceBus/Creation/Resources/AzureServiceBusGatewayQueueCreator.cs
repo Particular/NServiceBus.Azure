@@ -2,8 +2,8 @@
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
-    
-    public class AzureServiceBusGatewayQueueCreator
+
+    internal class AzureServiceBusGatewayQueueCreator : ICreateGatewayQueues
     {
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }
@@ -17,10 +17,6 @@
         public bool EnablePartitioning { get; set; }
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
-
-        public AzureServiceBusGatewayQueueCreator() : this(new CreatesNamespaceManagers())
-        {
-        }
 
         public AzureServiceBusGatewayQueueCreator(ICreateNamespaceManagers createNamespaceManagers)
         {

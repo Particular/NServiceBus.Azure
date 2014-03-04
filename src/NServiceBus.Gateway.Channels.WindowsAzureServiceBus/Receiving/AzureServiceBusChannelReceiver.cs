@@ -3,7 +3,6 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -13,20 +12,20 @@
     using Microsoft.ServiceBus.Messaging;
 
     [ChannelType("AzureServiceBus")]
-    public class AzureServiceBusChannelReceiver : IChannelReceiver
+    internal class AzureServiceBusChannelReceiver : IChannelReceiver
     {
         private CancellationTokenSource tokenSource;
         private readonly CircuitBreaker circuitBreaker = new CircuitBreaker(100, TimeSpan.FromSeconds(30));
 
         private readonly Queue pendingMessages = Queue.Synchronized(new Queue());
-        private readonly IList<INotifyReceivedMessages> notifiers = new List<INotifyReceivedMessages>();
+        private readonly IList<INotifyReceivedGatewayMessages> notifiers = new List<INotifyReceivedGatewayMessages>();
 
         private TransactionOptions transactionOptions;
 
         private const int PeekInterval = 50;
         private const int MaximumWaitTimeWhenIdle = 1000;
         private int timeToDelayNextPeek;
-        private int maximumConcurrencyLevel = 0;
+        private int maximumConcurrencyLevel;
 
         public AzureServiceBusChannelReceiver()
         {
@@ -49,7 +48,7 @@
 
             maximumConcurrencyLevel += numberOfWorkerThreads;
 
-            for (int i = 0; i < numberOfWorkerThreads; i++)
+            for (var i = 0; i < numberOfWorkerThreads; i++)
             {
                 StartThread();
             }
@@ -124,7 +123,7 @@
             TrackNotifier(address, notifier);
         }
 
-        void TrackNotifier(string address, INotifyReceivedMessages notifier)
+        void TrackNotifier(string address, INotifyReceivedGatewayMessages notifier)
         {
             notifier.Start(address, EnqueueMessage);
             notifiers.Add(notifier);
@@ -187,14 +186,9 @@
 
         public event EventHandler<DataReceivedOnChannelArgs> DataReceived;
 
-
-        private Func<int, INotifyReceivedMessages> CreateNotifier = (int numberOfWorkerThreads) =>
+        private Func<int, INotifyReceivedGatewayMessages> CreateNotifier = numberOfWorkerThreads =>
         {
-            //todo: IOC this Configure.Instance.Builder.Build<AzureServiceBusQueueNotifier>();
-            var notifier = new AzureServiceBusQueueNotifier(); 
-            notifier.QueueClientCreator = new AzureServicebusGatewayQueueClientCreator(
-                new AzureServiceBusGatewayQueueCreator(),
-                new CreatesMessagingFactories());
+            var notifier = Configure.Instance.Builder.Build<INotifyReceivedGatewayMessages>();
             notifier.BatchSize = numberOfWorkerThreads;
             return notifier;
         };
@@ -203,11 +197,6 @@
         {
             var streamToReturn = message.GetBody<Stream>();
             IDictionary<string, string> headers = message.Properties.ToDictionary(k => k.Key, k => k.Value != null ? k.Value.ToString() : null);
-
-            var pos = streamToReturn.Position;
-            var r = new StreamReader(streamToReturn);
-            var str = r.ReadToEnd();
-            streamToReturn.Position = pos;
 
             if (DataReceived != null)
             {

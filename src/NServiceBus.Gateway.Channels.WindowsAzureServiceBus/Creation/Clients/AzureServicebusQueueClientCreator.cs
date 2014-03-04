@@ -6,14 +6,14 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
     using Settings;
     using Unicast.Transport;
 
-    internal class AzureServicebusGatewayQueueClientCreator : ICreateQueueClients
+    internal class AzureServicebusGatewayGatewayQueueClientCreator : ICreateGatewayQueueClients
     {
-        readonly AzureServiceBusGatewayQueueCreator queueCreator;
+        readonly ICreateGatewayQueues queueCreator;
         readonly ICreateMessagingFactories createMessagingFactories;
 
         public int MaxRetries { get; set; }
 
-        public AzureServicebusGatewayQueueClientCreator(AzureServiceBusGatewayQueueCreator queueCreator, ICreateMessagingFactories createMessagingFactories)
+        public AzureServicebusGatewayGatewayQueueClientCreator(ICreateGatewayQueues queueCreator, ICreateMessagingFactories createMessagingFactories)
         {
             this.queueCreator = queueCreator;
             this.createMessagingFactories = createMessagingFactories;

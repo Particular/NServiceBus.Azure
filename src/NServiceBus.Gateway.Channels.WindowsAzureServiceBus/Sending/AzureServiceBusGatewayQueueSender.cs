@@ -13,7 +13,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    internal class AzureServiceBusMessageQueueSender
+    internal class AzureServiceBusGatewayQueueSender : ISendGatewayMessages
     {
         public const int DefaultBackoffTimeInSeconds = 10;
 
@@ -25,7 +25,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
 
         ICreateMessagingFactories createMessagingFactories;
 
-        public AzureServiceBusMessageQueueSender(ICreateMessagingFactories createMessagingFactories)
+        public AzureServiceBusGatewayQueueSender(ICreateMessagingFactories createMessagingFactories)
         {
             this.createMessagingFactories = createMessagingFactories;
         }
@@ -58,11 +58,6 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
                     }
                 }
 
-                var pos = message.Position;
-                var r = new StreamReader(message);
-                var str = r.ReadToEnd();
-                message.Position = pos;
-
                 var brokeredMessage = new BrokeredMessage(message, true);
                 foreach (var header in headers)
                 {
@@ -74,6 +69,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
                 Send(brokeredMessage, sender, address);
                 ///  else
                 //   Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(brokeredMessage, sender, address)), EnlistmentOptions.None);
+                tx.Complete();
             }
         }
 
