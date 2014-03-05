@@ -42,11 +42,6 @@
                 Configure.Instance.Configurer.ConfigureProperty<AzureServiceBusGatewayQueueSender>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
                 Configure.Instance.Configurer.ConfigureProperty<AzureServiceBusGatewayQueueSender>(t => t.BackoffTimeInSeconds, configSection.BackoffTimeInSeconds);
             });
-
-           
-           
-
-
         }
 
         void RegisterDefault<I, T>(DependencyLifecycle lifecycle, Action configure)

@@ -58,7 +58,7 @@ namespace NServiceBus.Gateway.Channels.WindowsAzureServiceBus
                     }
                 }
 
-                var brokeredMessage = new BrokeredMessage(message, true);
+                var brokeredMessage = new BrokeredMessage(message, false);
                 foreach (var header in headers)
                 {
                     brokeredMessage.Properties[header.Key] = header.Value;
