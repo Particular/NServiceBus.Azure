@@ -54,6 +54,10 @@
             }
         }
 
+        public bool RequiresDeduplication {
+            get { return false; }
+        }
+
         void StartThread()
         {
             var token = tokenSource.Token;
