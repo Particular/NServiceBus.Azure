@@ -20,32 +20,17 @@ namespace NServiceBus
 		
 		public static Configure AzureDataBus(this Configure config)
 		{
-            var container = Defaultcontainer;
-            
-		    CloudBlobClient cloudBlobClient;
+		    var configSection = Configure.GetConfigSection<AzureDataBusConfig>() ?? new AzureDataBusConfig();
 
-            var configSection = Configure.GetConfigSection<AzureDataBusConfig>();
+            var cloudBlobClient = CloudStorageAccount.Parse(configSection.ConnectionString).CreateCloudBlobClient();
 
-            if (configSection != null)
+            var dataBus = new BlobStorageDataBus(cloudBlobClient.GetContainerReference(configSection.Container))
             {
-                cloudBlobClient = CloudStorageAccount.Parse(configSection.ConnectionString).CreateCloudBlobClient();
-
-                container = configSection.Container;
-            }
-            else
-            {
-                cloudBlobClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudBlobClient();
-            }
-
-            var dataBus = new BlobStorageDataBus(cloudBlobClient.GetContainerReference(container));
-
-            if(configSection != null)
-            {
-                dataBus.BasePath = configSection.BasePath;
-                dataBus.MaxRetries = configSection.MaxRetries;
-                dataBus.NumberOfIOThreads = configSection.NumberOfIOThreads;
-                dataBus.BlockSize = configSection.BlockSize;
-            }
+                BasePath = configSection.BasePath,
+                MaxRetries = configSection.MaxRetries,
+                NumberOfIOThreads = configSection.NumberOfIOThreads,
+                BlockSize = configSection.BlockSize
+            };
 
 		    config.Configurer.RegisterSingleton<IDataBus>(dataBus);
 
