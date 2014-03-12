@@ -10,8 +10,9 @@
     using System.Transactions;
     using CircuitBreakers;
     using Microsoft.ServiceBus.Messaging;
+    using IChannelReceiver = V2.Channels.IChannelReceiver;
 
-    [ChannelType("AzureServiceBus")]
+    [V2.Channels.ChannelType("AzureServiceBus")]
     internal class AzureServiceBusChannelReceiver : IChannelReceiver
     {
         private CancellationTokenSource tokenSource;
@@ -188,7 +189,7 @@
             return true;
         }
 
-        public event EventHandler<DataReceivedOnChannelArgs> DataReceived;
+        public event EventHandler<V2.Channels.DataReceivedOnChannelArgs> DataReceived;
 
         private Func<int, INotifyReceivedGatewayMessages> CreateNotifier = numberOfWorkerThreads =>
         {
@@ -204,8 +205,8 @@
 
             if (DataReceived != null)
             {
-                
-                DataReceived(this, new DataReceivedOnChannelArgs()
+
+                DataReceived(this, new V2.Channels.DataReceivedOnChannelArgs()
                 {
                     Headers = headers,
                     Data = streamToReturn

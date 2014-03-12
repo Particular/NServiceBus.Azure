@@ -17,7 +17,7 @@
             if (!ShouldAutoCreate)
                 return;
 
-            var gatewayConfig = Configure.GetConfigSection<GatewayConfig>();
+            var gatewayConfig = Configure.GetConfigSection<V2.Config.GatewayConfig>();
 
             foreach (var channel in gatewayConfig.GetChannels())
             {

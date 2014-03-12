@@ -2,8 +2,9 @@
 {
     using System.Collections.Generic;
     using System.IO;
+    using IChannelSender = V2.Channels.IChannelSender;
 
-    [ChannelType("AzureServiceBus")]
+    [V2.Channels.ChannelType("AzureServiceBus")]
     internal class AzureServiceBusChannelSender : IChannelSender
     {
         readonly ISendGatewayMessages gatewayQueueSender;
