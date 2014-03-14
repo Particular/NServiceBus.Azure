@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>NServiceBus.Gateway.Channels.WindowsAzureServiceBus</id>
+    <title>NServiceBus Azure Transports WindowsAzureServiceBus</title>
+    <version>5.1.0</version>
+    <authors>NServiceBus Ltd</authors>
+    <owners>Udi Dahan, Andreas Ohlund, John Simons</owners>
+    <licenseUrl>http://particular.net/LicenseAgreement</licenseUrl>
+    <projectUrl>http://particular.net/</projectUrl>
+    <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>NServiceBus Gateway Channel using the Windows Azure Servicebus (SDK 2.2)</description>
+    <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
+    <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
+    <dependencies>
+		 <dependency id="WindowsAzure.ServiceBus" version="[2.2.0.0, 2.3.0.0)" />
+	</dependencies>
+  </metadata>
+  <files>
+    <file src="..\..\src\binaries\NServiceBus.Gateway.Channels.WindowsAzureServiceBus.???" target="lib\net40" />
+  </files>
+</package>
