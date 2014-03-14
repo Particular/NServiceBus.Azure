@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>NServiceBus.Gateway.Channels.WindowsAzureServiceBus</id>
-    <title>NServiceBus Azure Transports WindowsAzureServiceBus</title>
+    <title>NServiceBus Gateway Channel WindowsAzureServiceBus</title>
     <version>5.1.0</version>
     <authors>NServiceBus Ltd</authors>
     <owners>Udi Dahan, Andreas Ohlund, John Simons</owners>
