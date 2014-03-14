@@ -7,7 +7,7 @@
     {
         public void Run()
         {
-            if (!Feature.IsEnabled<Gateway>()) return;
+            if (!Feature.IsEnabled<V2.Features.Gateway>()) return;
 
             var configSection = Configure.GetConfigSection<AzureServiceBusGatewayQueueConfig>() ?? new AzureServiceBusGatewayQueueConfig();
 
