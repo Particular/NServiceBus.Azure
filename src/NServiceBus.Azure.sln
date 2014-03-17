@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.WindowsAz
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Gateway.Channels.WindowsAzureServiceBus", "NServiceBus.Gateway.Channels.WindowsAzureServiceBus\NServiceBus.Gateway.Channels.WindowsAzureServiceBus.csproj", "{D0773214-8609-47FB-B4C7-9BB11935A7BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Connect.Channels.WindowsAzureServiceBus", "NServiceBus.Connect.Channels.WindowsAzureServiceBus\NServiceBus.Connect.Channels.WindowsAzureServiceBus.csproj", "{D0773214-8609-47FB-B4C7-9BB11935A7BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
