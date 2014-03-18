@@ -65,6 +65,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sending\When_sending_an_oversized_message_without_a_transaction_scope.cs" />
+    <Compile Include="Sending\When_sending_an_oversized_message_from_a_transaction_scope.cs" />
     <Compile Include="SetupAcceptanceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
