@@ -15,7 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusMessageQueueSender : ISendMessages
     {
-        public const int DefaultBackoffTimeInSeconds = 10;
+        const int DefaultBackoffTimeInSeconds = 10;
 
         private readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
         
@@ -139,7 +139,5 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 }
             }
         }
-
-      
    }
 }
