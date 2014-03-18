@@ -1,10 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.IO;
     using System.Linq;
-    using System.Runtime.Serialization;
-    using System.Runtime.Serialization.Formatters.Binary;
     using Microsoft.ServiceBus.Messaging;
 
     public static class BrokeredMessageConverter
@@ -14,11 +11,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             TransportMessage t;
             var rawMessage = message.GetBody<byte[]>() ?? new byte[0];
 
-            if (message.Properties.Count == 0)
-            {
-                t = DeserializeMessage(rawMessage);
-            }
-            else
+            if (message.Properties.Count > 0)
             {
                 t = new TransportMessage(message.MessageId,
                     message.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value as string))
@@ -36,25 +29,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 t.Body = rawMessage;
             }
+            else
+            {
+                t = new TransportMessage();
+            }
 
             return t;
-        }
-
-        private static TransportMessage DeserializeMessage(byte[] rawMessage)
-        {
-            var formatter = new BinaryFormatter();
-
-            using (var stream = new MemoryStream(rawMessage))
-            {
-                var message = formatter.Deserialize(stream) as TransportMessage;
-
-                if (message == null)
-                {
-                    throw new SerializationException("Failed to deserialize message");
-                }
-
-                return message;
-            }
         }
     }
 }
