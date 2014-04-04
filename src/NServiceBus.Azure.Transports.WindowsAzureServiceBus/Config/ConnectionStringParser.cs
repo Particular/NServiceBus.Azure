@@ -7,7 +7,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             return inputQueue.Contains("@") ? inputQueue.Substring(inputQueue.IndexOf("@", System.StringComparison.Ordinal) + 1) : string.Empty;
         }
 
-        public object ParseQueueNameFrom(string inputQueue)
+        public string ParseQueueNameFrom(string inputQueue)
         {
             return inputQueue.Contains("@") ? inputQueue.Substring(0, inputQueue.IndexOf("@", System.StringComparison.Ordinal)) : inputQueue;
         }

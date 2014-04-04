@@ -15,7 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusMessageQueueSender : ISendMessages
     {
-        public const int DefaultBackoffTimeInSeconds = 10;
+        const int DefaultBackoffTimeInSeconds = 10;
 
         private readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
         
@@ -93,53 +93,59 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                             brokeredMessage.TimeToLive = message.TimeToBeReceived;
                         }
 
+                        if (brokeredMessage.Size > 256*1024)
+                        {
+                            throw new MessageTooLargeException(string.Format("The message with id {0} is larger that the maximum message size allowed by Azure ServiceBus, consider using the databus instead", message.Id));
+                        }
+
                         sender.Send(brokeredMessage);
                         sent = true;
                     }
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    throw new QueueNotFoundException { Queue = address };
+                    throw new QueueNotFoundException
+                    {
+                        Queue = address
+                    };
                 }
-                // todo: outbox
+                    // todo: outbox
                 catch (MessagingEntityDisabledException)
                 {
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
-                // back off when we're being throttled
+                    // back off when we're being throttled
                 catch (ServerBusyException)
                 {
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
-                // connection lost
+                    // connection lost
                 catch (MessagingCommunicationException)
                 {
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
-                // took to long, maybe we lost connection
+                    // took to long, maybe we lost connection
                 catch (TimeoutException)
                 {
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
             }
         }
-
-      
    }
 }

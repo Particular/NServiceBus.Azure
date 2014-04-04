@@ -1,16 +1,12 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using Features;
     using Config;
     using NServiceBus.Transports;
     using Settings;
 
     public class TopicAutoCreation : IWantToRunWhenConfigurationIsComplete
     {
-        public TopicAutoCreation()
-        {
-        }
-
+  
         public ICreateTopics TopicCreator { get; set; }
         
         public void Run()

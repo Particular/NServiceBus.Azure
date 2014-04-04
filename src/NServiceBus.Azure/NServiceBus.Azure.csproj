@@ -75,6 +75,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Spatial">
@@ -127,9 +128,6 @@
     <Compile Include="Subscriptions\Azure\SubscriptionServiceContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Fody.targets" />
     <None Include="ripple.dependencies.config" />
   </ItemGroup>

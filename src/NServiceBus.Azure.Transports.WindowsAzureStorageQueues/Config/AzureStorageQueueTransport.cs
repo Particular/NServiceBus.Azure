@@ -17,6 +17,8 @@
             EnableByDefault<TimeoutManager>();
             Categories.Serializers.SetDefault<JsonSerialization>();
 
+            SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
+
             var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
 
             if(configSection == null)

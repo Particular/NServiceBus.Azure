@@ -6,18 +6,21 @@
     using System.Linq;
     using System.Net;
     using System.Reflection;
+    using System.Runtime.Caching;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using Saga;
 
     /// <summary>
-    /// Saga persister implementation using NHibernate.
+    /// Saga persister implementation using azure table storage.
     /// </summary>
     public class AzureSagaPersister : ISagaPersister
     {
         readonly bool autoUpdateSchema;
         readonly CloudTableClient client;
         readonly ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
+        static readonly MemoryCache dictionaryTableCache = new MemoryCache("Entities");
+        const int longevity = 60000;
 
         /// <summary>
         /// 
@@ -58,67 +61,62 @@
         /// <returns>The saga entity if found, otherwise null.</returns>
         public T Get<T>(Guid sagaId) where T : IContainSagaData
         {
-            var tableName = typeof(T).Name;
-            var table = client.GetTableReference(tableName);
+            var id = sagaId.ToString();
+            var entityType = typeof(T);
+            var tableEntity = GetDictionaryTableEntity(id, entityType);
+            var entity = (T)ToEntity(entityType, tableEntity);
 
-            var query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sagaId.ToString()));
+            if (!Equals(entity, default(T)))
+            {
+                AddToCache(id, tableEntity);
+            }
 
-           return ToEntity<T>(table.ExecuteQuery(query).FirstOrDefault());
+            return entity;
         }
 
-       
-        T ISagaPersister.Get<T>(string property, object value)
+        void AddToCache(string id, DictionaryTableEntity tableEntity)
         {
-            var type = typeof (T);
-            var tableName = type.Name;
-            var table = client.GetTableReference(tableName);
-
-            TableQuery<DictionaryTableEntity> query;
-
-            var propertyInfo = type.GetProperty(property);
-
-            if (propertyInfo.PropertyType == typeof(byte[]))
+            var item = dictionaryTableCache.GetCacheItem(id);
+            if (item == null)
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBinary(property, QueryComparisons.Equal, (byte[])value));
-            }
-            else if (propertyInfo.PropertyType == typeof(bool))
-            {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBool(property, QueryComparisons.Equal, (bool) value));
-            }
-            else if (propertyInfo.PropertyType == typeof(DateTime))
-            {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDate(property, QueryComparisons.Equal, (DateTime)value));
-            }
-            else if (propertyInfo.PropertyType == typeof(Guid))
-            {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForGuid(property, QueryComparisons.Equal, (Guid)value));
-            }
-            else if (propertyInfo.PropertyType == typeof(Int32))
-            {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForInt(property, QueryComparisons.Equal, (int)value));
-            }
-            else if (propertyInfo.PropertyType == typeof(Int64))
-            {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForLong(property, QueryComparisons.Equal, (long)value));
-            }
-            else if (propertyInfo.PropertyType == typeof(Double))
-            {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDouble(property, QueryComparisons.Equal, (double)value));
-            }
-            else if (propertyInfo.PropertyType == typeof(string))
-            {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition(property, QueryComparisons.Equal, (string)value));
+                item = new CacheItem(id, tableEntity);
+                dictionaryTableCache.Set(item, new CacheItemPolicy
+                {
+                    Priority = CacheItemPriority.NotRemovable,
+                    SlidingExpiration = TimeSpan.FromMilliseconds(longevity)
+                });
             }
             else
             {
-                throw new NotSupportedException(
-                    string.Format("The property type '{0}' is not supported in windows azure table storage",
-                                  propertyInfo.PropertyType.Name));
+                item.Value = tableEntity;
+            }
+        }
+
+        DictionaryTableEntity GetDictionaryTableEntity(string sagaId, Type entityType)
+        {
+            var tableName = entityType.Name;
+            var table = client.GetTableReference(tableName);
+
+            var query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sagaId));
+            var tableEntity = table.ExecuteQuery(query).FirstOrDefault();
+            return tableEntity;
+        }
+
+        T ISagaPersister.Get<T>(string property, object value)
+        {
+            var type = typeof(T);
+            var tableEntity = GetDictionaryTableEntity(type, property, value);
+            var entity = (T) ToEntity(type, tableEntity);
+
+            if (!Equals(entity, default(T)))
+            {
+                var id = entity.Id.ToString();
+                AddToCache(id, tableEntity);
             }
 
             try
             {
-                return ToEntity<T>(table.ExecuteQuery(query).FirstOrDefault());
+                return entity;
             }
             catch (WebException ex)
             {
@@ -139,7 +137,57 @@
                 // can occur when table has not yet been created, but already looking for absence of instance
                 return default(T);
             }
+        }
 
+        DictionaryTableEntity GetDictionaryTableEntity(Type type, string property, object value)
+        {
+            var tableName = type.Name;
+            var table = client.GetTableReference(tableName);
+
+            TableQuery<DictionaryTableEntity> query;
+
+            var propertyInfo = type.GetProperty(property);
+
+            if (propertyInfo.PropertyType == typeof(byte[]))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBinary(property, QueryComparisons.Equal, (byte[]) value));
+            }
+            else if (propertyInfo.PropertyType == typeof(bool))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBool(property, QueryComparisons.Equal, (bool) value));
+            }
+            else if (propertyInfo.PropertyType == typeof(DateTime))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDate(property, QueryComparisons.Equal, (DateTime) value));
+            }
+            else if (propertyInfo.PropertyType == typeof(Guid))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForGuid(property, QueryComparisons.Equal, (Guid) value));
+            }
+            else if (propertyInfo.PropertyType == typeof(Int32))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForInt(property, QueryComparisons.Equal, (int) value));
+            }
+            else if (propertyInfo.PropertyType == typeof(Int64))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForLong(property, QueryComparisons.Equal, (long) value));
+            }
+            else if (propertyInfo.PropertyType == typeof(Double))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDouble(property, QueryComparisons.Equal, (double) value));
+            }
+            else if (propertyInfo.PropertyType == typeof(string))
+            {
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition(property, QueryComparisons.Equal, (string) value));
+            }
+            else
+            {
+                throw new NotSupportedException(
+                    string.Format("The property type '{0}' is not supported in windows azure table storage",
+                        propertyInfo.PropertyType.Name));
+            }
+            var tableEntity = table.ExecuteQuery(query).FirstOrDefault();
+            return tableEntity;
         }
 
         /// <summary>
@@ -161,7 +209,8 @@
 
         void Persist(IContainSagaData saga)
         {
-            var tableName = saga.GetType().Name;
+            var type = saga.GetType();
+            var tableName = type.Name;
             var table = client.GetTableReference(tableName);
             if (autoUpdateSchema && !tableCreated.ContainsKey(tableName))
             {
@@ -170,7 +219,7 @@
             }
 
             var partitionKey = saga.Id.ToString();
-
+                
             var batch = new TableBatchOperation();
 
             AddObjectToBatch(batch, saga, partitionKey);
@@ -178,60 +227,59 @@
             table.ExecuteBatch(batch);
         }
 
-        static void AddObjectToBatch(TableBatchOperation batch, object entity, string partitionKey, string rowkey = "")
+        void AddObjectToBatch(TableBatchOperation batch, object entity, string partitionKey, string rowkey = "")
         {
             if (rowkey == "") rowkey = partitionKey; // just to be backward compat with original implementation
 
             var type = entity.GetType();
-
+            var cacheItem = dictionaryTableCache.GetCacheItem(partitionKey);
+            var toPersist = cacheItem != null ? (DictionaryTableEntity)(cacheItem.Value) : new DictionaryTableEntity { PartitionKey = partitionKey, RowKey = rowkey };
+                
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-            var toPersist = ToDictionaryTableEntity(entity, partitionKey, rowkey, properties);
+            toPersist = ToDictionaryTableEntity(entity, toPersist, properties);
 
-            batch.Add(TableOperation.InsertOrReplace(toPersist));
+            var update = !string.IsNullOrEmpty(toPersist.ETag);
+
+            //no longer using InsertOrReplace as it ignores concurrency checks
+            batch.Add(update ? TableOperation.Replace(toPersist) : TableOperation.Insert(toPersist));
         }
 
-        static DictionaryTableEntity ToDictionaryTableEntity(object entity, string partitionKey, string rowkey, IEnumerable<PropertyInfo> properties)
+        DictionaryTableEntity ToDictionaryTableEntity(object entity, DictionaryTableEntity toPersist, IEnumerable<PropertyInfo> properties)
         {
-            var toPersist = new DictionaryTableEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = rowkey
-                };
-
             foreach (var propertyInfo in properties)
             {
                 if (propertyInfo.PropertyType == typeof (byte[]))
                 {
-                    toPersist.Add(propertyInfo.Name, (byte[]) propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name]= new EntityProperty((byte[]) propertyInfo.GetValue(entity, null)) ;
                 }
                 else if (propertyInfo.PropertyType == typeof (bool))
                 {
-                    toPersist.Add(propertyInfo.Name, (bool) propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name] = new EntityProperty((bool)propertyInfo.GetValue(entity, null));
                 }
                 else if (propertyInfo.PropertyType == typeof (DateTime))
                 {
-                    toPersist.Add(propertyInfo.Name, (DateTime) propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name] = new EntityProperty((DateTime)propertyInfo.GetValue(entity, null));
                 }
                 else if (propertyInfo.PropertyType == typeof (Guid))
                 {
-                    toPersist.Add(propertyInfo.Name, (Guid) propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name] = new EntityProperty((Guid)propertyInfo.GetValue(entity, null));
                 }
                 else if (propertyInfo.PropertyType == typeof (Int32))
                 {
-                    toPersist.Add(propertyInfo.Name, (Int32) propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name] = new EntityProperty((Int32)propertyInfo.GetValue(entity, null));
                 }
                 else if (propertyInfo.PropertyType == typeof (Int64))
                 {
-                    toPersist.Add(propertyInfo.Name, (Int64) propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name] = new EntityProperty((Int64)propertyInfo.GetValue(entity, null));
                 }
                 else if (propertyInfo.PropertyType == typeof(Double))
                 {
-                    toPersist.Add(propertyInfo.Name, (Double)propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name] = new EntityProperty((Double)propertyInfo.GetValue(entity, null));
                 }
                 else if (propertyInfo.PropertyType == typeof (string))
                 {
-                    toPersist.Add(propertyInfo.Name, (string) propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name] = new EntityProperty((string)propertyInfo.GetValue(entity, null));
                 }
                 else
                 {
@@ -243,14 +291,12 @@
             return toPersist;
         }
 
-        T ToEntity<T>(DictionaryTableEntity entity)
+        object ToEntity(Type entityType, DictionaryTableEntity entity)
         {
-            if (entity == null) return default(T);
+            if (entity == null) return null;
 
-            var toCreate = Activator.CreateInstance<T>();
-            var entityType = typeof (T);
-
-            foreach(var propertyInfo in entityType.GetProperties())
+            var toCreate = Activator.CreateInstance(entityType);
+            foreach (var propertyInfo in entityType.GetProperties())
             {
                 if (entity.ContainsKey(propertyInfo.Name))
                 {
@@ -296,13 +342,10 @@
                     {
                         throw new NotSupportedException(
                             string.Format("The property type '{0}' is not supported in windows azure table storage",
-                                          propertyInfo.PropertyType.Name));
+                                propertyInfo.PropertyType.Name));
                     }
-                    
-                    
                 }
             }
-
             return toCreate;
         }
     }

@@ -88,6 +88,7 @@
     <Compile Include="Creation\Resources\ICreateSubscriptions.cs" />
     <Compile Include="Creation\Resources\SubscriptionAlreadyInUseException.cs" />
     <Compile Include="NamingConventions\AzureServiceBusQueueAddressConvention.cs" />
+    <Compile Include="Sending\MessageTooLargeException.cs" />
     <Compile Include="Utils\DeterministicGuidBuilder.cs" />
     <Compile Include="Utils\IsHostedIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

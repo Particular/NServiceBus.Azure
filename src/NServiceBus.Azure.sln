@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.WindowsAz
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Connect.Channels.WindowsAzureServiceBus", "NServiceBus.Connect.Channels.WindowsAzureServiceBus\NServiceBus.Connect.Channels.WindowsAzureServiceBus.csproj", "{D0773214-8609-47FB-B4C7-9BB11935A7BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,12 +61,16 @@ Global
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0773214-8609-47FB-B4C7-9BB11935A7BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0773214-8609-47FB-B4C7-9BB11935A7BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0773214-8609-47FB-B4C7-9BB11935A7BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0773214-8609-47FB-B4C7-9BB11935A7BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
 		{09996CDC-90AC-442F-A6CE-601F37CD1352} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
+		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
 	EndGlobalSection
 EndGlobal
