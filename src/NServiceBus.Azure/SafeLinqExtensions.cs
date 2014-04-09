@@ -15,9 +15,9 @@ namespace NServiceBus.Azure
             catch (StorageException ex)
             {
                 if (ex.RequestInformation.HttpStatusCode == 404) return default(TSource);
-            }
 
-            return default(TSource);
+                throw;
+            }
         }
     }
 }
