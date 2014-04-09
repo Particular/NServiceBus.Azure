@@ -115,6 +115,7 @@
     <Compile Include="Config\AzureTimeoutPersisterConfig.cs" />
     <Compile Include="SagaPersisters\Azure\AzureSagaPersister.cs" />
     <Compile Include="SagaPersisters\Azure\DictionaryTableEntity.cs" />
+    <Compile Include="SafeLinqExtensions.cs" />
     <Compile Include="Timeout\Config\ConfigureTimeoutManager.cs" />
     <Compile Include="Timeout\TimeoutLogic\AutoRenewLease.cs" />
     <Compile Include="Timeout\TimeoutLogic\IDetermineWhoCanSend.cs" />
