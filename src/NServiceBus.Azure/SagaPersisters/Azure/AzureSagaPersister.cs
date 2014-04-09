@@ -9,6 +9,7 @@
     using System.Runtime.Caching;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
+    using NServiceBus.Azure;
     using Saga;
 
     /// <summary>
@@ -98,7 +99,8 @@
             var table = client.GetTableReference(tableName);
 
             var query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sagaId));
-            var tableEntity = table.ExecuteQuery(query).FirstOrDefault();
+
+            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
             return tableEntity;
         }
 
@@ -186,7 +188,7 @@
                     string.Format("The property type '{0}' is not supported in windows azure table storage",
                         propertyInfo.PropertyType.Name));
             }
-            var tableEntity = table.ExecuteQuery(query).FirstOrDefault();
+            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
             return tableEntity;
         }
 
@@ -202,7 +204,7 @@
 
             var query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, saga.Id.ToString()));
 
-            var entity = table.ExecuteQuery(query).FirstOrDefault();
+            var entity = table.ExecuteQuery(query).SafeFirstOrDefault();
 
             table.Execute(TableOperation.Delete(entity));
         }

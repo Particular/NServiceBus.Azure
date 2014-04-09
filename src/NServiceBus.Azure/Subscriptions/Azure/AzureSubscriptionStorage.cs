@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Azure;
     using MessageDrivenSubscriptions;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
@@ -60,7 +61,7 @@
                                 where s.PartitionKey == type.ToString() && s.RowKey == encodedAddress
                                 select s;
 
-                    var subscription = query.FirstOrDefault();
+                    var subscription = query.SafeFirstOrDefault();
                     if(subscription != null) context.DeleteObject(subscription);
                     context.SaveChangesWithRetries();
                 }
