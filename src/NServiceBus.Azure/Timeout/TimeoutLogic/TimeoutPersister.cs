@@ -62,7 +62,7 @@
                 lastSuccessfulReadEntity.LastSuccessfullRead = lastSuccessfulRead.Value;
             }
 
-            var future = futureTimeouts.FirstOrDefault();
+            var future = futureTimeouts.SafeFirstOrDefault();
             nextTimeToRunQuery = lastSuccessfulRead.HasValue ? lastSuccessfulRead.Value
                                         : (future != null ? future.Time : now.AddSeconds(1));
                 
@@ -209,7 +209,7 @@
         {
             result = (from c in context.TimeoutData
                         where c.PartitionKey == partitionKey && c.RowKey == rowKey
-                        select c).FirstOrDefault();
+                      select c).SafeFirstOrDefault();
 
             return result != null;
 
@@ -337,7 +337,7 @@
         {
             lastSuccessfulReadEntity = (from m in context.TimeoutManagerData
                                             where m.PartitionKey == GetUniqueEndpointName()
-                                            select m).FirstOrDefault();
+                                        select m).SafeFirstOrDefault();
             
             return lastSuccessfulReadEntity != null;
         }
