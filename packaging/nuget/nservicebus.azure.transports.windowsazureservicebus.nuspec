@@ -10,11 +10,11 @@
     <projectUrl>http://particular.net/</projectUrl>
     <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>NServiceBus Transport for the Windows Azure Servicebus (SDK 2.2)</description>
+    <description>NServiceBus Transport for the Windows Azure Servicebus</description>
     <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
     <dependencies>
-		 <dependency id="WindowsAzure.ServiceBus" version="[2.2.0.0, 2.4.0.0)" />
+		 <dependency id="WindowsAzure.ServiceBus" version="2.2.0.0" />
 	</dependencies>
   </metadata>
   <files>
