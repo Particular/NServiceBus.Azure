@@ -63,16 +63,5 @@ namespace NServiceBus
             return config;
         }
 
-        /// <summary>
-        /// Configures a queue per instance
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "6.0", TreatAsErrorFromVersion = "5.0", Replacement = "Scaleout")] 
-        public static Configure QueuePerInstance(this Configure config)
-        {
-            SettingsHolder.Set("ScaleOut.UseSingleBrokerQueue", false);
-            return config;
-        }
     }
 }

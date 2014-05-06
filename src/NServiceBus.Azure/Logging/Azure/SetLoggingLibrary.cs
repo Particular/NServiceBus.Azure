@@ -18,11 +18,6 @@ namespace NServiceBus
             return config;
         }
 
-        [ObsoleteEx(RemoveInVersion = "6.0", TreatAsErrorFromVersion = "5.0", Replacement = "TraceLogger")] 
-        public static Configure AzureDiagnosticsLogger(this Configure config, bool enable = true, bool initialize = true)
-        {
-            throw new NotSupportedException("Azure Diagnostics Logger is not supported anymore, setup logging using the .wadcfg file and use TraceLogger instead.");
-        }
     }
 
 }
