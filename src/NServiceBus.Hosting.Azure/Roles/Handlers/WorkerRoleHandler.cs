@@ -18,8 +18,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
             Configure.Transactions.Enable();
             Configure.Features.Enable<Features.Sagas>();
 
-            return Configure.Instance.UnicastBus()
-                    .RunHandlersUnderIncomingPrincipal(false);
+            return Configure.Instance.UnicastBus();
         }
     }
 }

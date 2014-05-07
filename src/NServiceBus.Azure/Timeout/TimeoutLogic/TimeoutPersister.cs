@@ -99,7 +99,6 @@
                                           SagaId = timeout.SagaId,
                                           StateAddress = stateAddress,
                                           Time = timeout.Time,
-                                          CorrelationId = timeout.CorrelationId,
                                           OwningTimeoutManager = timeout.OwningTimeoutManager,
                                           Headers = headers
                                       });
@@ -114,7 +113,6 @@
                                           SagaId = timeout.SagaId,
                                           StateAddress = stateAddress,
                                           Time = timeout.Time,
-                                          CorrelationId = timeout.CorrelationId,
                                           OwningTimeoutManager = timeout.OwningTimeoutManager,
                                           Headers = headers
                                       });
@@ -126,7 +124,6 @@
                                     SagaId = timeout.SagaId,
                                     StateAddress = stateAddress,
                                     Time = timeout.Time,
-                                    CorrelationId = timeout.CorrelationId,
                                     OwningTimeoutManager = timeout.OwningTimeoutManager,
                                     Headers = headers
                                 });
@@ -152,7 +149,6 @@
                 SagaId = timeoutDataEntity.SagaId,
                 State = Download(timeoutDataEntity.StateAddress),
                 Time = timeoutDataEntity.Time,
-                CorrelationId = timeoutDataEntity.CorrelationId,
                 Id = timeoutDataEntity.RowKey,
                 OwningTimeoutManager = timeoutDataEntity.OwningTimeoutManager,
                 Headers = Deserialize(timeoutDataEntity.Headers)

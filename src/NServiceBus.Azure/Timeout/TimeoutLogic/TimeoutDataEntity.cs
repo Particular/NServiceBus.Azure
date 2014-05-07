@@ -34,11 +34,6 @@ namespace NServiceBus.Azure
         public DateTime Time { get; set; }
 
         /// <summary>
-        /// The correlation id
-        /// </summary>
-        public string CorrelationId { get; set; }
-
-        /// <summary>
         /// The timeout manager that owns this particular timeout
         /// </summary>
         public string OwningTimeoutManager { get; set; }
