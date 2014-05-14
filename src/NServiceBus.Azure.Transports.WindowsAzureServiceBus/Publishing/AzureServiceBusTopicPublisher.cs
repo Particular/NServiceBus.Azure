@@ -9,6 +9,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using NServiceBus.Transports;
     using Settings;
+    using Unicast.Queuing;
 
     /// <summary>
     /// 
@@ -23,18 +24,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
         private static readonly object SenderLock = new Object();
         
-        public bool Publish(TransportMessage message, IEnumerable<Type> eventTypes)
+        public void Publish(TransportMessage message, IEnumerable<Type> eventTypes)
         {
             var sender = GetTopicClientForDestination(Address.Local);
 
-            if (sender == null) return false;
+            if (sender == null) throw new QueueNotFoundException { Queue = Address.Local };
 
             if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Send(message, sender);
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender)), EnlistmentOptions.None);
 
-            return true;
         }
 
         // todo, factor out... to bad IMessageSender is internal
