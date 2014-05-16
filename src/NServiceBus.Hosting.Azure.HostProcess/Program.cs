@@ -159,7 +159,10 @@ namespace NServiceBus.Hosting.Azure.HostProcess
                 {
                     var endpointType = Type.GetType(t, false);
                     if (endpointType == null)
-                        throw new ConfigurationErrorsException(string.Format("Command line argument 'endpointConfigurationType' has specified to use the type '{0}' but that type could not be loaded.", t));
+                    {
+                        var message = string.Format("Command line argument 'endpointConfigurationType' has specified to use the type '{0}' but that type could not be loaded.", t);
+                        throw new ConfigurationErrorsException(message);
+                    }
 
                     return endpointType;
                 }
@@ -170,7 +173,10 @@ namespace NServiceBus.Hosting.Azure.HostProcess
             {
                 var endpointType = Type.GetType(endpoint, false);
                 if (endpointType == null)
-                    throw new ConfigurationErrorsException(string.Format("The 'EndpointConfigurationType' entry in the NServiceBus.Host.exe.config has specified to use the type '{0}' but that type could not be loaded.", endpoint));
+                {
+                    var message = string.Format("The 'EndpointConfigurationType' entry in the NServiceBus.Host.exe.config has specified to use the type '{0}' but that type could not be loaded.", endpoint);
+                    throw new ConfigurationErrorsException(message);
+                }
 
                 return endpointType;
             }
