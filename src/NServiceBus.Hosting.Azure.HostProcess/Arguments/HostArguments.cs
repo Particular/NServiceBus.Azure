@@ -31,7 +31,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
         private static IArgument GetArgument(Parser.Args arguments, string key)
         {
-            IArgument argument = arguments.CustomArguments.Where(x => x.Key != null).SingleOrDefault(x => x.Key.ToUpper() == key.ToUpper());
+            var argument = arguments.CustomArguments.Where(x => x.Key != null).SingleOrDefault(x => x.Key.ToUpper() == key.ToUpper());
 
             if (argument != null)
             {

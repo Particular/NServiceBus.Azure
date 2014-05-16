@@ -3,7 +3,7 @@
     using System.Diagnostics;
     using System.Linq;
     using NUnit.Framework;
-    using NServiceBus.Hosting;
+    using Hosting;
 
     [TestFixture]
     public class When_killing_processes

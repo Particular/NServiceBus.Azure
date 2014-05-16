@@ -9,7 +9,7 @@
     public class When_determining_subscription_names
     {
         [Test]
-        public void Should_not_exceed_fifthy_characters_and_replace_by_a_deterministic_guid()
+        public void Should_not_exceed_50_characters_and_replace_by_a_deterministic_guid()
         {
             var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(typeof(SomeEventWithAnInsanelyLongName));
 

@@ -1,6 +1,5 @@
 namespace NServiceBus
 {
-    using System;
     using Logging;
     using Logging.Loggers;
 

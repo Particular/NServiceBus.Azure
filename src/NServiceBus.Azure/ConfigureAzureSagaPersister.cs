@@ -1,5 +1,4 @@
-﻿using System;
-using NServiceBus.Config;
+﻿using NServiceBus.Config;
 
 namespace NServiceBus
 {
@@ -20,8 +19,8 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure AzureSagaPersister(this Configure config)
         {
-            string connectionstring = string.Empty;
-            bool updateSchema = false;
+            var connectionstring = string.Empty;
+            var updateSchema = false;
 
             var configSection = Configure.GetConfigSection<AzureSagaPersisterConfig>();
 

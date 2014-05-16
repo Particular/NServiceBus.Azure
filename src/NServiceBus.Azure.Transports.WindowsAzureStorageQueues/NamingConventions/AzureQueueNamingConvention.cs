@@ -9,13 +9,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     {
         public static Func<string, string> Apply = queueName =>
         {
-            var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
+            var configSection = Configure.GetConfigSection<AzureQueueConfig>();
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
             {
-                queueName = (string) configSection.QueueName;
+                queueName = configSection.QueueName;
 
-                if ((bool) configSection.QueuePerInstance)
+                if (configSection.QueuePerInstance)
                 {
                     SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
                 }

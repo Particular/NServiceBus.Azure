@@ -11,8 +11,10 @@ namespace NServiceBus
 
         public static Configure AzureConfigurationSource(this Configure config, string configurationPrefix)
         {
-            var azureConfigSource = new AzureConfigurationSource(new AzureConfigurationSettings());
-            azureConfigSource.ConfigurationPrefix = configurationPrefix;
+            var azureConfigSource = new AzureConfigurationSource(new AzureConfigurationSettings())
+            {
+                ConfigurationPrefix = configurationPrefix
+            };
             return config.CustomConfigurationSource(azureConfigSource);
         }
     }

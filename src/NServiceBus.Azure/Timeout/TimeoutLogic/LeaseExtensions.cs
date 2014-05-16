@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net;
-
-namespace NServiceBus.Azure
+﻿namespace NServiceBus.Azure
 {
+    using System;
+    using System.Net;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
-    using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 
     public static class LeaseBlobExtensions
     {
@@ -25,7 +23,7 @@ namespace NServiceBus.Azure
 
         public static bool TryRenewLease(this CloudBlockBlob blob, string leaseId)
         {
-            try { blob.RenewLease(new AccessCondition()
+            try { blob.RenewLease(new AccessCondition
                 {
                     LeaseId = leaseId
                 }); return true; }

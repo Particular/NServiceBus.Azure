@@ -14,7 +14,7 @@
         [TestCase("Test.Queue")]
         [TestCase("TestQueueTestQueueTestQueueTestQueueTestQueueTestQueueTestQueue")]
         [TestCase("Test1234Queue")]
-        public void Should_fix_queue_name_when_upper_case_letters_are_used_dots_or_longer_than_63_charachters(string queueName)
+        public void Should_fix_queue_name_when_upper_case_letters_are_used_dots_or_longer_than_63_characters(string queueName)
         {
             address = new Address(queueName, "UseDevelopmentStorage=true");
 

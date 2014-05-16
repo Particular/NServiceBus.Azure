@@ -47,7 +47,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         {
             tokenSource = new CancellationTokenSource();
 
-            for (int i = 0; i < maximumConcurrencyLevel; i++)
+            for (var i = 0; i < maximumConcurrencyLevel; i++)
             {
                 StartThread();
             }

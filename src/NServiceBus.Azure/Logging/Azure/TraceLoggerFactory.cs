@@ -6,12 +6,12 @@ namespace NServiceBus.Logging.Loggers
     {
         public ILog GetLogger(Type type)
         {
-            return (ILog)new TraceLogger();
+            return new TraceLogger();
         }
 
         public ILog GetLogger(string name)
         {
-            return (ILog)new TraceLogger();
+            return new TraceLogger();
         }
     }
 }

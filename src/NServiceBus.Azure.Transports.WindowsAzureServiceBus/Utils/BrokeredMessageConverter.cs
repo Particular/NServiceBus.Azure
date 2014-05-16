@@ -31,8 +31,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             else
             {
-                t = new TransportMessage();
-                t.Body = rawMessage;
+                t = new TransportMessage
+                {
+                    Body = rawMessage
+                };
             }
 
             return t;

@@ -19,7 +19,7 @@ namespace NServiceBus.Hosting
         {
             try
             {
-                string localResource = SafeRoleEnvironment.GetRootPath(LocalResource);
+                var localResource = SafeRoleEnvironment.GetRootPath(LocalResource);
 
                 foreach (var endpoint in endpoints)
                 {

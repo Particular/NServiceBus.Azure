@@ -47,7 +47,7 @@ namespace NServiceBus.Hosting.Azure
 
         static void CurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Trace.WriteLine("Unhandled exception occured: " + e.ExceptionObject.ToString());
+            Trace.WriteLine("Unhandled exception occured: " + e.ExceptionObject);
         }
 
         public void Start()
