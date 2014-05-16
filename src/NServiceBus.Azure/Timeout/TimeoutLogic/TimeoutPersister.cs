@@ -244,7 +244,6 @@
         void Init(string connectionString)
         {
             account = CloudStorageAccount.Parse(connectionString);
-            var context = new ServiceContext(account.CreateCloudTableClient());
             var tableClient = account.CreateCloudTableClient();
             var table = tableClient.GetTableReference(ServiceContext.TimeoutManagerDataTableName);
             table.CreateIfNotExists();
