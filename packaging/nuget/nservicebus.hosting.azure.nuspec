@@ -18,7 +18,7 @@
 	</dependencies>
   </metadata>
   <files>
-    <file src="..\..\src\binaries\NServiceBus.Hosting.Azure.???" target="lib\net40" />
-    <file src="..\..\src\lib\Ionic.Zip.dll" target="lib\net40" /> 
+    <file src="..\..\src\binaries\NServiceBus.Hosting.Azure.???" target="lib\net45" />
+    <file src="..\..\src\lib\Ionic.Zip.dll" target="lib\net45" /> 
   </files>
 </package>
