@@ -34,15 +34,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net\lib\2.0\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WindowsAzure.ServiceBus\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
-    </Reference>
-    <Reference Include="NServiceBus">
-      <HintPath>..\packages\NServiceBus.Interfaces\lib\net45\NServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.AcceptanceTesting">
       <HintPath>..\packages\NServiceBus.AcceptanceTesting\lib\net45\NServiceBus.AcceptanceTesting.dll</HintPath>

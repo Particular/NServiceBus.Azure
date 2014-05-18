@@ -49,10 +49,6 @@
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NServiceBus.Interfaces\lib\net45\NServiceBus.dll</HintPath>
-    </Reference>
     <Reference Include="NServiceBus.Core">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceBus\lib\net45\NServiceBus.Core.dll</HintPath>
