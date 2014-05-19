@@ -15,7 +15,7 @@
     {
         public ICreateQueues QueueCreator { get; set; }
 
-        public void Run()
+        public void Run(Configure config)
         {
             if (!ShouldAutoCreate)
                 return;
@@ -52,7 +52,7 @@
 
     public class AutoCreationEqualizer: IWantToRunBeforeConfigurationIsFinalized
     {
-        public void Run()
+        public void Run(Configure config)
         {
             var should = QueueAutoCreation.ShouldAutoCreate;
 

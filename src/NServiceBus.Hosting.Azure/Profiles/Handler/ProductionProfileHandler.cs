@@ -7,7 +7,7 @@ namespace NServiceBus.Hosting.Azure.Profiles.Handlers
 
     internal class ProductionProfileHandler : IHandleProfile<Production>
     {
-        void IHandleProfile.ProfileActivated()
+        void IHandleProfile.ProfileActivated(Configure config)
         {
             if (LogManager.LoggerFactory is NullLoggerFactory)
                 Configure.Instance.TraceLogger();

@@ -7,7 +7,7 @@ namespace NServiceBus.Hosting.Azure.Profiles.Handlers
 
     internal class DevelopmentProfileHandler : IHandleProfile<Development>
     {
-        void IHandleProfile.ProfileActivated()
+        void IHandleProfile.ProfileActivated(Configure config)
         {
             if (LogManager.LoggerFactory is NullLoggerFactory)
                 Configure.Instance.ConsoleLogger();

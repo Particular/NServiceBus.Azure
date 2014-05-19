@@ -4,7 +4,7 @@ namespace NServiceBus.Config
 
     public class SetDefaultConfigurationSource : IWantToRunBeforeConfiguration
     {
-        public void Init()
+        public void Init(Configure config)
         {
             if (SafeRoleEnvironment.IsAvailable)
             {

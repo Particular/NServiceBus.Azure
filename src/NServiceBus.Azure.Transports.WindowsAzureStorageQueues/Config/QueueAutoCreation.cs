@@ -15,7 +15,7 @@
     {
         public ICreateQueues QueueCreator { get; set; }
 
-        public void Run()
+        public void Run(Configure config)
         {
             if (!IsEnabled<QueueAutoCreation>() || ConfigureQueueCreation.DontCreateQueues)
                 return;

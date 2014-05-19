@@ -5,7 +5,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
 
     public class DefaultTransportForHost : IWantToRunBeforeConfigurationIsFinalized
     {
-        public void Run()
+        public void Run(Configure config)
         {
 
             if (Configure.Instance.Configurer.HasComponent<ISendMessages>())

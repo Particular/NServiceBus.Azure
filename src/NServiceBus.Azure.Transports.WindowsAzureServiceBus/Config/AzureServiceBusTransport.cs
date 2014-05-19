@@ -14,7 +14,7 @@
         {
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
+            config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
             var queuename = AzureServiceBusQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
 
@@ -35,7 +35,7 @@
             
         }
 
-        public override void Initialize()
+        public override void Initialize(Configure config)
         {
             var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)

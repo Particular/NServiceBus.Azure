@@ -8,8 +8,8 @@
     {
   
         public ICreateTopics TopicCreator { get; set; }
-        
-        public void Run()
+
+        public void Run(Configure config)
         {
             if (!QueueAutoCreation.ShouldAutoCreate)
                 return;

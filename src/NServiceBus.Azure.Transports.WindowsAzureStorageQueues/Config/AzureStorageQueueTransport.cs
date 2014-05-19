@@ -31,7 +31,7 @@
             SettingsHolder.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
         }
 
-        public override void Initialize()
+        public override void Initialize(Configure config)
         {
             CloudQueueClient queueClient;
 

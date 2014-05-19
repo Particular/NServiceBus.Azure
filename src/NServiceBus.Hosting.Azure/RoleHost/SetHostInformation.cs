@@ -15,7 +15,7 @@ namespace NServiceBus.Hosting.Azure
             this.unicastBus = unicastBus;
         }
 
-        public void Run()
+        public void Run(Configure config)
         {
             if (SafeRoleEnvironment.IsAvailable)
             {

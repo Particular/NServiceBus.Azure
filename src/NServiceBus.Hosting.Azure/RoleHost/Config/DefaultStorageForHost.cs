@@ -9,7 +9,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
 
     public class DefaultStorageForHost : IWantToRunBeforeConfigurationIsFinalized
     {
-        public void Run()
+        public void Run(Configure config)
         {
             var selectedTransport = SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
 
