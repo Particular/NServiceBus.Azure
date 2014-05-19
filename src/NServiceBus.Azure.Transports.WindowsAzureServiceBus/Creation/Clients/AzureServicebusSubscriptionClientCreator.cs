@@ -62,7 +62,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         bool ShouldRetry()
         {
-            return (bool)SettingsHolder.Get("Transactions.Enabled");
+            var config = Configure.Instance; // todo: inject
+            return (bool)config.Settings.Get("Transactions.Enabled");
         }
     }
 }

@@ -34,6 +34,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
         public void Send(TransportMessage message, Address address)
         {
+            var config = Configure.Instance; //TODO: inject
+
             var sendClient = GetClientForConnectionString(address.Machine) ?? Client;
 
             var sendQueue = sendClient.GetQueueReference(AzureMessageQueueUtils.GetQueueName(address));
@@ -45,7 +47,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             var rawMessage = SerializeMessage(message);
 
-            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
+            if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
                 sendQueue.AddMessage(rawMessage, timeToBeReceived);
             }
@@ -60,7 +62,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             var validation = new DeterminesBestConnectionStringForStorageQueues();
             if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
             {
-                connectionString = validation.Determine();
+                connectionString = validation.Determine(Configure.Instance); // todo: inject
             }
 
             if (!destinationQueueClients.TryGetValue(connectionString, out sendClient))

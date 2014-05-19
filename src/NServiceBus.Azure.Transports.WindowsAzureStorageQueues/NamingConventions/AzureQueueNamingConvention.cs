@@ -1,5 +1,4 @@
 ﻿using NServiceBus.Config;
-using NServiceBus.Settings;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
@@ -9,7 +8,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     {
         public static Func<string, string> Apply = queueName =>
         {
-            var configSection = Configure.GetConfigSection<AzureQueueConfig>();
+            var config = Configure.Instance; //todo: inject
+
+            var configSection = config.GetConfigSection<AzureQueueConfig>();
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
             {
@@ -17,14 +18,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
                 if (configSection.QueuePerInstance)
                 {
-                    SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
+                    config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
                 }
             }
 
             if (queueName.Length >= 253) // 260 - a spot for the "." & 6 digits for the individualizer
                 queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
-            if (!SettingsHolder.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+            if (!config.Settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
                 queueName = QueueIndividualizer.Individualize(queueName);
 
             return queueName;

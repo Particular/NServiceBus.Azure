@@ -4,13 +4,12 @@ namespace NServiceBus.Hosting
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Configuration;
+    using Config;
     using Helpers;
     using Installation;
     using Logging;
     using Profiles;
     using Roles;
-    using Settings;
     using Utils;
 
     /// <summary>
@@ -31,6 +30,8 @@ namespace NServiceBus.Hosting
             string endpointName, IEnumerable<string> scannableAssembliesFullName = null)
         {
             this.specifier = specifier;
+            this.args = args;
+            this.defaultProfiles = defaultProfiles;
 
             if (String.IsNullOrEmpty(endpointName))
             {
@@ -55,11 +56,9 @@ namespace NServiceBus.Hosting
                     .ToList();
             }
 
-            profileManager = new ProfileManager(assembliesToScan, specifier, args, defaultProfiles);
-            ProfileActivator.ProfileManager = profileManager;
+            
 
-            configManager = new ConfigManager(assembliesToScan, specifier);
-            roleManager = new RoleManager(assembliesToScan);
+           roleManager = new RoleManager(assembliesToScan);
         }
 
         /// <summary>
@@ -71,8 +70,8 @@ namespace NServiceBus.Hosting
             {
                 PerformConfiguration();
 
-                bus = Configure.Instance.CreateBus();
-                if (bus != null && !SettingsHolder.Get<bool>("Endpoint.SendOnly"))
+                bus = config.CreateBus();
+                if (bus != null && !config.Settings.Get<bool>("Endpoint.SendOnly"))
                 {
                     bus.Start();
                 }
@@ -111,6 +110,8 @@ namespace NServiceBus.Hosting
 
         void PerformConfiguration()
         {
+            config = null;
+
             if (specifier is IWantCustomLogging)
             {
                 (specifier as IWantCustomLogging).Init();
@@ -137,7 +138,7 @@ namespace NServiceBus.Hosting
                         {
                             if (!m.IsPublic && m.Name == "NServiceBus.IWantCustomInitialization.Init")
                             {
-                                (specifier as IWantCustomInitialization).Init();
+                                config = (specifier as IWantCustomInitialization).Init();
                                 called = true;
                             }
                         }
@@ -150,14 +151,14 @@ namespace NServiceBus.Hosting
                             {
                                 if (!tm.IsPublic && tm.Name == "NServiceBus.IWantCustomLogging.Init")
                                 {
-                                    (specifier as IWantCustomInitialization).Init();
+                                    config = (specifier as IWantCustomInitialization).Init();
                                 }
                             }
                         }
                     }
                     else
                     {
-                        (specifier as IWantCustomInitialization).Init();
+                        config = (specifier as IWantCustomInitialization).Init();
                     }
                 }
                 catch (NullReferenceException ex)
@@ -171,26 +172,62 @@ namespace NServiceBus.Hosting
                 }
             }
 
-            if (!Configure.WithHasBeenCalled())
+            if (config == null)
             {
-                Configure.With(assembliesToScan);
+                config = Configure.With(assembliesToScan);
             }
 
-            if (!Configure.BuilderIsConfigured())
+            args = AddProfilesFromConfiguration(args);
+
+            profileManager = new ProfileManager(assembliesToScan, specifier, args, defaultProfiles);
+            ProfileActivator.ProfileManager = profileManager;
+
+            ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(config);
+
+            if (!config.HasBuilder())
             {
-                Configure.Instance.DefaultBuilder();
+                config.DefaultBuilder();
             }
 
             roleManager.ConfigureBusForEndpoint(specifier);
+        }
 
-            configManager.ConfigureCustomInitAndStartup();
+        void ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(Configure config)
+        {
+            var problems = config.TypesToScan.Where(t => typeof(IWantCustomInitialization).IsAssignableFrom(t) && !t.IsInterface && !typeof(IConfigureThisEndpoint).IsAssignableFrom(t)).ToList();
+
+            if (!problems.Any())
+            {
+                return;
+            }
+
+            throw new Exception("IWantCustomInitialization is only valid on the same class as ICOnfigureThisEndpoint. Please use INeedInitialization instead. Found types: " + string.Join(",",problems.Select(t=>t.FullName)));
+ 
+        }
+
+        private string[] AddProfilesFromConfiguration(IEnumerable<string> args)
+        {
+            var list = new List<string>(args);
+
+            var configSection = config.GetConfigSection<AzureProfileConfig>();
+
+            if (configSection != null)
+            {
+                var configuredProfiles = configSection.Profiles.Split(',');
+                Array.ForEach(configuredProfiles, s => list.Add(s.Trim()));
+            }
+
+            return list.ToArray();
         }
 
         List<Assembly> assembliesToScan;
-        ConfigManager configManager;
+       
         ProfileManager profileManager;
         RoleManager roleManager;
         IConfigureThisEndpoint specifier;
+        string[] args;
+        List<Type> defaultProfiles;
         IStartableBus bus;
+        Configure config;
     }
 }

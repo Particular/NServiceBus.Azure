@@ -7,7 +7,9 @@
     {
         public TransportConfig GetConfiguration()
         {
-            var source = Configure.ConfigurationSource;
+            // get configurationsource by reflection, don't want to expose it anymore in the core
+            var source = (IConfigurationSource)typeof(Configure).GetField("configurationSource").GetValue(Configure.Instance);
+            
             var c = source.GetConfiguration<AzureServiceBusQueueConfig>();
             var t = source.GetConfiguration<TransportConfig>();
 

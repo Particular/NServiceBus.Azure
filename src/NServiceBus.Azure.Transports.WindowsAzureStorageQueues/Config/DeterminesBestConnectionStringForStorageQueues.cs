@@ -2,17 +2,16 @@
 {
     using System.Configuration;
     using Config;
-    using Settings;
-
+    
     public class DeterminesBestConnectionStringForStorageQueues
     {
-        public string Determine()
+        public string Determine(Configure config)
         {
-            var configSection = Configure.GetConfigSection<AzureQueueConfig>();
+            var configSection = config.GetConfigSection<AzureQueueConfig>();
             var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
 
             if (string.IsNullOrEmpty(connectionString))
-                connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
+                connectionString = config.Settings.Get<string>("NServiceBus.Transport.ConnectionString");
 
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -35,7 +34,7 @@
 
             if (!IsPotentialStorageQueueConnectionString(connectionString))
             {
-                connectionString = Determine();
+                connectionString = Determine(Configure.Instance); //todo inject config
             }
 
             return replyQueue + "@" + connectionString;

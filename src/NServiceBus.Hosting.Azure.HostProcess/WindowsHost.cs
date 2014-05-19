@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using NServiceBus.Config;
 
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
@@ -23,8 +22,6 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
             Program.EndpointId = Program.GetEndpointId(specifier);
 
-            args = AddProfilesFromConfiguration(args);
-
             genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) }, Program.EndpointId);
         }
 
@@ -45,19 +42,6 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         }
 
 
-        private static string[] AddProfilesFromConfiguration(IEnumerable<string> args)
-        {
-            var list = new List<string>(args);
-
-            var configSection = Configure.GetConfigSection<AzureProfileConfig>();
-
-            if (configSection != null)
-            {
-                var configuredProfiles = configSection.Profiles.Split(',');
-                Array.ForEach(configuredProfiles, s => list.Add(s.Trim()));
-            }
-
-            return list.ToArray();
-        }
+        
     }
 }

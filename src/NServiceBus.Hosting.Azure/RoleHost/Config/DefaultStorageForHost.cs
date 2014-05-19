@@ -11,15 +11,17 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
     {
         public void Run(Configure config)
         {
-            var selectedTransport = config.Settings.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
+            //config.Settings.SetDefault("Persistence", typeof(AzureStorage));
 
-            InfrastructureServices.SetDefaultFor<ISagaPersister>(() => Configure.Instance.AzureSagaPersister());
-            InfrastructureServices.SetDefaultFor<IPersistTimeouts>(() => Configure.Instance.UseAzureTimeoutPersister());
+            //var selectedTransport = config.Settings.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
 
-            if (selectedTransport == null || !selectedTransport.HasNativePubSubSupport)
-            {
-                InfrastructureServices.SetDefaultFor<ISubscriptionStorage>(() => Configure.Instance.AzureSubscriptionStorage());
-            }
+            //InfrastructureServices.SetDefaultFor<ISagaPersister>(() => Configure.Instance.AzureSagaPersister());
+            //InfrastructureServices.SetDefaultFor<IPersistTimeouts>(() => Configure.Instance.UseAzureTimeoutPersister());
+
+            //if (selectedTransport == null || !selectedTransport.HasNativePubSubSupport)
+            //{
+            //    InfrastructureServices.SetDefaultFor<ISubscriptionStorage>(() => Configure.Instance.AzureSubscriptionStorage());
+            //}
             
         }
     }

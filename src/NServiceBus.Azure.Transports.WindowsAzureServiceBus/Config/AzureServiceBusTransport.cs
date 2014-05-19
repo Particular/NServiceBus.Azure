@@ -48,7 +48,7 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine();
+            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(config);
             Address.OverrideDefaultMachine(connectionString);
 
             new ContainerConfiguration().Configure(configSection, transportConfig);

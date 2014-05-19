@@ -3,6 +3,7 @@ using NServiceBus.Timeout.Hosting.Windows;
 
 namespace NServiceBus
 {
+    using System;
     using Azure;
     using Config;
 
@@ -17,8 +18,9 @@ namespace NServiceBus
         {
             var configSection = config.GetConfigSection<AzureTimeoutPersisterConfig>() ?? new AzureTimeoutPersisterConfig();
 
-            config.Configurer.ConfigureComponent<TimeoutPersisterReceiver>(DependencyLifecycle.SingleInstance);
-            config.Configurer.ConfigureComponent<DefaultTimeoutManager>(DependencyLifecycle.SingleInstance);
+            //todo: refactor this
+            //config.Configurer.ConfigureComponent<TimeoutPersisterReceiver>(DependencyLifecycle.SingleInstance);
+            //config.Configurer.ConfigureComponent<DefaultTimeoutManager>(DependencyLifecycle.SingleInstance);
 
             ServiceContext.TimeoutDataTableName = configSection.TimeoutDataTableName;
             ServiceContext.TimeoutManagerDataTableName = configSection.TimeoutManagerDataTableName;
@@ -27,6 +29,7 @@ namespace NServiceBus
                 .ConfigureProperty(tp => tp.ConnectionString, configSection.ConnectionString)
                 .ConfigureProperty(tp => tp.CatchUpInterval, configSection.CatchUpInterval)
                 .ConfigureProperty(tp => tp.PartitionKeyScope, configSection.PartitionKeyScope); 
+
             return config;
         }
     }

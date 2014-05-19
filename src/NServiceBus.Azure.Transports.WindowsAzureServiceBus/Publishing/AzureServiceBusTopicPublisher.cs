@@ -8,7 +8,6 @@ using Microsoft.ServiceBus.Messaging;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using NServiceBus.Transports;
-    using Settings;
     using Unicast.Queuing;
 
     /// <summary>
@@ -26,11 +25,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         
         public void Publish(TransportMessage message, IEnumerable<Type> eventTypes)
         {
+            var config = Configure.Instance; //todo: inject
+
             var sender = GetTopicClientForDestination(Address.Local);
 
             if (sender == null) throw new QueueNotFoundException { Queue = Address.Local };
 
-            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
+            if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Send(message, sender);
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender)), EnlistmentOptions.None);

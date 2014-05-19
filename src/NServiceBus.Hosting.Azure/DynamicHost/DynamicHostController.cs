@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NServiceBus.Hosting.Configuration;
 using NServiceBus.Hosting.Profiles;
 
 namespace NServiceBus.Hosting
@@ -11,7 +10,6 @@ namespace NServiceBus.Hosting
     public class DynamicHostController : IHost
     {
         private readonly IConfigureThisEndpoint specifier;
-        private readonly ConfigManager configManager;
         private readonly ProfileManager profileManager;
 
         private DynamicEndpointLoader loader;
@@ -28,17 +26,17 @@ namespace NServiceBus.Hosting
             var assembliesToScan = new List<Assembly> {GetType().Assembly};
 
             profileManager = new ProfileManager(assembliesToScan, specifier, requestedProfiles, defaultProfiles);
-            configManager = new ConfigManager(assembliesToScan, specifier);
-
         }
 
         public void Start()
         {
+            Configure config = null;
+
             if (specifier is IWantCustomInitialization)
             {
                 try
                 {
-                   (specifier as IWantCustomInitialization).Init();
+                   config = (specifier as IWantCustomInitialization).Init();
                 }
                 catch (NullReferenceException ex)
                 {
@@ -49,34 +47,36 @@ namespace NServiceBus.Hosting
                 }
             }
 
-            if (!Configure.WithHasBeenCalled())
-                Configure.With(GetType().Assembly);
+            if (config == null)
+            {
+                config = Configure.With(GetType().Assembly);
+            }
+               
 
-            if (!Configure.BuilderIsConfigured())
-                Configure.Instance.DefaultBuilder();
+            if (!config.HasBuilder())
+                config.DefaultBuilder();
 
-            Configure.Instance.AzureConfigurationSource();
-            Configure.Instance.Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
-            Configure.Instance.Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);
-            Configure.Instance.Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
-            Configure.Instance.Configurer.ConfigureComponent<DynamicHostMonitor>(DependencyLifecycle.SingleInstance);
+            config.AzureConfigurationSource();
+            config.Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
+            config.Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);
+            config.Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
+            config.Configurer.ConfigureComponent<DynamicHostMonitor>(DependencyLifecycle.SingleInstance);
 
-            var configSection = Configure.GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
+            var configSection = config.GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
 
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.ConnectionString, configSection.ConnectionString);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.Container, configSection.Container);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.LocalResource, configSection.LocalResource);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.TimeToWaitUntilProcessIsKilled, configSection.TimeToWaitUntilProcessIsKilled);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
+            config.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.ConnectionString, configSection.ConnectionString);
+            config.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.Container, configSection.Container);
+            config.Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.LocalResource, configSection.LocalResource);
+            config.Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
+            config.Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
+            config.Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.TimeToWaitUntilProcessIsKilled, configSection.TimeToWaitUntilProcessIsKilled);
+            config.Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
 
-            configManager.ConfigureCustomInitAndStartup();
-            profileManager.ActivateProfileHandlers();
+            profileManager.ActivateProfileHandlers(config);
 
-            loader = Configure.Instance.Builder.Build<DynamicEndpointLoader>();
-            provisioner = Configure.Instance.Builder.Build<DynamicEndpointProvisioner>();
-            runner = Configure.Instance.Builder.Build<DynamicEndpointRunner>();
+            loader = config.Builder.Build<DynamicEndpointLoader>();
+            provisioner = config.Builder.Build<DynamicEndpointProvisioner>();
+            runner = config.Builder.Build<DynamicEndpointRunner>();
 
             var endpointsToHost = loader.LoadEndpoints();
             if (endpointsToHost == null) return;
@@ -90,7 +90,7 @@ namespace NServiceBus.Hosting
 
             if (!configSection.AutoUpdate) return;
 
-            monitor = Configure.Instance.Builder.Build<DynamicHostMonitor>();
+            monitor = config.Builder.Build<DynamicHostMonitor>();
             monitor.UpdatedEndpoints += UpdatedEndpoints;
             monitor.NewEndpoints += NewEndpoints;
             monitor.RemovedEndpoints += RemovedEndpoints;

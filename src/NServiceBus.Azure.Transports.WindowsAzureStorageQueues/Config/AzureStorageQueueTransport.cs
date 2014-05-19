@@ -4,6 +4,7 @@
     using Config;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
+    using ObjectBuilder;
     using Settings;
     using Transports;
 
@@ -37,7 +38,7 @@
 
             var configSection = config.GetConfigSection<AzureQueueConfig>();
 
-            var connectionString = TryGetConnectionString(configSection);
+            var connectionString = TryGetConnectionString(configSection, config);
 
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -52,20 +53,23 @@
 
             NServiceBus.Configure.Instance.Configurer.RegisterSingleton<CloudQueueClient>(queueClient);
 
-            NServiceBus.Configure.Component<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(p => p.PurgeOnStartup, ConfigurePurging.PurgeRequested);
-            NServiceBus.Configure.Component<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
+            var recieverConfig = 
+            NServiceBus.Configure.Component<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
+            recieverConfig.ConfigureProperty(p => p.PurgeOnStartup, ConfigurePurging.PurgeRequested);
+            //todo: change all this
+            //config.Configurer.ConfigureComponent()
+                //.Component<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
             NServiceBus.Configure.Component<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             NServiceBus.Configure.Component<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
             var queuename = AzureQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
-            SettingsHolder.ApplyTo<AzureMessageQueueReceiver>();
+            config.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)recieverConfig);
             Address.InitializeLocalAddress(queuename);
         }
 
-        static string TryGetConnectionString(AzureQueueConfig configSection)
+        static string TryGetConnectionString(AzureQueueConfig configSection, Configure config)
         {
-            var connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
+            var connectionString = config.Settings.Get<string>("NServiceBus.Transport.ConnectionString");
 
             if (string.IsNullOrEmpty(connectionString))
             {

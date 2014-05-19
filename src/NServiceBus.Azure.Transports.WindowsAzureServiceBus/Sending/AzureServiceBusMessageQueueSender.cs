@@ -53,8 +53,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     }
                 }
             }
-
-            if (!SettingsHolder.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
+            var config = Configure.Instance; // todo: inject
+            if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Send(message, sender,address);
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender, address)), EnlistmentOptions.None);

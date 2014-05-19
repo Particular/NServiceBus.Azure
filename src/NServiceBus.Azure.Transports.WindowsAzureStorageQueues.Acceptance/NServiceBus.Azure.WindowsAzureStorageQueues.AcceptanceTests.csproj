@@ -40,9 +40,6 @@
     <Reference Include="NServiceBus.Core">
       <HintPath>..\packages\NServiceBus\lib\net45\NServiceBus.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus.Distributor.MSMQ">
-      <HintPath>..\packages\NServiceBus.Distributor.MSMQ\lib\net45\NServiceBus.Distributor.MSMQ.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit\lib\nunit.framework.dll</HintPath>
     </Reference>

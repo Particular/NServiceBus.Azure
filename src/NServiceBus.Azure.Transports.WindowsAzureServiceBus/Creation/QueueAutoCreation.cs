@@ -20,9 +20,9 @@
             if (!ShouldAutoCreate)
                 return;
 
-            var wantQueueCreatedInstances = Configure.Instance.Builder.BuildAll<IWantQueueCreated>().ToList();
+            var wantQueueCreatedInstances = config.Builder.BuildAll<IWantQueueCreated>().ToList();
 
-            foreach (var wantQueueCreatedInstance in wantQueueCreatedInstances.Where(wantQueueCreatedInstance => !wantQueueCreatedInstance.IsDisabled))
+            foreach (var wantQueueCreatedInstance in wantQueueCreatedInstances.Where(wantQueueCreatedInstance => wantQueueCreatedInstance.ShouldCreateQueue(config)))
             {
                 if (wantQueueCreatedInstance.Address == null)
                 {
@@ -60,7 +60,7 @@
             {
                 // force both to be false, as this is currently not guaranteed
                 Feature.Disable<QueueAutoCreation>();
-                Configure.Instance.DoNotCreateQueues();
+                config.DoNotCreateQueues();
             }
         }
     }

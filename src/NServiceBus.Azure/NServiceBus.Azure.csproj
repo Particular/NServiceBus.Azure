@@ -89,8 +89,6 @@
     <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Config\SetDefaultConfigurationSource.cs" />
-    <Compile Include="GenericHost.cs" />
-    <Compile Include="IHost.cs" />
     <Compile Include="Logging\Azure\TraceLogger.cs" />
     <Compile Include="Logging\Azure\TraceLoggerFactory.cs" />
     <Compile Include="ConfigureAzureSagaPersister.cs" />

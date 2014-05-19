@@ -9,7 +9,7 @@ namespace NServiceBus.Config
             if (SafeRoleEnvironment.IsAvailable)
             {
                 if (!IsHostedIn.ChildHostProcess())
-                    Configure.Instance.AzureConfigurationSource();
+                    config.AzureConfigurationSource();
             }
         }
     }
