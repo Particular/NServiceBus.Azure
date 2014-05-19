@@ -13,7 +13,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
                 return;
             }
 
-            if (SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport") != null)
+            if (config.Settings.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport") != null)
             {
                 return;
             }

@@ -15,7 +15,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure UseAzureTimeoutPersister(this Configure config)
         {
-            var configSection = Configure.GetConfigSection<AzureTimeoutPersisterConfig>() ?? new AzureTimeoutPersisterConfig();
+            var configSection = config.GetConfigSection<AzureTimeoutPersisterConfig>() ?? new AzureTimeoutPersisterConfig();
 
             config.Configurer.ConfigureComponent<TimeoutPersisterReceiver>(DependencyLifecycle.SingleInstance);
             config.Configurer.ConfigureComponent<DefaultTimeoutManager>(DependencyLifecycle.SingleInstance);

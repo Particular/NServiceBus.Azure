@@ -17,25 +17,25 @@
             EnableByDefault<TimeoutManager>();
             Categories.Serializers.SetDefault<JsonSerialization>();
 
-            SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
+            config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
-            var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
+            var configSection = config.GetConfigSection<AzureQueueConfig>();
 
             if(configSection == null)
                 return;
 
-            SettingsHolder.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PurgeOnStartup, configSection.PurgeOnStartup);
-            SettingsHolder.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, configSection.MaximumWaitTimeWhenIdle);
-            SettingsHolder.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, configSection.MessageInvisibleTime);
-            SettingsHolder.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PeekInterval, configSection.PeekInterval);
-            SettingsHolder.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
+            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PurgeOnStartup, configSection.PurgeOnStartup);
+            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, configSection.MaximumWaitTimeWhenIdle);
+            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, configSection.MessageInvisibleTime);
+            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PeekInterval, configSection.PeekInterval);
+            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
         }
 
         public override void Initialize(Configure config)
         {
             CloudQueueClient queueClient;
 
-            var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
+            var configSection = config.GetConfigSection<AzureQueueConfig>();
 
             var connectionString = TryGetConnectionString(configSection);
 

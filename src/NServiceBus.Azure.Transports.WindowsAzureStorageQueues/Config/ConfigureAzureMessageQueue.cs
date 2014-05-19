@@ -19,7 +19,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure PeekInterval(this Configure config, int value)
         {
-            SettingsHolder.SetProperty<AzureMessageQueueReceiver>(t=>t.PeekInterval,value);
+            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.PeekInterval, value);
 
             return config;
         }
@@ -32,7 +32,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure MaximumWaitTimeWhenIdle(this Configure config, int value)
         {
-            SettingsHolder.SetProperty<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, value);
+            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, value);
          
             return config;
         }
@@ -45,7 +45,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure MessageInvisibleTime(this Configure config, int value)
         {
-            SettingsHolder.SetProperty<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, value);
+            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, value);
 
             return config;
         }
@@ -58,7 +58,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure BatchSize(this Configure config, int value)
         {
-            SettingsHolder.SetProperty<AzureMessageQueueReceiver>(t => t.BatchSize, value);
+            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.BatchSize, value);
         
             return config;
         }

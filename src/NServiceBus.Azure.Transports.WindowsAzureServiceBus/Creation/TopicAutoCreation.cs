@@ -21,7 +21,7 @@
                 TopicCreator = new AzureServicebusTopicCreator(); 
             }
 
-            var selectedTransport = SettingsHolder.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
+            var selectedTransport = config.Settings.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
             if (selectedTransport is AzureServiceBus)
             {
                 TopicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));

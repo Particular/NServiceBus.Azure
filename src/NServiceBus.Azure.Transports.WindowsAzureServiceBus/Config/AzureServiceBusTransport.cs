@@ -22,7 +22,7 @@
 
             var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;
 
-            var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
+            var configSection = config.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection != null)
                 serverWaitTime = configSection.ServerWaitTime;
 
@@ -37,14 +37,14 @@
 
         public override void Initialize(Configure config)
         {
-            var configSection = NServiceBus.Configure.GetConfigSection<AzureServiceBusQueueConfig>();
+            var configSection = config.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)
             {
                 //hack: just to get the defaults, we should refactor this to support specifying the values on the NServiceBus/Transport connection string as well
                 configSection = new AzureServiceBusQueueConfig();
             }
 
-            var transportConfig = NServiceBus.Configure.GetConfigSection<TransportConfig>() ?? new TransportConfig();
+            var transportConfig = config.GetConfigSection<TransportConfig>() ?? new TransportConfig();
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
