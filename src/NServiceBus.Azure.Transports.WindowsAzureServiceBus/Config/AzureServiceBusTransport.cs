@@ -5,7 +5,6 @@
     using Azure.Transports.WindowsAzureServiceBus;
     using Config;
     using Microsoft.ServiceBus;
-    using Settings;
     using Transports;
 
     public class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
@@ -16,7 +15,7 @@
 
             config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
-            var queuename = AzureServiceBusQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
+            var queuename = AzureServiceBusQueueNamingConvention.Apply(config.EndpointName);
 
             Address.InitializeLocalAddress(queuename);
 
@@ -27,7 +26,7 @@
                 serverWaitTime = configSection.ServerWaitTime;
 
             // make sure the transaction stays open a little longer than the long poll.
-            NServiceBus.Configure.Transactions.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable));
+            config.Transactions.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable));
 
 
             Enable<AzureServiceBusTransport>();

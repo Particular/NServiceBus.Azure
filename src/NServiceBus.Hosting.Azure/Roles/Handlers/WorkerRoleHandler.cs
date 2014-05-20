@@ -16,8 +16,8 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
         public ConfigUnicastBus ConfigureRole(IConfigureThisEndpoint specifier)
         {
             var config = Configure.Instance; // todo: inject
-            
-            Configure.Transactions.Enable();
+
+            config.Transactions.Enable();
             config.Features.Enable<Features.Sagas>();
 
             return Configure.Instance.UnicastBus();

@@ -6,7 +6,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     {
         public static Func<Type, string> Apply = eventType =>
         {
-            var subscriptionName = eventType != null ? Configure.EndpointName + "." + eventType.Name : Configure.EndpointName;
+            var config = Configure.Instance;
+
+            var subscriptionName = eventType != null ? config.EndpointName + "." + eventType.Name : config.EndpointName;
 
             if (subscriptionName.Length >= 50)
                 subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
@@ -16,7 +18,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public static Func<Type, string> ApplyFullNameConvention = eventType =>
         {
-            var subscriptionName = eventType != null ? Configure.EndpointName + "." + eventType.FullName : Configure.EndpointName;
+            var config = Configure.Instance;
+
+            var subscriptionName = eventType != null ? config.EndpointName + "." + eventType.FullName : config.EndpointName;
 
             if (subscriptionName.Length >= 50)
                 subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();

@@ -19,6 +19,8 @@
     {
         public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
         {
+            var config = Configure.Instance;
+
             var results = new List<Tuple<string, DateTime>>();
            
             var now = DateTime.UtcNow;
@@ -35,13 +37,13 @@
                 result = (from c in context.TimeoutData
                             where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
                             && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
-                                && c.OwningTimeoutManager == Configure.EndpointName
+                                && c.OwningTimeoutManager == config.EndpointName
                             select c).ToList().OrderBy(c => c.Time);
             }
             else
             {
                 result = (from c in context.TimeoutData
-                            where c.OwningTimeoutManager == Configure.EndpointName
+                          where c.OwningTimeoutManager == config.EndpointName
                             select c).ToList().OrderBy(c => c.Time);
             }
 
@@ -323,9 +325,11 @@
 
         string GetUniqueEndpointName()
         {
+            var config = Configure.Instance;
+
             var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
 
-            return Configure.EndpointName + "_" + identifier;
+            return config.EndpointName + "_" + identifier;
         }
 
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)

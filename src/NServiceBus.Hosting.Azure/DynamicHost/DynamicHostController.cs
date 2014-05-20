@@ -25,7 +25,7 @@ namespace NServiceBus.Hosting
 
             var assembliesToScan = new List<Assembly> {GetType().Assembly};
 
-            profileManager = new ProfileManager(assembliesToScan, specifier, requestedProfiles, defaultProfiles);
+            profileManager = new ProfileManager(assembliesToScan, requestedProfiles, defaultProfiles);
         }
 
         public void Start()
@@ -51,10 +51,11 @@ namespace NServiceBus.Hosting
             {
                 config = Configure.With(GetType().Assembly);
             }
-               
 
-            if (!config.HasBuilder())
+            if (!Configure.BuilderIsConfigured())
+            {
                 config.DefaultBuilder();
+            }
 
             config.AzureConfigurationSource();
             config.Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);

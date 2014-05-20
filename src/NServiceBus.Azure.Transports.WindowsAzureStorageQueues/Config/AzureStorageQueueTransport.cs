@@ -51,18 +51,15 @@
                 Address.OverrideDefaultMachine(connectionString);                
             }
 
-            NServiceBus.Configure.Instance.Configurer.RegisterSingleton<CloudQueueClient>(queueClient);
+            config.Configurer.RegisterSingleton<CloudQueueClient>(queueClient);
 
-            var recieverConfig = 
-            NServiceBus.Configure.Component<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
+            var recieverConfig = config.Configurer.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
             recieverConfig.ConfigureProperty(p => p.PurgeOnStartup, ConfigurePurging.PurgeRequested);
-            //todo: change all this
-            //config.Configurer.ConfigureComponent()
-                //.Component<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
-            NServiceBus.Configure.Component<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
-            NServiceBus.Configure.Component<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
+            config.Configurer.ConfigureComponent<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
+            config.Configurer.ConfigureComponent<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
+            config.Configurer.ConfigureComponent<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
-            var queuename = AzureQueueNamingConvention.Apply(NServiceBus.Configure.EndpointName);
+            var queuename = AzureQueueNamingConvention.Apply(config.EndpointName);
             config.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)recieverConfig);
             Address.InitializeLocalAddress(queuename);
         }

@@ -179,15 +179,10 @@ namespace NServiceBus.Hosting
 
             args = AddProfilesFromConfiguration(args);
 
-            profileManager = new ProfileManager(assembliesToScan, specifier, args, defaultProfiles);
+            profileManager = new ProfileManager(assembliesToScan, args, defaultProfiles);
             ProfileActivator.ProfileManager = profileManager;
 
             ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(config);
-
-            if (!config.HasBuilder())
-            {
-                config.DefaultBuilder();
-            }
 
             roleManager.ConfigureBusForEndpoint(specifier);
         }
