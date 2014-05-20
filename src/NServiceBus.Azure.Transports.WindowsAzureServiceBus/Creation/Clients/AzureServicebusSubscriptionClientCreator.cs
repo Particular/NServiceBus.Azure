@@ -23,7 +23,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public SubscriptionClient Create(Address address, Type eventType)
         {
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
+            var config = Configure.Instance;
+
+            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType, config.EndpointName);
 
             try
             {
@@ -35,7 +37,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 // so let's differenatiate including this namespace, odds are very likely that we will get a guid instead
                 // that's why we're not defaulting to this convention.
 
-                subscriptionname = AzureServiceBusSubscriptionNamingConvention.ApplyFullNameConvention(eventType);
+                subscriptionname = AzureServiceBusSubscriptionNamingConvention.ApplyFullNameConvention(eventType, config.EndpointName);
 
                 return Create(eventType, address, subscriptionname);
             }

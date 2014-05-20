@@ -89,8 +89,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void UnSubscribeInternal(Type eventType, Address original)
         {
+            var config = Configure.Instance;
+
             var publisherAddress = AzureServiceBusPublisherAddressConvention.Apply(original);
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
+            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType, config.EndpointName);
 
             SubscriptionCreator.Delete(publisherAddress, subscriptionname);
 
