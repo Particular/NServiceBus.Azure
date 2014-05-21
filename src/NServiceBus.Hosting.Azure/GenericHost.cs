@@ -5,8 +5,10 @@ namespace NServiceBus.Hosting
     using System.Linq;
     using System.Reflection;
     using Config;
+    using Config.ConfigurationSource;
     using Helpers;
     using Installation;
+    using Integration.Azure;
     using Logging;
     using Profiles;
     using Roles;
@@ -30,8 +32,6 @@ namespace NServiceBus.Hosting
             string endpointName, IEnumerable<string> scannableAssembliesFullName = null)
         {
             this.specifier = specifier;
-            this.args = args;
-            this.defaultProfiles = defaultProfiles;
 
             if (String.IsNullOrEmpty(endpointName))
             {
@@ -56,7 +56,10 @@ namespace NServiceBus.Hosting
                     .ToList();
             }
 
-            
+            args = AddProfilesFromConfiguration(args);
+
+            profileManager = new ProfileManager(assembliesToScan, args, defaultProfiles);
+            ProfileActivator.ProfileManager = profileManager;
 
            roleManager = new RoleManager(assembliesToScan);
         }
@@ -176,12 +179,7 @@ namespace NServiceBus.Hosting
             {
                 config = Configure.With(assembliesToScan);
             }
-
-            args = AddProfilesFromConfiguration(args);
-
-            profileManager = new ProfileManager(assembliesToScan, args, defaultProfiles);
-            ProfileActivator.ProfileManager = profileManager;
-
+            
             ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(config);
 
             roleManager.ConfigureBusForEndpoint(specifier);
@@ -204,8 +202,8 @@ namespace NServiceBus.Hosting
         {
             var list = new List<string>(args);
 
-            var configSection = config.GetConfigSection<AzureProfileConfig>();
-
+            var configSection = ((IConfigurationSource) new AzureConfigurationSource(new AzureConfigurationSettings())).GetConfiguration<AzureProfileConfig>();
+                
             if (configSection != null)
             {
                 var configuredProfiles = configSection.Profiles.Split(',');
@@ -220,8 +218,6 @@ namespace NServiceBus.Hosting
         ProfileManager profileManager;
         RoleManager roleManager;
         IConfigureThisEndpoint specifier;
-        string[] args;
-        List<Type> defaultProfiles;
         IStartableBus bus;
         Configure config;
     }
