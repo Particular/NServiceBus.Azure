@@ -179,7 +179,12 @@ namespace NServiceBus.Hosting
             {
                 config = Configure.With(assembliesToScan);
             }
-            
+
+            if (!Configure.BuilderIsConfigured())
+            {
+                config.DefaultBuilder();
+            }
+
             ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(config);
 
             roleManager.ConfigureBusForEndpoint(specifier);
