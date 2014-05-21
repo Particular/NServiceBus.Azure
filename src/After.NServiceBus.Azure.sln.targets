@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
+    <BuildDependsOn >
+      CreatePackagesTarget;
+      $(BuildDependsOn);
+    </BuildDependsOn>
+  </PropertyGroup>
+
+  <UsingTask TaskName="GitVersionTask.GetVersion" AssemblyFile="$(SolutionDir)..\buildsupport\GitVersionTask\GitVersionTask.dll" />
+  
+  <Target Name="CreatePackagesTarget" AfterTargets="Rebuild" Condition="$(Configuration) == 'Release'">
+	  <GetVersion SolutionDirectory="$(SolutionDir)">
+		  <Output TaskParameter="LegacySemVerPadded" PropertyName="LegacySemVerPadded" />
+	  </GetVersion>	
+      <Exec Command="&quot;$(SolutionDir)..\buildsupport\ripple.exe&quot; create-packages -v $(LegacySemVerPadded) -u -d nugets" />
+  </Target>
+
+</Project>
+
+
