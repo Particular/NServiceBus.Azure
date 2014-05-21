@@ -14,7 +14,7 @@
 	  <GetVersion SolutionDirectory="$(SolutionDir)">
 		  <Output TaskParameter="LegacySemVerPadded" PropertyName="LegacySemVerPadded" />
 	  </GetVersion>	
-      <Exec Command="&quot;$(SolutionDir)..\buildsupport\ripple.exe&quot; create-packages -v $(LegacySemVerPadded) -u -d nugets" />
+      <Exec Command="&quot;$(SolutionDir)..\buildsupport\ripple.exe&quot; create-packages -v $(LegacySemVerPadded) -u -d ..\nugets" />
   </Target>
 
 </Project>
