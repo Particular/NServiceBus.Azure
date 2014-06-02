@@ -10,17 +10,19 @@
 
     public class AzureStorageQueueTransport : ConfigureTransport<AzureStorageQueue>
     {
+
         protected override void InternalConfigure(Configure config)
         {
-            Enable<AzureStorageQueueTransport>();
-            EnableByDefault<MessageDrivenSubscriptions>();
-            EnableByDefault<StorageDrivenPublisher>();
-            EnableByDefault<TimeoutManager>();
-            Categories.Serializers.SetDefault<JsonSerialization>();
+            config.Features(f => f.Enable<AzureStorageQueueTransport>());
+            config.Settings.EnableFeatureByDefault<MessageDrivenSubscriptions>();
+            config.Settings.EnableFeatureByDefault<StorageDrivenPublishing>();
+            config.Settings.EnableFeatureByDefault<TimeoutManager>();
+
+            config.Settings.SetDefault("SelectedSerializer", typeof(JsonSerialization));
 
             config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
-            var configSection = config.GetConfigSection<AzureQueueConfig>();
+            var configSection = config.Settings.GetConfigSection<AzureQueueConfig>();
 
             if(configSection == null)
                 return;
@@ -32,13 +34,13 @@
             config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
         }
 
-        public override void Initialize(Configure config)
+        protected override void Setup(FeatureConfigurationContext context)
         {
             CloudQueueClient queueClient;
 
-            var configSection = config.GetConfigSection<AzureQueueConfig>();
+            var configSection = context.Settings.GetConfigSection<AzureQueueConfig>();
 
-            var connectionString = TryGetConnectionString(configSection, config);
+            var connectionString = TryGetConnectionString(configSection, context.Settings);
 
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -51,22 +53,22 @@
                 Address.OverrideDefaultMachine(connectionString);                
             }
 
-            config.Configurer.RegisterSingleton<CloudQueueClient>(queueClient);
+            context.Container.RegisterSingleton<CloudQueueClient>(queueClient);
 
-            var recieverConfig = config.Configurer.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
+            var recieverConfig = context.Container.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
             recieverConfig.ConfigureProperty(p => p.PurgeOnStartup, ConfigurePurging.PurgeRequested);
-            config.Configurer.ConfigureComponent<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
-            config.Configurer.ConfigureComponent<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
-            config.Configurer.ConfigureComponent<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureComponent<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureComponent<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureComponent<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
-            var queuename = AzureQueueNamingConvention.Apply(config.EndpointName);
-            config.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)recieverConfig);
+            var queuename = AzureQueueNamingConvention.Apply(context.Settings.EndpointName());
+            context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)recieverConfig);
             Address.InitializeLocalAddress(queuename);
         }
 
-        static string TryGetConnectionString(AzureQueueConfig configSection, Configure config)
+        static string TryGetConnectionString(AzureQueueConfig configSection, ReadOnlySettings config)
         {
-            var connectionString = config.Settings.Get<string>("NServiceBus.Transport.ConnectionString");
+            var connectionString = config.Get<string>("NServiceBus.Transport.ConnectionString");
 
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -88,6 +90,7 @@
         {
             get { return "todo - refactor the transport to use a connection string instead of a custom section"; }
         }
+
 
     }
 }

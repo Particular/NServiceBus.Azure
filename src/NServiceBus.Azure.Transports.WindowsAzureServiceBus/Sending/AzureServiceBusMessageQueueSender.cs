@@ -7,7 +7,7 @@ using Microsoft.ServiceBus.Messaging;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using NServiceBus.Transports;
-    using Settings;
+    using Unicast;
     using Unicast.Queuing;
 
     /// <summary>
@@ -30,13 +30,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.createMessagingFactories = createMessagingFactories;
         }
 
-        public void Send(TransportMessage message, string destination)
+        public void Send(TransportMessage message, SendOptions options)
         {
-            Send(message, Address.Parse(destination));
-        }
-
-        public void Send(TransportMessage message, Address address)
-        {
+            var address = options.Destination;
             var destination = address.Queue;
             var @namespace = address.Machine;
 

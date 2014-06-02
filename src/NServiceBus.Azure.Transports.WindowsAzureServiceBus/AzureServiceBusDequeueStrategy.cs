@@ -26,7 +26,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private readonly Queue pendingMessages = Queue.Synchronized(new Queue());
         private readonly IList<INotifyReceivedMessages> notifiers = new List<INotifyReceivedMessages>();
         private CancellationTokenSource tokenSource;
-        private readonly CircuitBreaker circuitBreaker = new CircuitBreaker(100, TimeSpan.FromSeconds(30));
+        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => ConfigureCriticalErrorAction.RaiseCriticalError(string.Format("Failed to receive message from Azure ServiceBus."), ex));
         
         private const int PeekInterval = 50;
         private const int MaximumWaitTimeWhenIdle = 1000;
@@ -92,7 +92,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                         {
                             t.Exception.Handle(ex =>
                                 {
-                                    circuitBreaker.Execute(() => Configure.Instance.RaiseCriticalError("Failed to receive message!" /* from?*/, ex));
+                                    circuitBreaker.Failure(ex);
                                     return true;
                                 });
                         }
@@ -153,6 +153,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                         brokeredMessage.SafeComplete(); 
                     }
+
+                    circuitBreaker.Success();
                 }
                 catch (Exception ex)
                 {

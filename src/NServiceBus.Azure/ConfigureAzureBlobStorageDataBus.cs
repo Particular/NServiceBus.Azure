@@ -19,7 +19,7 @@ namespace NServiceBus
 		
 		public static Configure AzureDataBus(this Configure config)
 		{
-            var configSection = config.GetConfigSection<AzureDataBusConfig>() ?? new AzureDataBusConfig();
+            var configSection = config.Settings.GetConfigSection<AzureDataBusConfig>() ?? new AzureDataBusConfig();
 
             var cloudBlobClient = CloudStorageAccount.Parse(configSection.ConnectionString).CreateCloudBlobClient();
 

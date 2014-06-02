@@ -13,6 +13,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         readonly ICreateMessagingFactories createMessagingFactories;
 
         public int MaxRetries { get; set; }
+        public bool ShouldAutoCreate { get; set; }
 
         public AzureServicebusSubscriptionClientCreator(ICreateSubscriptions subscriptionCreator, ICreateMessagingFactories createMessagingFactories)
         {
@@ -46,7 +47,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public SubscriptionClient Create(Type eventType, Address topic, string subscriptionname)
         {
-            if (QueueAutoCreation.ShouldAutoCreate)
+            if (ShouldAutoCreate)
             {
                 subscriptionCreator.Create(topic, eventType, subscriptionname);
             }
@@ -56,7 +57,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void Delete(Address topic, string subscriptionname)
         {
-            if (QueueAutoCreation.ShouldAutoCreate)
+            if (ShouldAutoCreate)
             {
                 subscriptionCreator.Delete(topic, subscriptionname);
             }

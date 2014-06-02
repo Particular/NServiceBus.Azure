@@ -21,7 +21,7 @@ namespace NServiceBus.Hosting
         public DynamicHostController(IConfigureThisEndpoint specifier, string[] requestedProfiles, List<Type> defaultProfiles, string endpointName)
         {
             this.specifier = specifier;
-            Configure.GetEndpointNameAction = () => endpointName;
+            Configure.Instance.Settings.Set("EndpointName", endpointName);
 
             var assembliesToScan = new List<Assembly> {GetType().Assembly};
 
@@ -49,12 +49,8 @@ namespace NServiceBus.Hosting
 
             if (config == null)
             {
-                config = Configure.With(GetType().Assembly);
-            }
-
-            if (!Configure.BuilderIsConfigured())
-            {
-                config.DefaultBuilder();
+                config = Configure.With(o => o.AssembliesToScan(GetType().Assembly))
+                   .DefaultBuilder();
             }
 
             config.AzureConfigurationSource();
@@ -63,7 +59,7 @@ namespace NServiceBus.Hosting
             config.Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
             config.Configurer.ConfigureComponent<DynamicHostMonitor>(DependencyLifecycle.SingleInstance);
 
-            var configSection = config.GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
+            var configSection = config.Settings.GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
 
             config.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.ConnectionString, configSection.ConnectionString);
             config.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.Container, configSection.Container);
@@ -108,7 +104,7 @@ namespace NServiceBus.Hosting
                 runner.Stop(runningServices);
         }
 
-        public void Install<TEnvironment>(string username) where TEnvironment : IEnvironment
+        public void Install(string username)
         {
             //todo -yves
         }

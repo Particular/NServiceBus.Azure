@@ -7,7 +7,7 @@
     {
         public string Determine(Configure config)
         {
-            var configSection = config.GetConfigSection<AzureQueueConfig>();
+            var configSection = config.Settings.GetConfigSection<AzureQueueConfig>();
             var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
 
             if (string.IsNullOrEmpty(connectionString))

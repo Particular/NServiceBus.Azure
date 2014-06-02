@@ -71,7 +71,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     {
                         t.Exception.Handle(ex =>
                             {
-                                circuitBreaker.Execute(() => Configure.Instance.RaiseCriticalError(string.Format("Failed to receive message from '{0}'.", MessageReceiver), ex));
+                                circuitBreaker.Failure(ex);
                                 return true;
                             });
 
@@ -114,6 +114,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                             tryProcessMessage(message);
                         }
                     }
+
+                    circuitBreaker.Success();
                 }
                 catch (EnvelopeDeserializationFailed ex)
                 {
@@ -134,7 +136,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             }
         }
 
-        readonly CircuitBreaker circuitBreaker = new CircuitBreaker(100, TimeSpan.FromSeconds(30));
+        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => ConfigureCriticalErrorAction.RaiseCriticalError(string.Format("Failed to receive message from Azure Storage Queue."), ex));
         Func<TransportMessage, bool> tryProcessMessage;
         CancellationTokenSource tokenSource;
         Address addressToPoll;

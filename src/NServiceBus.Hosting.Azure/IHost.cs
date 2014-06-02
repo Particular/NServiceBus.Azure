@@ -1,7 +1,5 @@
 namespace NServiceBus.Hosting
 {
-    using Installation;
-
     /// <summary>
     /// Identifies a host
     /// </summary>
@@ -20,6 +18,6 @@ namespace NServiceBus.Hosting
         /// <summary>
         /// Performs necessary installation
         /// </summary>
-        void Install<TEnvironment>(string username) where TEnvironment : IEnvironment;
+        void Install(string username) ;
     }
 }

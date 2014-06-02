@@ -7,12 +7,10 @@ namespace NServiceBus.Hosting
     using Config;
     using Config.ConfigurationSource;
     using Helpers;
-    using Installation;
     using Integration.Azure;
     using Logging;
     using Profiles;
     using Roles;
-    using Utils;
 
     /// <summary>
     ///     A generic host that can be used to provide hosting services in different environments
@@ -38,8 +36,7 @@ namespace NServiceBus.Hosting
                 endpointName = specifier.GetType().Namespace ?? specifier.GetType().Assembly.GetName().Name;
             }
 
-            Configure.GetEndpointNameAction = () => endpointName;
-            Configure.DefineEndpointVersionRetriever = () => FileVersionRetriever.GetFileVersion(specifier.GetType());
+            endpointNameToUse = endpointName;
 
             if (scannableAssembliesFullName == null || !scannableAssembliesFullName.Any())
             {
@@ -61,7 +58,7 @@ namespace NServiceBus.Hosting
             profileManager = new ProfileManager(assembliesToScan, args, defaultProfiles);
             ProfileActivator.ProfileManager = profileManager;
 
-           roleManager = new RoleManager(assembliesToScan);
+            roleManager = new RoleManager(assembliesToScan);
         }
 
         /// <summary>
@@ -104,7 +101,7 @@ namespace NServiceBus.Hosting
         /// <summary>
         ///     When installing as windows service (/install), run infrastructure installers
         /// </summary>
-        public void Install<TEnvironment>(string username) where TEnvironment : IEnvironment
+        public void Install(string username)
         {
             PerformConfiguration();
             //HACK: to ensure the installer runner performs its installation
@@ -113,56 +110,18 @@ namespace NServiceBus.Hosting
 
         void PerformConfiguration()
         {
-            config = null;
-
-            if (specifier is IWantCustomLogging)
+            var loggingConfigurers = profileManager.GetLoggingConfigurer();
+            foreach (var loggingConfigurer in loggingConfigurers)
             {
-                (specifier as IWantCustomLogging).Init();
-            }
-            else
-            {
-                var loggingConfigurers = profileManager.GetLoggingConfigurer();
-                foreach (var loggingConfigurer in loggingConfigurers)
-                {
-                    loggingConfigurer.Configure(specifier);
-                }
+                loggingConfigurer.Configure(specifier);
             }
 
-            if (specifier is IWantCustomInitialization)
+            var initialization = specifier as IWantCustomInitialization;
+            if (initialization != null)
             {
                 try
                 {
-                    if (specifier is IWantCustomLogging)
-                    {
-                        var called = false;
-                        //make sure we don't call the Init method again, unless there's an explicit impl
-                        var initMap = specifier.GetType().GetInterfaceMap(typeof(IWantCustomInitialization));
-                        foreach (var m in initMap.TargetMethods)
-                        {
-                            if (!m.IsPublic && m.Name == "NServiceBus.IWantCustomInitialization.Init")
-                            {
-                                config = (specifier as IWantCustomInitialization).Init();
-                                called = true;
-                            }
-                        }
-
-                        if (!called)
-                        {
-                            //call the regular Init method if IWantCustomLogging was an explicitly implemented method
-                            var logMap = specifier.GetType().GetInterfaceMap(typeof(IWantCustomLogging));
-                            foreach (var tm in logMap.TargetMethods)
-                            {
-                                if (!tm.IsPublic && tm.Name == "NServiceBus.IWantCustomLogging.Init")
-                                {
-                                    config = (specifier as IWantCustomInitialization).Init();
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        config = (specifier as IWantCustomInitialization).Init();
-                    }
+                    initialization.Init();
                 }
                 catch (NullReferenceException ex)
                 {
@@ -177,17 +136,17 @@ namespace NServiceBus.Hosting
 
             if (config == null)
             {
-                config = Configure.With(assembliesToScan);
-            }
-
-            if (!Configure.BuilderIsConfigured())
-            {
-                config.DefaultBuilder();
+                config = Configure.With(o =>
+                {
+                    o.EndpointName(endpointNameToUse);
+                    o.AssembliesToScan(assembliesToScan);
+                })
+                .DefaultBuilder();
             }
 
             ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(config);
 
-            roleManager.ConfigureBusForEndpoint(specifier);
+            roleManager.ConfigureBusForEndpoint(specifier, config);
         }
 
         void ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(Configure config)
@@ -199,16 +158,16 @@ namespace NServiceBus.Hosting
                 return;
             }
 
-            throw new Exception("IWantCustomInitialization is only valid on the same class as ICOnfigureThisEndpoint. Please use INeedInitialization instead. Found types: " + string.Join(",",problems.Select(t=>t.FullName)));
- 
+            throw new Exception("IWantCustomInitialization is only valid on the same class as ICOnfigureThisEndpoint. Please use INeedInitialization instead. Found types: " + string.Join(",", problems.Select(t => t.FullName)));
+
         }
 
         private string[] AddProfilesFromConfiguration(IEnumerable<string> args)
         {
             var list = new List<string>(args);
 
-            var configSection = ((IConfigurationSource) new AzureConfigurationSource(new AzureConfigurationSettings())).GetConfiguration<AzureProfileConfig>();
-                
+            var configSection = ((IConfigurationSource)new AzureConfigurationSource(new AzureConfigurationSettings())).GetConfiguration<AzureProfileConfig>();
+
             if (configSection != null)
             {
                 var configuredProfiles = configSection.Profiles.Split(',');
@@ -219,11 +178,13 @@ namespace NServiceBus.Hosting
         }
 
         List<Assembly> assembliesToScan;
-       
+
         ProfileManager profileManager;
         RoleManager roleManager;
         IConfigureThisEndpoint specifier;
         IStartableBus bus;
         Configure config;
+
+        string endpointNameToUse;
     }
 }

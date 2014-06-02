@@ -11,6 +11,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         readonly ICreateMessagingFactories createMessagingFactories;
 
         public int MaxRetries { get; set; }
+        public bool ShouldAutoCreate { get; set; }
 
         public AzureServicebusQueueClientCreator(ICreateQueues queueCreator, ICreateMessagingFactories createMessagingFactories)
         {
@@ -20,7 +21,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public QueueClient Create(Address address)
         {
-            if (QueueAutoCreation.ShouldAutoCreate)
+            if (ShouldAutoCreate) 
             {
                 queueCreator.CreateQueueIfNecessary(address, null);
             }

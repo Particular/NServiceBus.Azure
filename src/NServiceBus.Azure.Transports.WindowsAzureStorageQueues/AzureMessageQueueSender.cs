@@ -9,7 +9,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using NServiceBus.Transports;
-    using Settings;
+    using Unicast;
     using Unicast.Queuing;
 
     /// <summary>
@@ -27,14 +27,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
         public CloudQueueClient Client { get; set; }
 
-        public void Send(TransportMessage message, string destination)
-        {
-            Send(message, Address.Parse(destination));
-        }
-
-        public void Send(TransportMessage message, Address address)
+        public void Send(TransportMessage message, SendOptions options)
         {
             var config = Configure.Instance; //TODO: inject
+            var address = options.Destination;
 
             var sendClient = GetClientForConnectionString(address.Machine) ?? Client;
 

@@ -15,7 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var validation = new DeterminesBestConnectionStringForAzureServiceBus();
             var connectionstring = validation.IsPotentialServiceBusConnectionString(potentialConnectionString)
                                      ? potentialConnectionString
-                                     : validation.Determine(Configure.Instance); // todo: inject
+                                     : validation.Determine(Configure.Instance.Settings); // todo: inject
 
             MessagingFactory factory;
             if (!MessagingFactories.TryGetValue(connectionstring, out factory))

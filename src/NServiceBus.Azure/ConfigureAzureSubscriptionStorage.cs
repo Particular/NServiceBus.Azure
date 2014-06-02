@@ -16,7 +16,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure AzureSubscriptionStorage(this Configure config)
         {
-            var configSection = config.GetConfigSection<AzureSubscriptionStorageConfig>();
+            var configSection = config.Settings.GetConfigSection<AzureSubscriptionStorageConfig>();
             if (configSection == null) { return config; }
 
             return config.AzureSubscriptionStorage(configSection.ConnectionString, configSection.CreateSchema, configSection.TableName);

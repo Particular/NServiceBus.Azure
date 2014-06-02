@@ -10,7 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var config = Configure.Instance; //todo: inject
 
-            var configSection = config.GetConfigSection<AzureServiceBusQueueConfig>();
+            var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
             {

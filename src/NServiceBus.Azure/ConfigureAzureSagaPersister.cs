@@ -22,7 +22,7 @@ namespace NServiceBus
             var connectionstring = string.Empty;
             var updateSchema = false;
 
-            var configSection = config.GetConfigSection<AzureSagaPersisterConfig>();
+            var configSection = config.Settings.GetConfigSection<AzureSagaPersisterConfig>();
 
             if (configSection != null)
             {

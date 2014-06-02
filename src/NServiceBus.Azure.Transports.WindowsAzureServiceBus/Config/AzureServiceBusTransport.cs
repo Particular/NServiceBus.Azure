@@ -11,7 +11,7 @@
     {
         protected override void InternalConfigure(Configure config)
         {
-            Categories.Serializers.SetDefault<JsonSerialization>();
+            config.Settings.SetDefault("SelectedSerializer", typeof(JsonSerialization));
 
             config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
@@ -21,33 +21,34 @@
 
             var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;
 
-            var configSection = config.GetConfigSection<AzureServiceBusQueueConfig>();
+            var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection != null)
                 serverWaitTime = configSection.ServerWaitTime;
 
             // make sure the transaction stays open a little longer than the long poll.
-            config.Transactions.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable));
+            config.Transactions( s => s.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable)));
 
 
-            Enable<AzureServiceBusTransport>();
-            EnableByDefault<TimeoutManager>();
+            config.Features( f => f.Enable<AzureServiceBusTransport>());
+            config.Settings.EnableFeatureByDefault<TimeoutManager>();
             
         }
 
-        public override void Initialize(Configure config)
+        protected override void Setup(FeatureConfigurationContext context)
         {
-            var configSection = config.GetConfigSection<AzureServiceBusQueueConfig>();
+
+            var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)
             {
                 //hack: just to get the defaults, we should refactor this to support specifying the values on the NServiceBus/Transport connection string as well
                 configSection = new AzureServiceBusQueueConfig();
             }
 
-            var transportConfig = config.GetConfigSection<TransportConfig>() ?? new TransportConfig();
+            var transportConfig = context.Settings.GetConfigSection<TransportConfig>() ?? new TransportConfig();
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(config);
+            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
             Address.OverrideDefaultMachine(connectionString);
 
             new ContainerConfiguration().Configure(configSection, transportConfig);
@@ -62,5 +63,7 @@
         {
             get { return "Endpoint=sb://{yournamespace}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={yourkey}"; }
         }
+
+        
     }
 }

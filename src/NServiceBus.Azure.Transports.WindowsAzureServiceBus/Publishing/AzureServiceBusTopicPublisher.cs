@@ -8,6 +8,7 @@ using Microsoft.ServiceBus.Messaging;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using NServiceBus.Transports;
+    using Unicast;
     using Unicast.Queuing;
 
     /// <summary>
@@ -23,7 +24,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
         private static readonly object SenderLock = new Object();
         
-        public void Publish(TransportMessage message, IEnumerable<Type> eventTypes)
+        public void Publish(TransportMessage message, PublishOptions options)
         {
             var config = Configure.Instance; //todo: inject
 

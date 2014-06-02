@@ -1,31 +1,31 @@
-﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
-{
-    using Config;
-    using NServiceBus.Transports;
-    using Settings;
+﻿//namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
+//{
+//    using Config;
+//    using NServiceBus.Transports;
+//    using Settings;
 
-    public class TopicAutoCreation : IWantToRunWhenConfigurationIsComplete
-    {
+//    public class TopicAutoCreation : IWantToRunWhenConfigurationIsComplete
+//    {
   
-        public ICreateTopics TopicCreator { get; set; }
+//        public ICreateTopics TopicCreator { get; set; }
 
-        public void Run(Configure config)
-        {
-            if (!QueueAutoCreation.ShouldAutoCreate)
-                return;
+//        public void Run(Configure config)
+//        {
+//            if (!QueueAutoCreation.ShouldAutoCreate)
+//                return;
 
-            // to stay backward compat, this used to be autocreated the constructor but is now injected
-            // so if this class was manually instantiated, it could lead to a null ref otherwise.
-            if (TopicCreator == null)
-            {
-                TopicCreator = new AzureServicebusTopicCreator(); 
-            }
+//            // to stay backward compat, this used to be autocreated the constructor but is now injected
+//            // so if this class was manually instantiated, it could lead to a null ref otherwise.
+//            if (TopicCreator == null)
+//            {
+//                TopicCreator = new AzureServicebusTopicCreator(); 
+//            }
 
-            var selectedTransport = config.Settings.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
-            if (selectedTransport is AzureServiceBus)
-            {
-                TopicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));
-            }
-        }
-    }
-}
+//            var selectedTransport = config.Settings.GetOrDefault<TransportDefinition>("NServiceBus.Transport.SelectedTransport");
+//            if (selectedTransport is AzureServiceBus)
+//            {
+//                TopicCreator.CreateIfNecessary(AzureServiceBusPublisherAddressConvention.Apply(Address.Local));
+//            }
+//        }
+//    }
+//}

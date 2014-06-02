@@ -2,16 +2,17 @@
 {
     using System.Configuration;
     using Config;
-    
+    using Settings;
+
     public class DeterminesBestConnectionStringForAzureServiceBus
     {
-        public string Determine(Configure config)
+        public string Determine(ReadOnlySettings settings)
         {
-            var configSection = config.GetConfigSection<AzureServiceBusQueueConfig>();
+            var configSection = settings.GetConfigSection<AzureServiceBusQueueConfig>();
             var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
 
             if (string.IsNullOrEmpty(connectionString))
-                connectionString = config.Settings.Get<string>("NServiceBus.Transport.ConnectionString");
+                connectionString = settings.Get<string>("NServiceBus.Transport.ConnectionString");
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.IssuerKey) && !string.IsNullOrEmpty(configSection.ServiceNamespace))
                 connectionString = string.Format("Endpoint=sb://{0}.servicebus.windows.net/;SharedSecretIssuer=owner;SharedSecretValue={1}", configSection.ServiceNamespace, configSection.IssuerKey);
@@ -38,9 +39,10 @@
             else
             {
                 var replyQueue = replyToAddress.Queue;
-                var @namespace = Determine(Configure.Instance); //todo: inject
+                var @namespace = Determine(Configure.Instance.Settings); //todo: inject
                 return replyQueue + "@" + @namespace;
             }
         }
+
     }
 }

@@ -146,7 +146,7 @@ namespace NServiceBus.Hosting.Azure
         {
             var list = new List<string>(args);
 
-            var configSection = Configure.Instance.GetConfigSection<AzureProfileConfig>();//todo inject
+            var configSection = Configure.Instance.Settings.GetConfigSection<AzureProfileConfig>();//todo inject
 
             if (configSection != null)
             {

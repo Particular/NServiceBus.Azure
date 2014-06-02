@@ -15,7 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var connectionstring = potentialConnectionstring != RuntimeEnvironment.MachineName
                                       ? potentialConnectionstring
-                                      : new DeterminesBestConnectionStringForAzureServiceBus().Determine(Configure.Instance);//todo: inject
+                                      : new DeterminesBestConnectionStringForAzureServiceBus().Determine(Configure.Instance.Settings);//todo: inject
 
             NamespaceManager manager;
             if (!NamespaceManagers.TryGetValue(connectionstring, out manager))

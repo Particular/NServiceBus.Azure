@@ -10,7 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         {
             var config = Configure.Instance; //todo: inject
 
-            var configSection = config.GetConfigSection<AzureQueueConfig>();
+            var configSection = config.Settings.GetConfigSection<AzureQueueConfig>();
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
             {
