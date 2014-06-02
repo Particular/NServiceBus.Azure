@@ -7,7 +7,7 @@
     using Microsoft.ServiceBus;
     using Transports;
 
-    public class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
+    internal class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
     {
         protected override void InternalConfigure(Configure config)
         {

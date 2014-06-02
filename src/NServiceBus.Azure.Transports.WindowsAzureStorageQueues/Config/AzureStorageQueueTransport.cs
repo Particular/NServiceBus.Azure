@@ -8,7 +8,7 @@
     using Settings;
     using Transports;
 
-    public class AzureStorageQueueTransport : ConfigureTransport<AzureStorageQueue>
+    internal class AzureStorageQueueTransport : ConfigureTransport<AzureStorageQueue>
     {
 
         protected override void InternalConfigure(Configure config)
