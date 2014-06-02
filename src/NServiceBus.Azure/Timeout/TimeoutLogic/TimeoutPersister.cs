@@ -37,13 +37,13 @@
                 result = (from c in context.TimeoutData
                             where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
                             && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
-                                && c.OwningTimeoutManager == config.EndpointName
+                                && c.OwningTimeoutManager == config.Settings.EndpointName()
                             select c).ToList().OrderBy(c => c.Time);
             }
             else
             {
                 result = (from c in context.TimeoutData
-                          where c.OwningTimeoutManager == config.EndpointName
+                          where c.OwningTimeoutManager == config.Settings.EndpointName()
                             select c).ToList().OrderBy(c => c.Time);
             }
 
@@ -329,7 +329,7 @@
 
             var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
 
-            return config.EndpointName + "_" + identifier;
+            return config.Settings.EndpointName() + "_" + identifier;
         }
 
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)

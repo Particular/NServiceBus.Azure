@@ -92,7 +92,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var config = Configure.Instance;
 
             var publisherAddress = AzureServiceBusPublisherAddressConvention.Apply(original);
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType, config.EndpointName);
+            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType, config.Settings.EndpointName());
 
             SubscriptionCreator.Delete(publisherAddress, subscriptionname);
 

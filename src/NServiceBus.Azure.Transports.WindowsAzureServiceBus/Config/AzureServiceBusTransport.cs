@@ -15,7 +15,7 @@
 
             config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
-            var queuename = AzureServiceBusQueueNamingConvention.Apply(config.EndpointName);
+            var queuename = AzureServiceBusQueueNamingConvention.Apply(config.Settings.EndpointName());
 
             Address.InitializeLocalAddress(queuename);
 
