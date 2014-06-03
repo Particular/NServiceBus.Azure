@@ -10,7 +10,6 @@
 
     internal class AzureStorageQueueTransport : ConfigureTransport<AzureStorageQueue>
     {
-
         protected override void InternalConfigure(Configure config)
         {
             config.Features(f => f.Enable<AzureStorageQueueTransport>());
