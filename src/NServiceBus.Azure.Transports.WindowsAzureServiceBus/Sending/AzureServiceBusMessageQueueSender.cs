@@ -67,16 +67,19 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var config = Configure.Instance; // todo: inject
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
-                SendInternal(message, sender, address, DelayIfNeeded(options, expectDelay));
+                SendInternal(message, sender, options, expectDelay);
             }
             else
             {
-                Transaction.Current.EnlistVolatile(new SendResourceManager(() => SendInternal(message, sender, address, options.DeliverAt)), EnlistmentOptions.None);
+                Transaction.Current.EnlistVolatile(new SendResourceManager(() => SendInternal(message, sender, options, expectDelay)), EnlistmentOptions.None);
             }
         }
 
-        void SendInternal(TransportMessage message, QueueClient sender, Address address, DateTime? timeToSend )
+        void SendInternal(TransportMessage message, QueueClient sender, SendOptions options, bool expectDelay )
         {
+            var address = options.Destination;
+            var timeToSend = DelayIfNeeded(options, expectDelay);
+
             var numRetries = 0;
             var sent = false;
 
@@ -87,8 +90,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     using (var brokeredMessage = message.Body != null ? new BrokeredMessage(message.Body) : new BrokeredMessage())
                     {
                         brokeredMessage.CorrelationId = message.CorrelationId;
-                        if (message.TimeToBeReceived < TimeSpan.MaxValue) brokeredMessage.TimeToLive = message.TimeToBeReceived;
-
+                        
                         if (timeToSend.HasValue)
                             brokeredMessage.ScheduledEnqueueTimeUtc = timeToSend.Value;
 
@@ -100,14 +102,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                         brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
                         brokeredMessage.MessageId = message.Id;
 
-                        if (message.ReplyToAddress != null)
+                        if (options.ReplyToAddress != null)
                         {
-                            brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(message.ReplyToAddress);
+                            brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(options.ReplyToAddress);
                         }
 
-                        if (message.TimeToBeReceived < TimeSpan.MaxValue)
+                        if (options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue)
                         {
-                            brokeredMessage.TimeToLive = message.TimeToBeReceived;
+                            brokeredMessage.TimeToLive = options.TimeToBeReceived.Value;
                         }
 
                         if (brokeredMessage.Size > 256*1024)
