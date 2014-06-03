@@ -13,7 +13,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusMessageQueueSender : ISendMessages
+    public class AzureServiceBusMessageQueueSender : ISendMessages, IDeferMessages
     {
         const int DefaultBackoffTimeInSeconds = 10;
 
@@ -31,6 +31,21 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         }
 
         public void Send(TransportMessage message, SendOptions options)
+        {
+            SendInternal(message, options);
+        }
+
+        public void Defer(TransportMessage message, SendOptions options)
+        {
+            SendInternal(message, options, expectDelay:true);
+        }
+
+        public void ClearDeferredMessages(string headerKey, string headerValue)
+        {
+            //? throw new NotSupportedException();
+        }
+
+        void SendInternal(TransportMessage message, SendOptions options, bool expectDelay = false)
         {
             var address = options.Destination;
             var destination = address.Queue;
@@ -51,13 +66,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             var config = Configure.Instance; // todo: inject
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
-                Send(message, sender,address);
+            {
+                SendInternal(message, sender, address, DelayIfNeeded(options, expectDelay));
+            }
             else
-                Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender, address)), EnlistmentOptions.None);
-
+            {
+                Transaction.Current.EnlistVolatile(new SendResourceManager(() => SendInternal(message, sender, address, options.DeliverAt)), EnlistmentOptions.None);
+            }
         }
 
-        void Send(TransportMessage message, QueueClient sender, Address address)
+        void SendInternal(TransportMessage message, QueueClient sender, Address address, DateTime? timeToSend )
         {
             var numRetries = 0;
             var sent = false;
@@ -70,6 +88,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     {
                         brokeredMessage.CorrelationId = message.CorrelationId;
                         if (message.TimeToBeReceived < TimeSpan.MaxValue) brokeredMessage.TimeToLive = message.TimeToBeReceived;
+
+                        if (timeToSend.HasValue)
+                            brokeredMessage.ScheduledEnqueueTimeUtc = timeToSend.Value;
 
                         foreach (var header in message.Headers)
                         {
@@ -143,5 +164,31 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 }
             }
         }
-   }
+
+
+        DateTime? DelayIfNeeded(SendOptions options, bool expectDelay)
+        {
+            DateTime? deliverAt = null;
+
+            if (options.DelayDeliveryWith.HasValue)
+            {
+                deliverAt = DateTime.UtcNow + options.DelayDeliveryWith.Value;
+            }
+            else
+            {
+                if (options.DeliverAt.HasValue)
+                {
+                    deliverAt = options.DeliverAt.Value;
+                }
+                else if (expectDelay)
+                {
+                    throw new ArgumentException("A delivery time needs to be specified for Deferred messages");
+                }
+
+            }
+
+            return deliverAt;
+        }
+
+    }
 }
