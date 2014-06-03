@@ -29,7 +29,6 @@
             config.Transactions( s => s.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable)));
             
             config.Features( f => f.Enable<AzureServiceBusTransport>());
-            config.Settings.EnableFeatureByDefault<TimeoutManager>();
             
         }
 
