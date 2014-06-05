@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using NServiceBus.Logging;
 
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
     using Config;
 

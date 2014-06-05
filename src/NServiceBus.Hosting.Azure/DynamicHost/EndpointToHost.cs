@@ -6,7 +6,7 @@ namespace NServiceBus.Hosting
 {
     using Microsoft.WindowsAzure.Storage.Blob;
 
-    public class EndpointToHost
+    internal class EndpointToHost
     {
         private readonly CloudBlockBlob blob;
 

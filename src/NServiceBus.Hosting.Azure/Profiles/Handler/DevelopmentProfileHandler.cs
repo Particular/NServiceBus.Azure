@@ -7,7 +7,7 @@ namespace NServiceBus.Hosting.Azure.Profiles.Handlers
     {
         void IHandleProfile.ProfileActivated(Configure config)
         {
-            Configure.Instance.ConsoleLogger();
+            //Configure.Instance.ConsoleLogger();
         }
     }
 }

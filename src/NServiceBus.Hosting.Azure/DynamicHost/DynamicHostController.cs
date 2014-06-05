@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using NServiceBus.Hosting.Profiles;
 
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
-    using Installation;
-
-    public class DynamicHostController : IHost
+    internal class DynamicHostController : IHost
     {
         private readonly IConfigureThisEndpoint specifier;
         private readonly ProfileManager profileManager;

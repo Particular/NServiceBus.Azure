@@ -1,4 +1,4 @@
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
     using System;
     using System.Collections.Generic;
@@ -7,10 +7,10 @@ namespace NServiceBus.Hosting
     using Config;
     using Config.ConfigurationSource;
     using Helpers;
+    using Hosting.Profiles;
+    using Hosting.Roles;
     using Integration.Azure;
     using Logging;
-    using Profiles;
-    using Roles;
 
     /// <summary>
     ///     A generic host that can be used to provide hosting services in different environments

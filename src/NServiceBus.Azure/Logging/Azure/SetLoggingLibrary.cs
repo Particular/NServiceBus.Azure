@@ -7,7 +7,7 @@ namespace NServiceBus
     {
         public static Configure ConsoleLogger(this Configure config)
         {
-            LogManager.LoggerFactory = new ConsoleLoggerFactory();
+           // LogManager.LoggerFactory = new ConsoleLoggerFactory();
             return config;
         }
 
@@ -19,12 +19,4 @@ namespace NServiceBus
 
     }
 
-}
-
-namespace NServiceBus.Logging.Loggers
-{
-}
-
-namespace NServiceBus.Logging.Loggers
-{
 }

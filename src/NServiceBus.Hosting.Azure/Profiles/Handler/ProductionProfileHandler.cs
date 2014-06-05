@@ -6,7 +6,7 @@ namespace NServiceBus.Hosting.Azure.Profiles.Handlers
     {
         void IHandleProfile.ProfileActivated(Configure config)
         {
-            Configure.Instance.TraceLogger();
+            //Configure.Instance.TraceLogger();
         }
     }
 }

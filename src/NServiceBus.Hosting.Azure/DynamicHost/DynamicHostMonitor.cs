@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using NServiceBus.Logging;
 
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
     using Microsoft.WindowsAzure.Storage;
 
