@@ -2,8 +2,6 @@ using NServiceBus.Azure.Transports.WindowsAzureStorageQueues;
 
 namespace NServiceBus
 {
-    using Settings;
-
     public static class ConfigureAzureMessageQueue
     {
         public static Configure AzureMessageQueue(this Configure config)
