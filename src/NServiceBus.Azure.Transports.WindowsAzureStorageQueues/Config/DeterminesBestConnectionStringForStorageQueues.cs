@@ -2,16 +2,17 @@
 {
     using System.Configuration;
     using Config;
-    
+    using Settings;
+
     public class DeterminesBestConnectionStringForStorageQueues
     {
-        public string Determine(Configure config)
+        public string Determine(ReadOnlySettings settings)
         {
-            var configSection = config.Settings.GetConfigSection<AzureQueueConfig>();
+            var configSection = settings.GetConfigSection<AzureQueueConfig>();
             var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
 
             if (string.IsNullOrEmpty(connectionString))
-                connectionString = config.Settings.Get<string>("NServiceBus.Transport.ConnectionString");
+                connectionString = settings.Get<string>("NServiceBus.Transport.ConnectionString");
 
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -27,14 +28,14 @@
                 potentialConnectionString.StartsWith("DefaultEndpointsProtocol=https");
         }
 
-        public string Determine(Address replyToAddress)
+        public string Determine(ReadOnlySettings settings, Address replyToAddress)
         {
             var replyQueue = replyToAddress.Queue;
             var connectionString = replyToAddress.Machine;
 
             if (!IsPotentialStorageQueueConnectionString(connectionString))
             {
-                connectionString = Determine(Configure.Instance); //todo inject config
+                connectionString = Determine(settings); //todo inject config
             }
 
             return replyQueue + "@" + connectionString;

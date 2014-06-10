@@ -17,10 +17,15 @@
     
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
     {
-        public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
-        {
-            var config = Configure.Instance;
+        readonly Configure config;
 
+        public TimeoutPersister(Configure config)
+        {
+            this.config = config;
+        }
+
+        public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
+        {
             var results = new List<Tuple<string, DateTime>>();
            
             var now = DateTime.UtcNow;
@@ -325,8 +330,6 @@
 
         string GetUniqueEndpointName()
         {
-            var config = Configure.Instance;
-
             var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
 
             return config.Settings.EndpointName() + "_" + identifier;

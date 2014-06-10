@@ -105,7 +105,9 @@ namespace NServiceBus.Hosting.Azure
         {
             PerformConfiguration();
             //HACK: to ensure the installer runner performs its installation
-            Configure.Instance.Initialize();
+
+            config.EnableInstallers(username);
+            config.CreateBus();
         }
 
         void PerformConfiguration()

@@ -3,20 +3,21 @@ using Microsoft.ServiceBus.Messaging;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using NServiceBus.Transports;
-    using Settings;
 
     public class AzureServicebusQueueClientCreator : ICreateQueueClients
     {
         readonly ICreateQueues queueCreator;
         readonly ICreateMessagingFactories createMessagingFactories;
+        readonly Configure config;
 
         public int MaxRetries { get; set; }
         public bool ShouldAutoCreate { get; set; }
 
-        public AzureServicebusQueueClientCreator(ICreateQueues queueCreator, ICreateMessagingFactories createMessagingFactories)
+        public AzureServicebusQueueClientCreator(ICreateQueues queueCreator, ICreateMessagingFactories createMessagingFactories, Configure config)
         {
             this.queueCreator = queueCreator;
             this.createMessagingFactories = createMessagingFactories;
+            this.config = config;
         }
 
         public QueueClient Create(Address address)
@@ -34,8 +35,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         bool ShouldRetry()
         {
-            var config = Configure.Instance;// todo: inject
-
             return (bool)config.Settings.Get("Transactions.Enabled");
         }
     }

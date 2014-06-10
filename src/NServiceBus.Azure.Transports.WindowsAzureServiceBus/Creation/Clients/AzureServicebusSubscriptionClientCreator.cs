@@ -2,7 +2,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
-    using Settings;
 
     /// <summary>
     /// 
@@ -11,21 +10,21 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     {
         readonly ICreateSubscriptions subscriptionCreator;
         readonly ICreateMessagingFactories createMessagingFactories;
+        readonly Configure config;
 
         public int MaxRetries { get; set; }
         public bool ShouldAutoCreate { get; set; }
 
-        public AzureServicebusSubscriptionClientCreator(ICreateSubscriptions subscriptionCreator, ICreateMessagingFactories createMessagingFactories)
+        public AzureServicebusSubscriptionClientCreator(ICreateSubscriptions subscriptionCreator, ICreateMessagingFactories createMessagingFactories, Configure config)
         {
             this.subscriptionCreator = subscriptionCreator;
             this.createMessagingFactories = createMessagingFactories;
+            this.config = config;
         }
 
 
         public SubscriptionClient Create(Address address, Type eventType)
         {
-            var config = Configure.Instance;
-
             var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType, config.Settings.EndpointName());
 
             try
@@ -65,7 +64,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         bool ShouldRetry()
         {
-            var config = Configure.Instance; // todo: inject
             return (bool)config.Settings.Get("Transactions.Enabled");
         }
     }

@@ -30,7 +30,7 @@
             return potentialConnectionString.StartsWith("Endpoint=sb://");
         }
 
-        public string Determine(Address replyToAddress)
+        public string Determine(ReadOnlySettings settings, Address replyToAddress)
         {
             if (IsPotentialServiceBusConnectionString(replyToAddress.Machine))
             {
@@ -39,7 +39,7 @@
             else
             {
                 var replyQueue = replyToAddress.Queue;
-                var @namespace = Determine(Configure.Instance.Settings); //todo: inject
+                var @namespace = Determine(settings); //todo: inject
                 return replyQueue + "@" + @namespace;
             }
         }

@@ -17,6 +17,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     /// </summary>
     public class AzureMessageQueueSender : ISendMessages
     {
+        readonly Configure config;
         private readonly Dictionary<string, CloudQueueClient> destinationQueueClients = new Dictionary<string, CloudQueueClient>();
         private static readonly object SenderLock = new Object();
 
@@ -27,10 +28,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
         public CloudQueueClient Client { get; set; }
 
+        public AzureMessageQueueSender(Configure config)
+        {
+            this.config = config;
+        }
+
         public void Send(TransportMessage message, SendOptions options)
         {
-            var config = Configure.Instance; //TODO: inject
-            var address = options.Destination;
+           var address = options.Destination;
 
             var sendClient = GetClientForConnectionString(address.Machine) ?? Client;
 
@@ -58,7 +63,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             var validation = new DeterminesBestConnectionStringForStorageQueues();
             if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
             {
-                connectionString = validation.Determine(Configure.Instance); // todo: inject
+                connectionString = validation.Determine(config.Settings); 
             }
 
             if (!destinationQueueClients.TryGetValue(connectionString, out sendClient))
@@ -91,7 +96,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             using (var stream = new MemoryStream())
             {
                 var validation = new DeterminesBestConnectionStringForStorageQueues();
-                var replyToAddress = validation.Determine( message.ReplyToAddress ?? Address.Local );
+                var replyToAddress = validation.Determine(config.Settings,  message.ReplyToAddress ?? Address.Local );
 
                 var toSend = new MessageWrapper
                     {

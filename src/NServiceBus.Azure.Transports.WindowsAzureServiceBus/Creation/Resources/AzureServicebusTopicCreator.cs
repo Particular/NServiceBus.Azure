@@ -10,7 +10,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public bool EnablePartitioning { get; set; }
 
-        public AzureServicebusTopicCreator() : this(new CreatesNamespaceManagers())
+        public AzureServicebusTopicCreator(Configure config)
+            : this(new CreatesNamespaceManagers(config))
         {
         }
 

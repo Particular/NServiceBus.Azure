@@ -7,16 +7,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public class CreatesNamespaceManagers : ICreateNamespaceManagers
     {
+        readonly Configure config;
         private static readonly Dictionary<string, NamespaceManager> NamespaceManagers = new Dictionary<string, NamespaceManager>();
 
         private static readonly object NamespaceLock = new Object();
+
+        public CreatesNamespaceManagers(Configure config)
+        {
+            this.config = config;
+        }
 
         public NamespaceManager Create(string potentialConnectionstring)
         {
             var connectionStringParser = new DeterminesBestConnectionStringForAzureServiceBus();
             var connectionstring = potentialConnectionstring != RuntimeEnvironment.MachineName && connectionStringParser.IsPotentialServiceBusConnectionString(potentialConnectionstring)
                                       ? potentialConnectionstring
-                                      : connectionStringParser.Determine(Configure.Instance.Settings);//todo: inject
+                                      : connectionStringParser.Determine(config.Settings);
 
             NamespaceManager manager;
             if (!NamespaceManagers.TryGetValue(connectionstring, out manager))

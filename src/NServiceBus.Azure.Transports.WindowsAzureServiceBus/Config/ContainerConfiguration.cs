@@ -7,10 +7,8 @@
 
     internal class ContainerConfiguration
     {
-        public void Configure(AzureServiceBusQueueConfig configSection, TransportConfig transportConfig)
+        public void Configure(Configure config, AzureServiceBusQueueConfig configSection, TransportConfig transportConfig)
         {
-            var config = NServiceBus.Configure.Instance;
-
             ConfigureCreationInfrastructure(config, configSection, transportConfig);
 
             ConfigureReceiveInfrastructure(config, configSection);

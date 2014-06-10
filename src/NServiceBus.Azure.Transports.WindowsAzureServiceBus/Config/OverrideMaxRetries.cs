@@ -1,15 +1,20 @@
 ﻿namespace NServiceBus.Features
 {
-    using System.Reflection;
     using Config;
     using Config.ConfigurationSource;
 
     public class OverrideMaxRetries : IProvideConfiguration<TransportConfig>
     {
+        readonly Configure config;
+
+        public OverrideMaxRetries(Configure config)
+        {
+            this.config = config;
+        }
+
         public TransportConfig GetConfiguration()
         {
-            // todo inject configure instance
-            var source = Configure.Instance.Settings.Get<IConfigurationSource>();
+            var source = config.Settings.Get<IConfigurationSource>();
             
             var c = source.GetConfiguration<AzureServiceBusQueueConfig>();
             var t = source.GetConfiguration<TransportConfig>();

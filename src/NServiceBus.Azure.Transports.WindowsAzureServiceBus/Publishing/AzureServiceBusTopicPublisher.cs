@@ -16,6 +16,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusTopicPublisher : IPublishMessages
     {
+        readonly Configure config;
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
 
@@ -23,11 +24,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
         private static readonly object SenderLock = new Object();
-        
+
+        public AzureServiceBusTopicPublisher(Configure config)
+        {
+            this.config = config;
+        }
+
         public void Publish(TransportMessage message, PublishOptions options)
         {
-            var config = Configure.Instance; //todo: inject
-
             var sender = GetTopicClientForDestination(Address.Local);
 
             if (sender == null) throw new QueueNotFoundException { Queue = Address.Local };
@@ -109,7 +113,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 
                 if (message.ReplyToAddress != null)
                 {
-                    brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(message.ReplyToAddress);
+                    brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(config.Settings, message.ReplyToAddress);
                 }
 
                 if (message.TimeToBeReceived < TimeSpan.MaxValue)

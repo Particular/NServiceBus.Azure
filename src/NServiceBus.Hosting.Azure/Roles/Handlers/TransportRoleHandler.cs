@@ -19,7 +19,7 @@ namespace NServiceBus.Hosting.Roles.Handlers
                          .SelectMany(i => i.GetGenericArguments())
                          .Single(t => typeof(TransportDefinition).IsAssignableFrom(t));
 
-            Configure.Instance.UseTransport(transportDefinitionType);
+            config.UseTransport(transportDefinitionType);
         }
     }
 }

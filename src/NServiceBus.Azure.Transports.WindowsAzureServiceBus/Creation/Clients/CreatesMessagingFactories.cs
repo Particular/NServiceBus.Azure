@@ -6,16 +6,23 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public class CreatesMessagingFactories : ICreateMessagingFactories
     {
+        readonly Configure config;
+
         private static readonly Dictionary<string, MessagingFactory> MessagingFactories = new Dictionary<string, MessagingFactory>();
 
         private static readonly object FactoryLock = new Object();
+
+        public CreatesMessagingFactories(Configure config)
+        {
+            this.config = config;
+        }
 
         public MessagingFactory Create(string potentialConnectionString)
         {
             var validation = new DeterminesBestConnectionStringForAzureServiceBus();
             var connectionstring = validation.IsPotentialServiceBusConnectionString(potentialConnectionString)
                                      ? potentialConnectionString
-                                     : validation.Determine(Configure.Instance.Settings); // todo: inject
+                                     : validation.Determine(config.Settings); 
 
             MessagingFactory factory;
             if (!MessagingFactories.TryGetValue(connectionstring, out factory))

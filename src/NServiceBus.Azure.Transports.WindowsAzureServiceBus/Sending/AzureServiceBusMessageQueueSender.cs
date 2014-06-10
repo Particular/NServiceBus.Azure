@@ -24,10 +24,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public int MaxDeliveryCount { get; set; }
 
         ICreateMessagingFactories createMessagingFactories;
+        readonly Configure config;
 
-        public AzureServiceBusMessageQueueSender(ICreateMessagingFactories createMessagingFactories)
+        public AzureServiceBusMessageQueueSender(ICreateMessagingFactories createMessagingFactories, Configure config)
         {
             this.createMessagingFactories = createMessagingFactories;
+            this.config = config;
         }
 
         public void Send(TransportMessage message, SendOptions options)
@@ -64,7 +66,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     }
                 }
             }
-            var config = Configure.Instance; // todo: inject
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
                 SendInternal(message, sender, options, expectDelay);
@@ -104,7 +105,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                         if (options.ReplyToAddress != null)
                         {
-                            brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(options.ReplyToAddress);
+                            brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(config.Settings, options.ReplyToAddress);
                         }
 
                         if (options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue)

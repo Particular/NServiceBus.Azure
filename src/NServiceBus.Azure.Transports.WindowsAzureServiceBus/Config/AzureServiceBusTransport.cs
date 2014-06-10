@@ -9,8 +9,12 @@
 
     internal class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
     {
+        private Configure config;
+
         protected override void InternalConfigure(Configure config)
         {
+            this.config = config;
+
             config.Settings.SetDefault("SelectedSerializer", typeof(JsonSerialization));
 
             config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
@@ -48,7 +52,7 @@
             var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
             Address.OverrideDefaultMachine(connectionString);
 
-            new ContainerConfiguration().Configure(configSection, transportConfig);
+            new ContainerConfiguration().Configure(config, configSection, transportConfig);
         }
 
         protected override bool RequiresConnectionString
