@@ -37,14 +37,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             if (sender == null) throw new QueueNotFoundException { Queue = Address.Local };
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
-                Send(message, sender);
+                Send(message, sender, options);
             else
-                Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender)), EnlistmentOptions.None);
+                Transaction.Current.EnlistVolatile(new SendResourceManager(() => Send(message, sender, options)), EnlistmentOptions.None);
 
         }
 
         // todo, factor out... to bad IMessageSender is internal
-        private void Send(TransportMessage message, TopicClient sender)
+        private void Send(TransportMessage message, TopicClient sender, PublishOptions options)
         {
             var numRetries = 0;
             var sent = false;
@@ -53,7 +53,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    SendTo(message, sender);
+                    SendTo(message, sender, options);
                     sent = true;
                 }
                 // todo, outbox
@@ -96,7 +96,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         }
 
         // todo, factor out... to bad IMessageSender is internal
-        private void SendTo(TransportMessage message, TopicClient sender)
+        private void SendTo(TransportMessage message, TopicClient sender, PublishOptions options)
         {
             using (var brokeredMessage = message.Body != null ? new BrokeredMessage(message.Body) : new BrokeredMessage())
             {
@@ -114,6 +114,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 if (message.ReplyToAddress != null)
                 {
                     brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(config.Settings, message.ReplyToAddress);
+                }
+                else if (options.ReplyToAddress != null)
+                {
+                    brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(config.Settings, options.ReplyToAddress);
                 }
 
                 if (message.TimeToBeReceived < TimeSpan.MaxValue)
