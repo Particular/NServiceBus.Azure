@@ -16,10 +16,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 queueName = configSection.QueueName;
 
-                if (configSection.QueuePerInstance)
-                {
-                    config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
-                }
+                //if (configSection.QueuePerInstance)
+                //{
+                //    config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
+                //}
             }
 
             if (queueName.Length >= 283) // 290 - a spot for the "-" & 6 digits for the individualizer

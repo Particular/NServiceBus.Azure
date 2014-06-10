@@ -9,25 +9,27 @@
 
     internal class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
     {
-        private Configure config;
-
         protected override void InternalConfigure(Configure config)
         {
-            this.config = config;
-
             config.Settings.SetDefault("SelectedSerializer", typeof(JsonSerialization));
 
-            config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
+            var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
+            var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;
 
+            if (configSection != null)
+            {
+                config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", !configSection.QueuePerInstance);
+                
+                serverWaitTime = configSection.ServerWaitTime;
+            }
+            else
+            {
+                config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
+            }
+            
             var queuename = AzureServiceBusQueueNamingConvention.Apply(config.Settings.EndpointName());
 
             Address.InitializeLocalAddress(queuename);
-
-            var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;
-
-            var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
-            if (configSection != null)
-                serverWaitTime = configSection.ServerWaitTime;
 
             // make sure the transaction stays open a little longer than the long poll.
             config.Transactions( s => s.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable)));
