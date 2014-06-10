@@ -52,7 +52,7 @@
             var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
             Address.OverrideDefaultMachine(connectionString);
 
-            new ContainerConfiguration().Configure(config, configSection, transportConfig);
+            new ContainerConfiguration().Configure(context, configSection, transportConfig);
         }
 
         protected override bool RequiresConnectionString

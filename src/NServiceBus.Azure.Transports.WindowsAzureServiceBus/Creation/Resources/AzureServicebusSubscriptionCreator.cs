@@ -16,10 +16,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
 
-        public AzureServicebusSubscriptionCreator(Configure config) : this(new CreatesNamespaceManagers(config))
-        {
-        }
-
         public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers)
         {
             this.createNamespaceManagers = createNamespaceManagers;

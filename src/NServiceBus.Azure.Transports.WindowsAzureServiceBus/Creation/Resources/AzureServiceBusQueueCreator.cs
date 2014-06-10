@@ -19,10 +19,6 @@
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
 
-        public AzureServiceBusQueueCreator(Configure config) : this(new CreatesNamespaceManagers(config))
-        {
-        }
-
         public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers)
         {
             this.createNamespaceManagers = createNamespaceManagers;

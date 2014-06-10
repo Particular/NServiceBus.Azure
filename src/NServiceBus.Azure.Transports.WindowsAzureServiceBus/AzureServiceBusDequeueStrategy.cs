@@ -11,6 +11,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Threading.Tasks;
     using CircuitBreakers;
     using NServiceBus.Transports;
+    using ObjectBuilder;
     using ObjectBuilder.Common;
     using Unicast.Transport;
 
@@ -19,7 +20,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusDequeueStrategy : IDequeueMessages
     {
-        readonly IContainer container;
+        readonly IBuilder container;
         private Address address;
         private TransactionSettings settings;
         private Func<TransportMessage, bool> tryProcessMessage;
@@ -36,7 +37,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         private static int maximumConcurrencyLevel;
 
-        public AzureServiceBusDequeueStrategy(IContainer container)
+        public AzureServiceBusDequeueStrategy(IBuilder container)
         {
             this.container = container;
         }
@@ -44,7 +45,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        public Func<IContainer, INotifyReceivedMessages> CreateNotifier = container =>
+        public Func<IBuilder, INotifyReceivedMessages> CreateNotifier = container =>
             {
                 var notifier = (AzureServiceBusQueueNotifier)container.Build(typeof(AzureServiceBusQueueNotifier));
                 notifier.BatchSize = maximumConcurrencyLevel;
