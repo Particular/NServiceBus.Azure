@@ -11,7 +11,7 @@
     {
         protected override void InternalConfigure(Configure config)
         {
-            config.Settings.SetDefault("SelectedSerializer", typeof(JsonSerialization));
+            config.Settings.SetDefault("SelectedSerializer", typeof(Json));
 
             var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
             var serverWaitTime = AzureServicebusDefaults.DefaultServerWaitTime;

@@ -21,7 +21,7 @@
             config.Settings.EnableFeatureByDefault<StorageDrivenPublishing>();
             config.Settings.EnableFeatureByDefault<TimeoutManager>();
 
-            config.Settings.SetDefault("SelectedSerializer", typeof(JsonSerialization));
+            config.Settings.SetDefault("SelectedSerializer", typeof(Json));
 
             config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
 
