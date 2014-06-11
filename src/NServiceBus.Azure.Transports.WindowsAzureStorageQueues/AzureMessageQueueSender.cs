@@ -44,9 +44,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             if (!sendQueue.Exists())
                 throw new QueueNotFoundException { Queue = address };
 
-            var timeToBeReceived = message.TimeToBeReceived < TimeSpan.MaxValue ? message.TimeToBeReceived : (TimeSpan?)null;
+            var timeToBeReceived = options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue ? options.TimeToBeReceived : null;
 
-            var rawMessage = SerializeMessage(message);
+            var rawMessage = SerializeMessage(message, options);
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
@@ -91,21 +91,21 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             return sendClient;
         }
 
-        private CloudQueueMessage SerializeMessage(TransportMessage message)
+        private CloudQueueMessage SerializeMessage(TransportMessage message, SendOptions options)
         {
             using (var stream = new MemoryStream())
             {
                 var validation = new DeterminesBestConnectionStringForStorageQueues();
-                var replyToAddress = validation.Determine(config.Settings,  message.ReplyToAddress ?? Address.Local );
+                var replyToAddress = validation.Determine(config.Settings, message.ReplyToAddress ?? options.ReplyToAddress ?? Address.Local);
 
                 var toSend = new MessageWrapper
                     {
                         Id = message.Id,
                         Body = message.Body,
-                        CorrelationId = message.CorrelationId,
+                        CorrelationId = options.CorrelationId,
                         Recoverable = message.Recoverable,
                         ReplyToAddress = replyToAddress,
-                        TimeToBeReceived = message.TimeToBeReceived,
+                        TimeToBeReceived = options.TimeToBeReceived.HasValue ? options.TimeToBeReceived.Value : default(TimeSpan),
                         Headers = message.Headers,
                         MessageIntent = message.MessageIntent
                     };
