@@ -111,7 +111,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     };
 
 
-                MessageSerializer.Serialize(new IMessage[] { toSend }, stream);
+                MessageSerializer.Serialize(toSend, stream);
                 return new CloudQueueMessage(stream.ToArray());
             }
         }
