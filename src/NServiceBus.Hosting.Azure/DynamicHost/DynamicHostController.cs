@@ -54,8 +54,7 @@ namespace NServiceBus.Hosting.Azure
                 {
                     o.EndpointName(endpointNameToUse);
                     o.AssembliesToScan(GetType().Assembly);
-                })
-                .DefaultBuilder();
+                });
             }
 
             config.AzureConfigurationSource();

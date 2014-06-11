@@ -142,8 +142,7 @@ namespace NServiceBus.Hosting.Azure
                 {
                     o.EndpointName(endpointNameToUse);
                     o.AssembliesToScan(assembliesToScan);
-                })
-                .DefaultBuilder();
+                });
             }
 
             ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(config);
