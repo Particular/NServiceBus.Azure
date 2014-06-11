@@ -12,7 +12,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using CircuitBreakers;
     using NServiceBus.Transports;
     using ObjectBuilder;
-    using ObjectBuilder.Common;
     using Unicast.Transport;
 
     /// <summary>
@@ -128,8 +127,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                      continue;
                  }
 
-                timeToDelayNextPeek = 0;
-                Exception exception = null;
+                 timeToDelayNextPeek = 0;
+                 Exception exception = null;
+
+                // due to clock drift we may receive messages that aren't due yet according to our clock, let's put this back
+                if (brokeredMessage.ScheduledEnqueueTimeUtc > DateTime.UtcNow) 
+                {
+                    pendingMessages.Enqueue(brokeredMessage);
+                    continue;
+                }
+
 
                 if (!RenewLockIfNeeded(brokeredMessage)) continue;
 
