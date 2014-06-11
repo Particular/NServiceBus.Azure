@@ -30,9 +30,7 @@
         {
             public MyEndpoint()
             {
-                EndpointSetup<DefaultServer>()
-                    .AllowExceptions()
-                    ;
+                EndpointSetup<DefaultServer>();
             }
 
             public class SettingLockDurationLargerThanTestTimeout : IProvideConfiguration<AzureServiceBusQueueConfig>
