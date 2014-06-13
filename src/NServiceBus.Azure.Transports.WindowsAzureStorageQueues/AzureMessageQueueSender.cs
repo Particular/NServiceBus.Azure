@@ -102,7 +102,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     {
                         Id = message.Id,
                         Body = message.Body,
-                        CorrelationId = options.CorrelationId,
+                        CorrelationId = message.CorrelationId ?? options.CorrelationId,
                         Recoverable = message.Recoverable,
                         ReplyToAddress = replyToAddress,
                         TimeToBeReceived = options.TimeToBeReceived.HasValue ? options.TimeToBeReceived.Value : default(TimeSpan),
