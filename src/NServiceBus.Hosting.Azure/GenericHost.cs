@@ -11,6 +11,7 @@ namespace NServiceBus.Hosting.Azure
     using Hosting.Roles;
     using Integration.Azure;
     using Logging;
+    using NServiceBus.Azure;
 
     /// <summary>
     ///     A generic host that can be used to provide hosting services in different environments
@@ -142,6 +143,14 @@ namespace NServiceBus.Hosting.Azure
                 {
                     o.EndpointName(endpointNameToUse);
                     o.AssembliesToScan(assembliesToScan);
+
+                    if (SafeRoleEnvironment.IsAvailable)
+                    {
+                        if (!IsHostedIn.ChildHostProcess())
+                        {
+                           o.AzureConfigurationSource();
+                        }
+                    }
                 });
             }
 
