@@ -54,10 +54,10 @@ namespace NServiceBus.Hosting.Azure
                 {
                     o.EndpointName(endpointNameToUse);
                     o.AssembliesToScan(GetType().Assembly);
+                    o.AzureConfigurationSource();
                 });
             }
 
-            config.AzureConfigurationSource();
             config.Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
             config.Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);
             config.Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
