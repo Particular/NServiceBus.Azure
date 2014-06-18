@@ -124,7 +124,7 @@ namespace NServiceBus.Hosting.Azure
             {
                 try
                 {
-                    initialization.Init();
+                    config = initialization.Init();
                 }
                 catch (NullReferenceException ex)
                 {
