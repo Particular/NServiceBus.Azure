@@ -83,19 +83,9 @@ namespace NServiceBus.Config
                 setting = (string)roleEnvironmentType.GetMethod("GetConfigurationSettingValue").Invoke(null, new object[] { name });
                 result = !string.IsNullOrEmpty(setting);
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    if (inner.GetType().Name.Contains("RoleEnvironmentException"))
-                        return result;
-
-                    inner = inner.InnerException;
-                }
-
-                throw;
+                isAvailable = false;
             }
 
             return result;
@@ -128,19 +118,9 @@ namespace NServiceBus.Config
                 path = GetRootPath(name);
                 result = path != null;
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    if (inner.GetType().Name.Contains("RoleEnvironmentException"))
-                        return result;
-
-                    inner = inner.InnerException;
-                }
-
-                throw;
+                isAvailable = false;
             }
 
             return result;
@@ -179,14 +159,9 @@ namespace NServiceBus.Config
             {
                 return (bool)roleEnvironmentType.GetProperty("IsAvailable").GetValue(null, null);
             }
-            catch (TypeInitializationException ex)
+            catch 
             {
-                var e = ex.InnerException;
-                if (e is FileNotFoundException && e.Message.Contains("msshrtmi"))
-                {
-                    return false;
-                }
-                throw;
+                return false;
             }
         }
 
