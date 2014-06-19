@@ -38,6 +38,7 @@ namespace NServiceBus.Hosting.Azure
             }
 
             endpointNameToUse = endpointName;
+            endpointVersionToUse = FileVersionRetriever.GetFileVersion(specifier.GetType());
 
             if (scannableAssembliesFullName == null || !scannableAssembliesFullName.Any())
             {
@@ -119,57 +120,21 @@ namespace NServiceBus.Hosting.Azure
                 loggingConfigurer.Configure(specifier);
             }
 
-            var initialization = specifier as IWantCustomInitialization;
-            if (initialization != null)
-            {
-                try
-                {
-                    config = initialization.Init();
-                }
-                catch (NullReferenceException ex)
-                {
-                    throw new NullReferenceException(
-                        "NServiceBus has detected a null reference in your initialization code." +
-                        " This could be due to trying to use NServiceBus.Configure before it was ready." +
-                        " One possible solution is to inherit from IWantCustomInitialization in a different class" +
-                        " than the one that inherits from IConfigureThisEndpoint, and put your code there.",
-                        ex);
-                }
-            }
+             config = Configure.With(o =>{
+                o.EndpointName(endpointNameToUse);
+                o.EndpointVersion(() => endpointVersionToUse);
+                o.AssembliesToScan(assembliesToScan);
 
-            if (config == null)
-            {
-                config = Configure.With(o =>
+                if (SafeRoleEnvironment.IsAvailable)
                 {
-                    o.EndpointName(endpointNameToUse);
-                    o.AssembliesToScan(assembliesToScan);
-
-                    if (SafeRoleEnvironment.IsAvailable)
+                    if (!IsHostedIn.ChildHostProcess())
                     {
-                        if (!IsHostedIn.ChildHostProcess())
-                        {
-                           o.AzureConfigurationSource();
-                        }
+                        o.AzureConfigurationSource();
                     }
-                });
-            }
-
-            ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(config);
+                }
+            });
 
             roleManager.ConfigureBusForEndpoint(specifier, config);
-        }
-
-        void ValidateThatIWantCustomInitIsOnlyUsedOnTheEndpointConfig(Configure config)
-        {
-            var problems = config.TypesToScan.Where(t => typeof(IWantCustomInitialization).IsAssignableFrom(t) && !t.IsInterface && !typeof(IConfigureThisEndpoint).IsAssignableFrom(t)).ToList();
-
-            if (!problems.Any())
-            {
-                return;
-            }
-
-            throw new Exception("IWantCustomInitialization is only valid on the same class as ICOnfigureThisEndpoint. Please use INeedInitialization instead. Found types: " + string.Join(",", problems.Select(t => t.FullName)));
-
         }
 
         private string[] AddProfilesFromConfiguration(IEnumerable<string> args)
@@ -196,5 +161,6 @@ namespace NServiceBus.Hosting.Azure
         Configure config;
 
         string endpointNameToUse;
+        string endpointVersionToUse;
     }
 }

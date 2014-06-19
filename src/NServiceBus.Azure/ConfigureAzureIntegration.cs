@@ -4,7 +4,7 @@ namespace NServiceBus
 {
     public static class ConfigureAzureIntegration
     {
-        public static void AzureConfigurationSource(this Configure.ConfigurationBuilder config, string configurationPrefix = null)
+        public static void AzureConfigurationSource(this ConfigurationBuilder config, string configurationPrefix = null)
         {
             var azureConfigSource = new AzureConfigurationSource(new AzureConfigurationSettings())
             {

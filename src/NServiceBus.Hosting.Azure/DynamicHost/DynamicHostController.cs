@@ -31,32 +31,13 @@ namespace NServiceBus.Hosting.Azure
 
         public void Start()
         {
-            Configure config = null;
-
-            if (specifier is IWantCustomInitialization)
-            {
-                try
-                {
-                   config = (specifier as IWantCustomInitialization).Init();
-                }
-                catch (NullReferenceException ex)
-                {
-                    throw new NullReferenceException("NServiceBus has detected a null reference in your initalization code." +
-                        " This could be due to trying to use NServiceBus.Configure before it was ready." +
-                        " One possible solution is to inherit from IWantCustomInitialization in a different class" +
-                        " than the one that inherits from IConfigureThisEndpoint, and put your code there.", ex);
-                }
-            }
-
-            if (config == null)
-            {
-                config = Configure.With(o =>
+            var config = Configure.With(o =>
                 {
                     o.EndpointName(endpointNameToUse);
                     o.AssembliesToScan(GetType().Assembly);
                     o.AzureConfigurationSource();
                 });
-            }
+            
 
             config.Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
             config.Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);

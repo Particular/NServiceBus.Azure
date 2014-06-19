@@ -90,6 +90,7 @@
     <Compile Include="DynamicHost\EndpointsEventArgs.cs" />
     <Compile Include="DynamicHost\EndpointToHost.cs" />
     <Compile Include="DynamicHost\UnableToKillProcessException.cs" />
+    <Compile Include="FileVersionRetriever.cs" />
     <Compile Include="GenericHost.cs" />
     <Compile Include="IHost.cs" />
     <Compile Include="LoggingHandlers\DevelopmentLoggingHandler.cs" />
