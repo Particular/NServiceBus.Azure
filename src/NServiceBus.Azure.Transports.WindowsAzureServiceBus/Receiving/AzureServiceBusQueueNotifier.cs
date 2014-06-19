@@ -84,7 +84,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
-            catch (MessagingCommunicationException)
+            catch (MessagingException)
             {
                 if (cancelRequested) return;
 
