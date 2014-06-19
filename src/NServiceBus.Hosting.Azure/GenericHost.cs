@@ -132,7 +132,11 @@ namespace NServiceBus.Hosting.Azure
                         o.AzureConfigurationSource();
                     }
                 }
-            });
+                
+                 specifier.Customize(o);
+              });
+
+            
 
             roleManager.ConfigureBusForEndpoint(specifier, config);
         }

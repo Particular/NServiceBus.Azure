@@ -36,6 +36,8 @@ namespace NServiceBus.Hosting.Azure
                     o.EndpointName(endpointNameToUse);
                     o.AssembliesToScan(GetType().Assembly);
                     o.AzureConfigurationSource();
+
+                    specifier.Customize(o);
                 });
             
 
