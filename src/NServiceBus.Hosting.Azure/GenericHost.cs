@@ -22,22 +22,16 @@ namespace NServiceBus.Hosting.Azure
         ///     Accepts the type which will specify the users custom configuration.
         ///     This type should implement <see cref="IConfigureThisEndpoint" />.
         /// </summary>
-        /// <param name="endpointName"></param>
         /// <param name="scannableAssembliesFullName">Assemblies full name that were scanned.</param>
         /// <param name="specifier"></param>
         /// <param name="args"></param>
         /// <param name="defaultProfiles"></param>
         public GenericHost(IConfigureThisEndpoint specifier, string[] args, List<Type> defaultProfiles,
-            string endpointName, IEnumerable<string> scannableAssembliesFullName = null)
+            IEnumerable<string> scannableAssembliesFullName = null)
         {
             this.specifier = specifier;
 
-            if (String.IsNullOrEmpty(endpointName))
-            {
-                endpointName = specifier.GetType().Namespace ?? specifier.GetType().Assembly.GetName().Name;
-            }
-
-            endpointNameToUse = endpointName;
+            endpointNameToUse = specifier.GetType().Namespace ?? specifier.GetType().Assembly.GetName().Name;
             endpointVersionToUse = FileVersionRetriever.GetFileVersion(specifier.GetType());
 
             if (scannableAssembliesFullName == null || !scannableAssembliesFullName.Any())

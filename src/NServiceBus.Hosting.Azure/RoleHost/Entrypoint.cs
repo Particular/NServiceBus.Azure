@@ -28,19 +28,14 @@ namespace NServiceBus.Hosting.Azure
 
             var specifier = (IConfigureThisEndpoint)Activator.CreateInstance(endpointConfigurationType);
 
-            var endpointName = SafeRoleEnvironment.IsAvailable
-                ? SafeRoleEnvironment.CurrentRoleName
-                : GetType().Name;
-
             if (specifier is AsA_Host)
             {
-                host = new DynamicHostController(specifier, requestedProfiles, new List<Type> { typeof(Development) },
-                    endpointName);
+                host = new DynamicHostController(specifier, requestedProfiles, new List<Type> { typeof(Development) });
             }
             else
             {
                 host = new GenericHost(specifier, requestedProfiles,
-                    new List<Type> { typeof(Development) }, endpointName);
+                    new List<Type> { typeof(Development) });
             }
 
         }

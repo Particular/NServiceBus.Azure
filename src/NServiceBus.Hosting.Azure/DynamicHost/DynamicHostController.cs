@@ -16,14 +16,10 @@ namespace NServiceBus.Hosting.Azure
         private DynamicHostMonitor monitor;
         private List<EndpointToHost> runningServices;
 
-        private string endpointNameToUse;
-
-        public DynamicHostController(IConfigureThisEndpoint specifier, string[] requestedProfiles, List<Type> defaultProfiles, string endpointName)
+        public DynamicHostController(IConfigureThisEndpoint specifier, string[] requestedProfiles, List<Type> defaultProfiles)
         {
             this.specifier = specifier;
             
-            endpointNameToUse = endpointName;
-
             var assembliesToScan = new List<Assembly> {GetType().Assembly};
 
             profileManager = new ProfileManager(assembliesToScan, requestedProfiles, defaultProfiles);
@@ -33,7 +29,6 @@ namespace NServiceBus.Hosting.Azure
         {
             var config = Configure.With(o =>
                 {
-                    o.EndpointName(endpointNameToUse);
                     o.AssembliesToScan(GetType().Assembly);
                     o.AzureConfigurationSource();
 
