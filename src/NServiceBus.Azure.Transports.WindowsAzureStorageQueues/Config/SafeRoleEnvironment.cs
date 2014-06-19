@@ -20,18 +20,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             {
                 TryLoadRoleEnvironment();
             }
-            catch (Exception ex)
+            catch 
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(ex.StackTrace);
-
-                    inner = inner.InnerException;
-                }
-                throw;
+                isAvailable = false;
             }
             
         }
