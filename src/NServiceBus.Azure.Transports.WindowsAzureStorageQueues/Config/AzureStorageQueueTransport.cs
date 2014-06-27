@@ -12,11 +12,9 @@
     {
         protected override void InternalConfigure(Configure config)
         {
-            config.Features(f =>
-            {
-                f.Enable<AzureStorageQueueTransport>();
-                f.Enable<TimeoutManagerBasedDeferral>();
-            });
+            config.EnableFeature<AzureStorageQueueTransport>();
+            config.EnableFeature<TimeoutManagerBasedDeferral>();
+                
             config.Settings.EnableFeatureByDefault<MessageDrivenSubscriptions>();
             config.Settings.EnableFeatureByDefault<StorageDrivenPublishing>();
             config.Settings.EnableFeatureByDefault<TimeoutManager>();

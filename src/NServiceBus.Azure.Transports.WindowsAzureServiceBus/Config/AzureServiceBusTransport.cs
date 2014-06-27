@@ -33,9 +33,9 @@
 
             // make sure the transaction stays open a little longer than the long poll.
             config.Transactions( s => s.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable)));
-            
-            config.Features( f => f.Enable<AzureServiceBusTransport>());
-            
+
+            config.EnableFeature<AzureServiceBusTransport>();
+
         }
 
         protected override void Setup(FeatureConfigurationContext context)

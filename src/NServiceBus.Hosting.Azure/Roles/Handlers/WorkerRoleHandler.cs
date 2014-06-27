@@ -1,5 +1,4 @@
 using NServiceBus.Hosting.Roles;
-using NServiceBus.Unicast.Config;
 
 namespace NServiceBus.Hosting.Azure.Roles.Handlers
 {
@@ -11,7 +10,7 @@ namespace NServiceBus.Hosting.Azure.Roles.Handlers
         public void ConfigureRole(IConfigureThisEndpoint specifier, Configure config)
         {
             config.Transactions(t => t.Enable());
-            config.Features(f => f.Enable<Features.Sagas>());
+            config.EnableFeature<Features.Sagas>();
         }
     }
 }
