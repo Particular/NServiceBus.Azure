@@ -92,8 +92,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>() ?? new AzureServiceBusQueueConfig();
             var transportConfig = context.Settings.GetConfigSection<TransportConfig>() ?? new TransportConfig();
 
-            config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", !configSection.QueuePerInstance);
-           
             var queuename = QueueNamingConvention(null, config.Settings.EndpointName());
             Address.InitializeLocalAddress(queuename);
 

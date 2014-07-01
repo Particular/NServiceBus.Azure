@@ -4,9 +4,16 @@
 
     public class DefaultTopology : Feature
     {
+        public DefaultTopology()
+        {
+            EnableByDefault();
+        }
+
         protected override void Setup(FeatureConfigurationContext context)
         {
-            context.Container.ConfigureComponent<QueueAndTopicByEndpointTopology>(DependencyLifecycle.SingleInstance);
+            var topology = new QueueAndTopicByEndpointTopology(Configure.Instance);
+            topology.Configure(context);
+            context.Container.RegisterSingleton<ITopology>(topology);
         }
     }
 }

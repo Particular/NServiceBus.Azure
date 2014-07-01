@@ -15,8 +15,17 @@
 
             var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
             var serverWaitTime = configSection != null ?  configSection.ServerWaitTime : AzureServicebusDefaults.DefaultServerWaitTime;
-            
-            // make sure the transaction stays open a little longer than the long poll.
+
+           if (configSection != null)
+           {
+               config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", !configSection.QueuePerInstance);
+           }
+           else
+           {
+               config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true);
+           }
+
+           // make sure the transaction stays open a little longer than the long poll.
             config.Transactions( s => s.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable)));
 
             config.EnableFeature<AzureServiceBusTransport>();
