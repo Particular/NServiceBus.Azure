@@ -13,6 +13,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     public class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
     {
         readonly Configure config;
+        readonly ITopology topology;
 
         /// <summary>
         /// 
@@ -22,9 +23,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public IMessageMapper MessageMapper { get; set; }
         public StaticMessageRouter MessageRouter { get; set; }
 
-        public AzureServiceBusTopicSubscriptionManager(Configure config)
+        public AzureServiceBusTopicSubscriptionManager(Configure config, ITopology topology)
         {
             this.config = config;
+            this.topology = topology;
         }
 
         /// <summary>
@@ -50,7 +52,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void SubscribeInternal(Type eventType, Address original)
         {
-            var publisherAddress = AzureServiceBusPublisherAddressConventionForSubscriptions.Apply(original);
+            var publisherAddress = topology.PublisherAddressConventionForSubscriptions(original);
            
             // resolving manually as the bus also gets the subscription manager injected
             // but this is the only way to get to the correct dequeue strategy
@@ -96,8 +98,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void UnSubscribeInternal(Type eventType, Address original)
         {
-            var publisherAddress = AzureServiceBusPublisherAddressConvention.Apply(original);
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType, config.Settings.EndpointName());
+            var publisherAddress = topology.PublisherAddressConvention(original);
+            var subscriptionname = topology.SubscriptionNamingConvention(eventType, config.Settings.EndpointName());
 
             SubscriptionCreator.Delete(publisherAddress, subscriptionname);
 

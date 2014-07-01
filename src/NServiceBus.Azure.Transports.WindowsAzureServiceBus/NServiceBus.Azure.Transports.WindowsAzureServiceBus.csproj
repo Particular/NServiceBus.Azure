@@ -80,8 +80,10 @@
     <Compile Include="Creation\QueueAutoCreation.cs" />
     <Compile Include="Creation\Resources\ICreateSubscriptions.cs" />
     <Compile Include="Creation\Resources\SubscriptionAlreadyInUseException.cs" />
-    <Compile Include="NamingConventions\AzureServiceBusQueueAddressConvention.cs" />
     <Compile Include="Sending\MessageTooLargeException.cs" />
+    <Compile Include="Topology\DefaultTopology.cs" />
+    <Compile Include="Topology\ITopology.cs" />
+    <Compile Include="Topology\QueueAndTopicByEndpointTopology.cs" />
     <Compile Include="Utils\DeterministicGuidBuilder.cs" />
     <Compile Include="Utils\IsHostedIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -110,11 +112,6 @@
     <Compile Include="Creation\Clients\AzureServicebusQueueClientCreator.cs" />
     <Compile Include="Creation\Resources\ServicebusSubscriptionFilterBuilder.cs" />
     <Compile Include="Receiving\INotifyReceivedMessages.cs" />
-    <Compile Include="NamingConventions\AzureServiceBusPublisherAddressConvention.cs" />
-    <Compile Include="NamingConventions\AzureServiceBusPublisherAddressConventionForSubscriptions.cs" />
-    <Compile Include="NamingConventions\AzureServiceBusQueueNamingConvention.cs" />
-    <Compile Include="NamingConventions\AzureServiceBusSubscriptionNamingConvention.cs" />
-    <Compile Include="NamingConventions\AzureServiceBusTopicNameConvention.cs" />
     <Compile Include="Receiving\ReceiveResourceManager.cs" />
     <Compile Include="Sending\SendResourceManager.cs" />
   </ItemGroup>
@@ -123,7 +120,9 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="NamingConventions\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)..\BuildSupport\RippleRestoreTask.targets" />
   <Import Project="$(SolutionDir)..\BuildSupport\GitVersionTask\Build\GitVersionTask.targets" />

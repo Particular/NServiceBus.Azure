@@ -11,21 +11,23 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         readonly ICreateSubscriptions subscriptionCreator;
         readonly ICreateMessagingFactories createMessagingFactories;
         readonly Configure config;
+        readonly ITopology topology;
 
         public int MaxRetries { get; set; }
         public bool ShouldAutoCreate { get; set; }
 
-        public AzureServicebusSubscriptionClientCreator(ICreateSubscriptions subscriptionCreator, ICreateMessagingFactories createMessagingFactories, Configure config)
+        public AzureServicebusSubscriptionClientCreator(ICreateSubscriptions subscriptionCreator, ICreateMessagingFactories createMessagingFactories, Configure config, ITopology topology)
         {
             this.subscriptionCreator = subscriptionCreator;
             this.createMessagingFactories = createMessagingFactories;
             this.config = config;
+            this.topology = topology;
         }
 
 
         public SubscriptionClient Create(Address address, Type eventType)
         {
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType, config.Settings.EndpointName());
+            var subscriptionname = topology.SubscriptionNamingConvention(eventType, config.Settings.EndpointName());
 
             try
             {
@@ -37,7 +39,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 // so let's differenatiate including this namespace, odds are very likely that we will get a guid instead
                 // that's why we're not defaulting to this convention.
 
-                subscriptionname = AzureServiceBusSubscriptionNamingConvention.ApplyFullNameConvention(eventType, config.Settings.EndpointName());
+                subscriptionname = topology.SubscriptionNamingConvention(eventType, config.Settings.EndpointName());
 
                 return Create(eventType, address, subscriptionname);
             }

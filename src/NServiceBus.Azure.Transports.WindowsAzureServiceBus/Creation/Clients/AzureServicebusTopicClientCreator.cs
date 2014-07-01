@@ -1,6 +1,5 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using System;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Transports;
 
@@ -8,18 +7,20 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     {
         readonly ICreateMessagingFactories createMessagingFactories;
         readonly ICreateTopics topicCreator;
+        readonly ITopology topology;
 
         public bool ShouldAutoCreate { get; set; }
 
-        public AzureServicebusTopicClientCreator(ICreateMessagingFactories createMessagingFactories, ICreateTopics topicCreator)
+        public AzureServicebusTopicClientCreator(ICreateMessagingFactories createMessagingFactories, ICreateTopics topicCreator, ITopology topology)
         {
             this.createMessagingFactories = createMessagingFactories;
             this.topicCreator = topicCreator;
+            this.topology = topology;
         }
 
         public TopicClient Create(Address address)
         {
-            address = AzureServiceBusPublisherAddressConvention.Apply(address);
+            address = topology.PublisherAddressConvention(address);
 
             if (ShouldAutoCreate) // todo move to property
             {
