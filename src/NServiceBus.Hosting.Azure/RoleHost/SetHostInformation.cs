@@ -24,7 +24,7 @@ namespace NServiceBus.Hosting.Azure
                 var hostId = DeterministicGuid(instance, host);
 
 #pragma warning disable 618
-                var hostInfo = new HostInformation(hostId, host, instance);
+                var hostInfo = new HostInformation(hostId, host);
 #pragma warning restore 618
 
                 unicastBus.HostInformation = hostInfo;
