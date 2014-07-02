@@ -1,6 +1,8 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using Config;
     using Features;
+    using QueueAndTopicByEndpoint;
 
     public class DefaultTopology : Feature
     {
@@ -11,9 +13,21 @@
 
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var topology = new QueueAndTopicByEndpointTopology(Configure.Instance);
-            topology.Configure(context);
-            context.Container.RegisterSingleton<ITopology>(topology);
+            var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>() ?? new AzureServiceBusQueueConfig();
+            var transportConfig = context.Settings.GetConfigSection<TransportConfig>() ?? new TransportConfig();
+
+            new ContainerConfiguration().Configure(context, configSection, transportConfig);
+
+            context.Container.ConfigureComponent(b =>
+            {
+                var config = b.Build<Configure>();
+                var subscriptionCreator = b.Build<AzureServicebusSubscriptionCreator>();
+                var topology = new QueueAndTopicByEndpointTopology(config, subscriptionCreator);
+                topology.Initialize(context.Settings);
+                return topology;
+
+            }, DependencyLifecycle.SingleInstance);
+
         }
     }
 }

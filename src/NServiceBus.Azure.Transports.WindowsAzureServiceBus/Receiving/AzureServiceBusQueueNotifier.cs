@@ -7,7 +7,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusQueueNotifier : INotifyReceivedMessages
+    public class AzureServiceBusQueueNotifier : INotifyReceivedBrokeredMessages
     {
         private QueueClient _queueClient;
         private Action<BrokeredMessage> _tryProcessMessage;
@@ -31,7 +31,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         public int BackoffTimeInSeconds { get; set; }
 
-        public Address Address { get; private set; }
+        public Type MessageType { get; set; }
+        public Address Address { get; set; }
 
         /// <summary>
         /// 

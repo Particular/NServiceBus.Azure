@@ -6,12 +6,10 @@ using Microsoft.ServiceBus.Messaging;
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System.Collections;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using CircuitBreakers;
     using NServiceBus.Transports;
-    using ObjectBuilder;
     using Unicast.Transport;
 
     /// <summary>
@@ -19,38 +17,26 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusDequeueStrategy : IDequeueMessages
     {
-        readonly IBuilder container;
+        readonly ITopology topology;
         private Address address;
         private TransactionSettings settings;
         private Func<TransportMessage, bool> tryProcessMessage;
         private Action<TransportMessage, Exception> endProcessMessage;
         private TransactionOptions transactionOptions;
         private readonly Queue pendingMessages = Queue.Synchronized(new Queue());
-        private readonly IList<INotifyReceivedMessages> notifiers = new List<INotifyReceivedMessages>();
+        private readonly IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
         private CancellationTokenSource tokenSource;
         readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => ConfigureCriticalErrorAction.RaiseCriticalError(string.Format("Failed to receive message from Azure ServiceBus."), ex));
         
         private const int PeekInterval = 50;
         private const int MaximumWaitTimeWhenIdle = 1000;
         private int timeToDelayNextPeek;
+        private int maximumConcurrencyLevel;
 
-        private static int maximumConcurrencyLevel;
-
-        public AzureServiceBusDequeueStrategy(IBuilder container)
+        public AzureServiceBusDequeueStrategy(ITopology topology)
         {
-            this.container = container;
+            this.topology = topology;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public Func<IBuilder, INotifyReceivedMessages> CreateNotifier = container =>
-            {
-                var notifier = (AzureServiceBusQueueNotifier)container.Build(typeof(AzureServiceBusQueueNotifier));
-                notifier.BatchSize = maximumConcurrencyLevel;
-                return notifier;
-            };
-
         
         /// <summary>
         /// Initializes the <see cref="IDequeueMessages"/>.
@@ -75,7 +61,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="maximumConcurrencyLevel">Indicates the maximum concurrency level this <see cref="IDequeueMessages"/> is able to support.</param>
         public virtual void Start(int maximumConcurrencyLevel)
         {
-            AzureServiceBusDequeueStrategy.maximumConcurrencyLevel = maximumConcurrencyLevel;
+            this.maximumConcurrencyLevel = maximumConcurrencyLevel;
 
             CreateAndStartNotifier();
             
@@ -223,7 +209,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         public virtual void Stop()
         {
-            foreach (var notifier in notifiers)
+            foreach (var notifier in notifiers.Values)
             {
                 notifier.Stop();
             }
@@ -235,14 +221,33 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void CreateAndStartNotifier()
         {
-            var notifier = CreateNotifier(container);
-            TrackNotifier(address, notifier);
+            var notifier = topology.GetReceiver();
+
+            TrackNotifier(null, address, notifier);
         }
 
-        public void TrackNotifier(Address address, INotifyReceivedMessages notifier)
+        public void TrackNotifier(Type eventType, Address original, INotifyReceivedBrokeredMessages notifier)
         {
+            var key = CreateKeyFor(eventType, original);
+
             notifier.Start(address, EnqueueMessage);
-            notifiers.Add(notifier);
+            notifiers.Add(key, notifier);
+        }
+
+        public void RemoveNotifier(Type eventType, Address original)
+        {
+            var key = CreateKeyFor(eventType, original);
+            if (!notifiers.ContainsKey(key)) return;
+
+            var toRemove = notifiers[key];
+            toRemove.Stop();
+            notifiers.Remove(key);
+        }
+
+        public INotifyReceivedBrokeredMessages GetNotifier(Type eventType, Address original)
+        {
+            var key = CreateKeyFor(eventType, original);
+            return !notifiers.ContainsKey(key) ? null : notifiers[key];
         }
 
         void EnqueueMessage(BrokeredMessage brokeredMessage)
@@ -263,17 +268,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             pendingMessages.Enqueue(brokeredMessage);
         }
 
-        public void RemoveNotifier(Address publisherAddress)
+       
+
+        string CreateKeyFor(Type eventType, Address original)
         {
-            var toRemove = notifiers.Cast<AzureServiceBusQueueNotifier>()
-                                    .FirstOrDefault(notifier => notifier.Address == publisherAddress);
-
-            if (toRemove == null) return;
-
-            toRemove.Stop();
-            notifiers.Remove(toRemove);
+            var key = original.ToString();
+            if (eventType != null)
+            {
+                key += eventType.FullName;
+            }
+            return key;
         }
-
     }
 
 

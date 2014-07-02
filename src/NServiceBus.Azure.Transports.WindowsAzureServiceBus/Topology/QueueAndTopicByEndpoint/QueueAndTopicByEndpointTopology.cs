@@ -1,16 +1,25 @@
-namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
+namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint
 {
     using System;
     using Config;
-    using Features;
+    using Settings;
 
-    public class QueueAndTopicByEndpointTopology : ITopology
+    /// <summary>
+    /// Sends occur through queues, one for each endpoint, 
+    /// publishes through a topic per endpoint, 
+    /// receives on both it's own queue &amp; subscriptions per datatype
+    /// </summary>
+
+    internal class QueueAndTopicByEndpointTopology : ITopology
     {
-        readonly Configure config;
 
-        public QueueAndTopicByEndpointTopology(Configure config)
+        readonly Configure config;
+        readonly ICreateSubscriptions subscriptionCreator;
+
+        internal QueueAndTopicByEndpointTopology(Configure config, ICreateSubscriptions subscriptionCreator)
         {
             this.config = config;
+            this.subscriptionCreator = subscriptionCreator;
         }
 
         public Func<Type, string, string> QueueNamingConvention {
@@ -87,17 +96,50 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
         }
 
-        public void Configure(FeatureConfigurationContext context)
+        public void Initialize(ReadOnlySettings settings)
         {
-            var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>() ?? new AzureServiceBusQueueConfig();
-            var transportConfig = context.Settings.GetConfigSection<TransportConfig>() ?? new TransportConfig();
-
-            var queuename = QueueNamingConvention(null, config.Settings.EndpointName());
+            var queuename = QueueNamingConvention(null, settings.EndpointName());
             Address.InitializeLocalAddress(queuename);
-
-            new ContainerConfiguration().Configure(context, configSection, transportConfig);
         }
 
-        
+        public void Create()
+        {
+            throw new NotImplementedException();
+        }
+
+        public INotifyReceivedBrokeredMessages Subscribe(Type eventType, Address address)
+        {
+            var publisherAddress = PublisherAddressConventionForSubscriptions(address);
+            var notifier = config.Builder.Build<AzureServiceBusSubscriptionNotifier>();
+            //todo: notifier.BatchSize = maximumConcurrencyLevel;
+            notifier.MessageType = eventType;
+            notifier.Address = publisherAddress;
+            return notifier;
+        }
+
+        public void Unsubscribe(INotifyReceivedBrokeredMessages notifier)
+        {
+            var subscriptionname = SubscriptionNamingConvention(notifier.MessageType, config.Settings.EndpointName());
+
+            subscriptionCreator.Delete(notifier.Address, subscriptionname);
+        }
+
+        public INotifyReceivedBrokeredMessages GetReceiver()
+        {
+            var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
+            //todo: notifier.BatchSize = maximumConcurrencyLevel;
+            return notifier;
+        }
+
+        public ISendBrokeredMessages GetSender()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IPublishBrokeredMessages GetPublisher()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

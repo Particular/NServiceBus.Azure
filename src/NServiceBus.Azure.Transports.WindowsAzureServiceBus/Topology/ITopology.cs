@@ -3,16 +3,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using Features;
+    using Settings;
 
     public interface ITopology
     {
         // for a large part the topology is defined by the naming conventions
 
-        Func<Type, string, string> QueueNamingConvention { get; }
 
         Func<Type, string, string> SubscriptionNamingConvention { get; }
 
-        Func<Type, string, string> TopicNamingConvention { get; }
 
         Func<Address, Address> PublisherAddressConvention { get; }
 
@@ -20,13 +19,25 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         Func<Address, Address> QueueAddressConvention { get; }
         
-        // the container registrations are also dependent on it
-        void Configure(FeatureConfigurationContext context);
-
         //GuardAgainstSubscriptionReuseAcrossLogicalEndpoints?
 
         //ServicebusSubscriptionFilterBuilder?
 
         //GetTopicClientForDestination?
+
+
+        //All of the above should be internal, the ideal interface would be something like this
+
+        void Initialize(ReadOnlySettings setting);
+
+        void Create();
+
+        INotifyReceivedBrokeredMessages Subscribe(Type eventType, Address address);
+        void Unsubscribe(INotifyReceivedBrokeredMessages notifier);
+
+        INotifyReceivedBrokeredMessages GetReceiver();
+
+        ISendBrokeredMessages GetSender();
+        IPublishBrokeredMessages GetPublisher();
     }
 }

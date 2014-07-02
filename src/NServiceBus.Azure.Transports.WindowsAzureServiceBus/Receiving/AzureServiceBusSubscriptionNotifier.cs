@@ -7,7 +7,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusSubscriptionNotifier : INotifyReceivedMessages
+    public class AzureServiceBusSubscriptionNotifier : INotifyReceivedBrokeredMessages
     {
         private SubscriptionClient subscriptionClient;
         private Action<BrokeredMessage> tryProcessMessage;
@@ -36,7 +36,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        public Type EventType { get; set; }
+        public Type MessageType { get; set; }
+
+        public Address Address { get; set; }
 
         /// <summary>
         /// 
@@ -49,7 +51,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             this.tryProcessMessage = tryProcessMessage;
 
-            subscriptionClient = SubscriptionClientCreator.Create(address, EventType);
+            subscriptionClient = SubscriptionClientCreator.Create(address, MessageType);
 
             if (subscriptionClient != null) subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }

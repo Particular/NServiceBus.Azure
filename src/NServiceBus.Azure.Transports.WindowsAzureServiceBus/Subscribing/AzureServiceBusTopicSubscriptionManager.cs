@@ -15,10 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         readonly Configure config;
         readonly ITopology topology;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public ICreateSubscriptions SubscriptionCreator { get; set; }
+       
 
         public IMessageMapper MessageMapper { get; set; }
         public StaticMessageRouter MessageRouter { get; set; }
@@ -52,8 +49,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void SubscribeInternal(Type eventType, Address original)
         {
-            var publisherAddress = topology.PublisherAddressConventionForSubscriptions(original);
-           
             // resolving manually as the bus also gets the subscription manager injected
             // but this is the only way to get to the correct dequeue strategy
             var bus = config.Builder.Build<UnicastBus>();
@@ -70,9 +65,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     "AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
             }
 
-            var notifier = config.Builder.Build<AzureServiceBusSubscriptionNotifier>();
-            notifier.EventType = eventType;
-            strategy.TrackNotifier(publisherAddress, notifier);
+            var notifier = topology.Subscribe(eventType, original);
+            strategy.TrackNotifier(eventType, original, notifier);
         }
 
         /// <summary>
@@ -98,11 +92,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void UnSubscribeInternal(Type eventType, Address original)
         {
-            var publisherAddress = topology.PublisherAddressConvention(original);
-            var subscriptionname = topology.SubscriptionNamingConvention(eventType, config.Settings.EndpointName());
-
-            SubscriptionCreator.Delete(publisherAddress, subscriptionname);
-
             // resolving manually as the bus also gets the subscription manager injected
             // but this is the only way to get to the correct dequeue strategy
             var bus = config.Builder.Build<UnicastBus>();
@@ -119,7 +108,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     "AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
             }
 
-            strategy.RemoveNotifier(publisherAddress);
+            var notifier = strategy.GetNotifier(eventType, original);
+
+            topology.Unsubscribe(notifier);
+
+            strategy.RemoveNotifier(eventType, original);
         }
 
         /// <summary>
