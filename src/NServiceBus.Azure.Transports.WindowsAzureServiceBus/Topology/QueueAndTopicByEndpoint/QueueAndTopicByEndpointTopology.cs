@@ -3,6 +3,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     using System;
     using Config;
     using Settings;
+    using Transports;
 
     /// <summary>
     /// Sends occur through queues, one for each endpoint, 
@@ -14,12 +15,29 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     {
 
         readonly Configure config;
+        readonly ICreateMessagingFactories messagingFactories;
+        readonly ICreateNamespaceManagers namespaceManagers;
         readonly ICreateSubscriptions subscriptionCreator;
+        readonly ICreateQueues queueCreator;
+        readonly ICreateTopics topicCreator;
+        readonly ICreateQueueClients queueClients;
 
-        internal QueueAndTopicByEndpointTopology(Configure config, ICreateSubscriptions subscriptionCreator)
+        internal QueueAndTopicByEndpointTopology(
+            Configure config, 
+            ICreateMessagingFactories messagingFactories,
+            ICreateNamespaceManagers namespaceManagers,
+            ICreateSubscriptions subscriptionCreator, 
+            ICreateQueues queueCreator,
+            ICreateTopics topicCreator, 
+            ICreateQueueClients queueClients)
         {
             this.config = config;
+            this.messagingFactories = messagingFactories;
+            this.namespaceManagers = namespaceManagers;
             this.subscriptionCreator = subscriptionCreator;
+            this.queueCreator = queueCreator;
+            this.topicCreator = topicCreator;
+            this.queueClients = queueClients;
         }
 
         public Func<Type, string, string> QueueNamingConvention {
@@ -124,9 +142,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             subscriptionCreator.Delete(notifier.Address, subscriptionname);
         }
 
-        public INotifyReceivedBrokeredMessages GetReceiver()
+        public INotifyReceivedBrokeredMessages GetReceiver(Address address)
         {
+            var factory = messagingFactories.Create(address.Machine);
+            var description = queueCreator.Create(address);
             var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
+            notifier.QueueClient = queueClients.Create(description, factory);
+
             //todo: notifier.BatchSize = maximumConcurrencyLevel;
             return notifier;
         }

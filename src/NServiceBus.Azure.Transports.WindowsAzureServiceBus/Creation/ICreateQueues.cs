@@ -5,13 +5,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.Transports
     /// <summary>
     /// 
     /// </summary>
-    public interface ICreateTopics
+    public interface ICreateQueues
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        TopicDescription Create(Address address);
+        QueueDescription Create(Address address);
     }
 }

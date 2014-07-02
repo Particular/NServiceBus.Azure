@@ -221,7 +221,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void CreateAndStartNotifier()
         {
-            var notifier = topology.GetReceiver();
+            var notifier = topology.GetReceiver(address);
 
             TrackNotifier(null, address, notifier);
         }

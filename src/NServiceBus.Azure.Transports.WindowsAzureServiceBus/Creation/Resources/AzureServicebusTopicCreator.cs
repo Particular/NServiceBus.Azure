@@ -2,7 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Transports;
+    using Transports;
 
     public class AzureServicebusTopicCreator : ICreateTopics
     {
@@ -15,20 +15,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.createNamespaceManagers = createNamespaceManagers;
         }
 
-        public void Create(Address address)
+        public TopicDescription Create(Address address)
         {
             var topicName = address.Queue;
             var namespaceclient = createNamespaceManagers.Create(address.Machine);
+            var description = new TopicDescription(topicName)
+            {
+                // todo: add the other settings from a separate config section? Or same as queue section?
+                EnablePartitioning = EnablePartitioning
+            };
+
             try
             {
                 
                 if (!namespaceclient.TopicExists(topicName))
                 {
-                    var description = new TopicDescription(topicName)
-                    {
-                        // todo: add the other settings from a separate config section? Or same as queue section?
-                        EnablePartitioning = EnablePartitioning
-                    };
+                    
 
                     namespaceclient.CreateTopic(description);
                 }
@@ -44,12 +46,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 if (!namespaceclient.QueueExists(topicName))
                     throw;
             }
+
+            return description;
         }
 
-        public void CreateIfNecessary(Address address)
-        {
-            Create(address);
-
-        }
     }
 }

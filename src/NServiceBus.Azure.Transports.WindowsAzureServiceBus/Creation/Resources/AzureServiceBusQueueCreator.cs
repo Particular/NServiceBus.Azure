@@ -2,9 +2,8 @@
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Transports;
-
-    public class AzureServiceBusQueueCreator : ICreateQueues
+    
+    public class AzureServiceBusQueueCreator : NServiceBus.Transports.ICreateQueues, Transports.ICreateQueues
     {
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }
@@ -24,28 +23,28 @@
             this.createNamespaceManagers = createNamespaceManagers;
         }
 
-        public void Create(Address address)
+        public QueueDescription Create(Address address)
         {
             var queueName = address.Queue;
             var path = "";
             var namespaceClient = createNamespaceManagers.Create(address.Machine);
+
+            var description = new QueueDescription(queueName)
+            {
+                LockDuration = LockDuration,
+                MaxSizeInMegabytes = MaxSizeInMegabytes,
+                RequiresDuplicateDetection = RequiresDuplicateDetection,
+                RequiresSession = RequiresSession,
+                DefaultMessageTimeToLive = DefaultMessageTimeToLive,
+                EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
+                DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
+                MaxDeliveryCount = MaxDeliveryCount,
+                EnableBatchedOperations = EnableBatchedOperations,
+                EnablePartitioning = EnablePartitioning
+            };
+
             try
             {
-
-                var description = new QueueDescription(queueName)
-                {
-                    LockDuration = LockDuration,
-                    MaxSizeInMegabytes = MaxSizeInMegabytes,
-                    RequiresDuplicateDetection = RequiresDuplicateDetection,
-                    RequiresSession = RequiresSession,
-                    DefaultMessageTimeToLive = DefaultMessageTimeToLive,
-                    EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
-                    DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
-                    MaxDeliveryCount = MaxDeliveryCount,
-                    EnableBatchedOperations = EnableBatchedOperations,
-                    EnablePartitioning = EnablePartitioning
-                };
-
                 path = description.Path;
                 if (!namespaceClient.QueueExists(path))
                 {
@@ -63,6 +62,8 @@
                 if (!namespaceClient.QueueExists(path))
                     throw;
             }
+
+            return description;
         }
 
         public void CreateQueueIfNecessary(Address address, string account)

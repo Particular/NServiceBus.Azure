@@ -9,14 +9,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusQueueNotifier : INotifyReceivedBrokeredMessages
     {
-        private QueueClient _queueClient;
         private Action<BrokeredMessage> _tryProcessMessage;
         private bool cancelRequested;
         
         /// <summary>
         /// 
         /// </summary>
-        public ICreateQueueClients QueueClientCreator { get; set; }
+        public QueueClient QueueClient { get; set; }
 
         /// <summary>
         /// 
@@ -47,9 +46,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             _tryProcessMessage = tryProcessMessage;
             
-            _queueClient = QueueClientCreator.Create(address);
-
-            _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
 
         /// <summary>
@@ -64,7 +61,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             try
             {
-                var receivedMessages = _queueClient.EndReceiveBatch(ar);
+                var receivedMessages = QueueClient.EndReceiveBatch(ar);
 
                 if (cancelRequested) return;
 
@@ -96,7 +93,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 // time's up, just continue and retry
             }
 
-            _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
     }
 }

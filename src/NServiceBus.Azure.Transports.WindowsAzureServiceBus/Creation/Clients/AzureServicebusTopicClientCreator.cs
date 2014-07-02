@@ -1,7 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Transports;
+    using Transports;
 
     public class AzureServicebusTopicClientCreator : ICreateTopicClients
     {
@@ -24,7 +24,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             if (ShouldAutoCreate) // todo move to property
             {
-                topicCreator.CreateIfNecessary(address);
+                topicCreator.Create(address);
             }
 
             var factory = createMessagingFactories.Create(address.Machine);

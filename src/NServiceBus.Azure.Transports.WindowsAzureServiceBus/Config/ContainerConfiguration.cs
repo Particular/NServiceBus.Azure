@@ -60,7 +60,7 @@
             context.Container.ConfigureComponent<CreatesNamespaceManagers>(DependencyLifecycle.InstancePerCall);
 
             context.Container.ConfigureComponent<AzureServicebusQueueClientCreator>(DependencyLifecycle.InstancePerCall);
-            context.Container.ConfigureProperty<AzureServicebusQueueClientCreator>(t => t.MaxRetries, transportConfig.MaxRetries);
+            //context.Container.ConfigureProperty<AzureServicebusQueueClientCreator>(t => t.MaxRetries, transportConfig.MaxRetries);
 
             context.Container.ConfigureComponent<AzureServiceBusQueueCreator>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.LockDuration, TimeSpan.FromMilliseconds(configSection.LockDuration));
