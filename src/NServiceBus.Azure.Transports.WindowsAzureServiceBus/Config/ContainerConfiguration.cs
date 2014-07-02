@@ -7,9 +7,9 @@
 
     internal class ContainerConfiguration
     {
-        public void Configure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection, TransportConfig transportConfig)
+        public void Configure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
-            ConfigureCreationInfrastructure(context, configSection, transportConfig);
+            ConfigureCreationInfrastructure(context, configSection);
 
             ConfigureReceiveInfrastructure(context, configSection);
 
@@ -54,14 +54,13 @@
             context.Container.ConfigureProperty<AzureServiceBusMessageQueueSender>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
         }
 
-        private void ConfigureCreationInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection, TransportConfig transportConfig)
+        private void ConfigureCreationInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
             context.Container.ConfigureComponent<CreatesMessagingFactories>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<CreatesNamespaceManagers>(DependencyLifecycle.InstancePerCall);
 
             context.Container.ConfigureComponent<AzureServicebusQueueClientCreator>(DependencyLifecycle.InstancePerCall);
-            //context.Container.ConfigureProperty<AzureServicebusQueueClientCreator>(t => t.MaxRetries, transportConfig.MaxRetries);
-
+            
             context.Container.ConfigureComponent<AzureServiceBusQueueCreator>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.LockDuration, TimeSpan.FromMilliseconds(configSection.LockDuration));
             context.Container.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.MaxSizeInMegabytes, configSection.MaxSizeInMegabytes);
@@ -79,8 +78,7 @@
             context.Container.ConfigureProperty<AzureServicebusTopicCreator>(t => t.EnablePartitioning, configSection.EnablePartitioning);
 
             context.Container.ConfigureComponent<AzureServicebusSubscriptionClientCreator>(DependencyLifecycle.InstancePerCall);
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionClientCreator>(t => t.MaxRetries, transportConfig.MaxRetries);
-
+            
             context.Container.ConfigureComponent<AzureServicebusSubscriptionCreator>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.LockDuration, TimeSpan.FromMilliseconds(configSection.LockDuration));
             context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.RequiresSession, configSection.RequiresSession);

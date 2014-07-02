@@ -21,7 +21,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.createNamespaceManagers = createNamespaceManagers;
         }
 
-        public void Create(Address topic, Type eventType, string subscriptionname)
+        public SubscriptionDescription Create(Address topic, Type eventType, string subscriptionname)
         {
             var topicPath = topic.Queue;
             var namespaceClient = createNamespaceManagers.Create(topic.Machine);
@@ -33,22 +33,24 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
             }
 
+            var description = new SubscriptionDescription(topicPath, subscriptionname)
+            {
+                LockDuration = LockDuration,
+                RequiresSession = RequiresSession,
+                DefaultMessageTimeToLive = DefaultMessageTimeToLive,
+                EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
+                MaxDeliveryCount = MaxDeliveryCount,
+                EnableBatchedOperations = EnableBatchedOperations,
+                EnableDeadLetteringOnFilterEvaluationExceptions = EnableDeadLetteringOnFilterEvaluationExceptions
+            };
+
             if (namespaceClient.TopicExists(topicPath))
             {
                 try
                 {
                     if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
                     {
-                        var description = new SubscriptionDescription(topicPath, subscriptionname)
-                        {
-                            LockDuration = LockDuration,
-                            RequiresSession = RequiresSession,
-                            DefaultMessageTimeToLive = DefaultMessageTimeToLive,
-                            EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
-                            MaxDeliveryCount = MaxDeliveryCount,
-                            EnableBatchedOperations = EnableBatchedOperations,
-                            EnableDeadLetteringOnFilterEvaluationExceptions = EnableDeadLetteringOnFilterEvaluationExceptions
-                        };
+                       
 
                         if (filter != string.Empty)
                         {
@@ -78,6 +80,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 throw new InvalidOperationException(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist", topicPath));
             }
+
+            return description;
         }
 
         static void GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(string subscriptionname,

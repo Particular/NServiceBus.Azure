@@ -2,6 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 {
     using System;
     using Config;
+    using Microsoft.ServiceBus.Messaging;
     using Settings;
     using Transports;
 
@@ -20,7 +21,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         readonly ICreateSubscriptions subscriptionCreator;
         readonly ICreateQueues queueCreator;
         readonly ICreateTopics topicCreator;
-        readonly ICreateQueueClients queueClients;
+        readonly ICreateQueueClients queueClients; 
+        readonly ICreateSubscriptionClients subscriptionClients;
 
         internal QueueAndTopicByEndpointTopology(
             Configure config, 
@@ -29,7 +31,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             ICreateSubscriptions subscriptionCreator, 
             ICreateQueues queueCreator,
             ICreateTopics topicCreator, 
-            ICreateQueueClients queueClients)
+            ICreateQueueClients queueClients, 
+            ICreateSubscriptionClients subscriptionClients)
         {
             this.config = config;
             this.messagingFactories = messagingFactories;
@@ -38,6 +41,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             this.queueCreator = queueCreator;
             this.topicCreator = topicCreator;
             this.queueClients = queueClients;
+            this.subscriptionClients = subscriptionClients;
         }
 
         public Func<Type, string, string> QueueNamingConvention {
@@ -80,6 +84,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                 };
             }
         }
+        public Func<Type, string, string> SubscriptionFullNamingConvention
+        {
+            get
+            {
+                return (messagetype, endpointname) =>
+                {
+                    var subscriptionName = messagetype != null ? endpointname + "." + messagetype.FullName : endpointname;
+
+                    if (subscriptionName.Length >= 50)
+                        subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
+
+                    return subscriptionName;
+                };
+            }
+        }
+
         public Func<Type, string, string> TopicNamingConvention
         {
             get
@@ -129,10 +149,34 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         {
             var publisherAddress = PublisherAddressConventionForSubscriptions(address);
             var notifier = config.Builder.Build<AzureServiceBusSubscriptionNotifier>();
+            notifier.SubscriptionClient = CreateSubscriptionClient(eventType, publisherAddress);
             //todo: notifier.BatchSize = maximumConcurrencyLevel;
             notifier.MessageType = eventType;
             notifier.Address = publisherAddress;
             return notifier;
+        }
+
+        private SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
+        {
+            var subscriptionname = SubscriptionNamingConvention(eventType, config.Settings.EndpointName());
+            var factory = messagingFactories.Create(address.Machine);
+
+            try
+            {
+                var description = subscriptionCreator.Create(address, eventType, subscriptionname);
+                return subscriptionClients.Create(description, factory);
+            }
+            catch (SubscriptionAlreadyInUseException)
+            {
+                // if this occurs, it means that another endpoint is using the same eventtype name but in another namespace,
+                // so let's differenatiate including this namespace, odds are very likely that we will get a guid instead
+                // that's why we're not defaulting to this convention.
+
+                subscriptionname = SubscriptionFullNamingConvention(eventType, config.Settings.EndpointName());
+                var description = subscriptionCreator.Create(address, eventType, subscriptionname);
+                return subscriptionClients.Create(description, factory);
+            }
+
         }
 
         public void Unsubscribe(INotifyReceivedBrokeredMessages notifier)

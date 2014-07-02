@@ -9,7 +9,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusSubscriptionNotifier : INotifyReceivedBrokeredMessages
     {
-        private SubscriptionClient subscriptionClient;
         private Action<BrokeredMessage> tryProcessMessage;
         private bool cancelRequested;
 
@@ -31,7 +30,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        public ICreateSubscriptionClients SubscriptionClientCreator { get; set; }
+        public SubscriptionClient SubscriptionClient { get; set; }
 
         /// <summary>
         /// 
@@ -50,9 +49,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             this.tryProcessMessage = tryProcessMessage;
 
-            subscriptionClient = SubscriptionClientCreator.Create(Address, MessageType);
-
-            if (subscriptionClient != null) subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
 
         /// <summary>
@@ -67,7 +64,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             try
             {
-                var receivedMessages = subscriptionClient.EndReceiveBatch(ar);
+                var receivedMessages = SubscriptionClient.EndReceiveBatch(ar);
 
                 if (cancelRequested) return;
 
@@ -99,7 +96,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 // time's up, just continue and retry
             }
 
-            subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
     }
 }

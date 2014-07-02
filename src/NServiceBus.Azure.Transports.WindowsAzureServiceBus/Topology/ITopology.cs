@@ -6,8 +6,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public interface ITopology
     {
-        Func<Type, string, string> SubscriptionNamingConvention { get; }
-        
         Func<Address, Address> PublisherAddressConvention { get; }
         
         //All of the above should be internal, the ideal interface would be something like this
