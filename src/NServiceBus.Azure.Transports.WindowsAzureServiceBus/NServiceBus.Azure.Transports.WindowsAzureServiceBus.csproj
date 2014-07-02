@@ -83,6 +83,7 @@
     <Compile Include="Creation\Resources\SubscriptionAlreadyInUseException.cs" />
     <Compile Include="Publishing\AzureServiceBusTopicPublisher.cs" />
     <Compile Include="Publishing\IPublishBrokeredMessages.cs" />
+    <Compile Include="Sending\AzureServiceBusQueueSender.cs" />
     <Compile Include="Sending\ISendBrokeredMessages.cs" />
     <Compile Include="Sending\MessageTooLargeException.cs" />
     <Compile Include="Topology\DefaultTopology.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="AzureServiceBus.cs" />
     <Compile Include="Config\AzureServicebusDefaults.cs" />
     <Compile Include="AzureServiceBusDequeueStrategy.cs" />
-    <Compile Include="Sending\AzureServiceBusMessageQueueSender.cs" />
+    <Compile Include="Sending\AzureServiceBusSender.cs" />
     <Compile Include="Receiving\AzureServiceBusQueueNotifier.cs" />
     <Compile Include="Receiving\AzureServiceBusSubscriptionNotifier.cs" />
     <Compile Include="Publishing\AzureServiceBusPublisher.cs" />

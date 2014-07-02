@@ -6,8 +6,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public interface ITopology
     {
-        Func<Address, Address> PublisherAddressConvention { get; }
-        
         //All of the above should be internal, the ideal interface would be something like this
 
         void Initialize(ReadOnlySettings setting);
@@ -19,7 +17,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         INotifyReceivedBrokeredMessages GetReceiver(Address address);
 
-        ISendBrokeredMessages GetSender();
+        ISendBrokeredMessages GetSender(Address destination);
         IPublishBrokeredMessages GetPublisher(Address local);
     }
 }

@@ -4,14 +4,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Threading;
     using Microsoft.ServiceBus.Messaging;
 
-    public class AzureServiceBusTopicPublisher : IPublishBrokeredMessages
+    public class AzureServiceBusQueueSender : ISendBrokeredMessages
     {
-        public TopicClient TopicClient { get; set; }
+        const int DefaultBackoffTimeInSeconds = 10;
 
-        public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
 
-        public void Publish(BrokeredMessage brokeredMessage)
+        public QueueClient QueueClient { get; set; }
+
+        public void Send(BrokeredMessage brokeredMessage)
         {
             var numRetries = 0;
             var sent = false;
@@ -20,45 +21,44 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    TopicClient.Send(brokeredMessage);
-
+                    QueueClient.Send(brokeredMessage);
                     sent = true;
                 }
-                // todo, outbox
+                    // todo: outbox
                 catch (MessagingEntityDisabledException)
                 {
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
-                // back off when we're being throttled
+                    // back off when we're being throttled
                 catch (ServerBusyException)
                 {
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
-                // took to long, maybe we lost connection
-                catch (TimeoutException)
-                {
-                    numRetries++;
-
-                    if (numRetries >= MaxDeliveryCount) throw;
-
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
-                }
-                // connection lost
+                    // connection lost
                 catch (MessagingCommunicationException)
                 {
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+                }
+                    // took to long, maybe we lost connection
+                catch (TimeoutException)
+                {
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
             }
         }

@@ -201,9 +201,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             return notifier;
         }
 
-        public ISendBrokeredMessages GetSender()
+        public ISendBrokeredMessages GetSender(Address original)
         {
-            throw new NotImplementedException();
+            var address = QueueAddressConvention(original);
+            var factory = messagingFactories.Create(address.Machine);
+            var description = queueCreator.Create(address);
+            var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));
+            sender.QueueClient = queueClients.Create(description, factory);
+            return sender;
         }
 
         public IPublishBrokeredMessages GetPublisher(Address original)
