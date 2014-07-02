@@ -230,7 +230,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var key = CreateKeyFor(eventType, original);
 
-            notifier.Start(address, EnqueueMessage);
+            notifier.Start(EnqueueMessage);
             notifiers.Add(key, notifier);
         }
 

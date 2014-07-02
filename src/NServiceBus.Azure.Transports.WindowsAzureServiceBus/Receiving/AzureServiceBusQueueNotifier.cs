@@ -36,12 +36,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="address"></param>
         /// <param name="tryProcessMessage"></param>
-        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage)
+        public void Start(Action<BrokeredMessage> tryProcessMessage)
         {
-            Address = address;
-
             cancelRequested = false;
 
             _tryProcessMessage = tryProcessMessage;

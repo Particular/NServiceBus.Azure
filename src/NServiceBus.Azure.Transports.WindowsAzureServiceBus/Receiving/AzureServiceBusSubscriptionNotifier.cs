@@ -43,15 +43,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="address"></param>
         /// <param name="tryProcessMessage"></param>
-        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage)
+        public void Start(Action<BrokeredMessage> tryProcessMessage)
         {
             cancelRequested = false;
 
             this.tryProcessMessage = tryProcessMessage;
 
-            subscriptionClient = SubscriptionClientCreator.Create(address, MessageType);
+            subscriptionClient = SubscriptionClientCreator.Create(Address, MessageType);
 
             if (subscriptionClient != null) subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }

@@ -5,7 +5,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     public interface INotifyReceivedBrokeredMessages
     {
-        void Start(Address address, Action<BrokeredMessage> tryProcessMessage);
+        void Start(Action<BrokeredMessage> tryProcessMessage);
 
         void Stop();
 
