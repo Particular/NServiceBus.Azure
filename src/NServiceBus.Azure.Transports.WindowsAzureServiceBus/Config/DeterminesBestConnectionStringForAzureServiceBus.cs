@@ -4,7 +4,7 @@
     using Config;
     using Settings;
 
-    public class DeterminesBestConnectionStringForAzureServiceBus
+    internal class DeterminesBestConnectionStringForAzureServiceBus
     {
         public string Determine(ReadOnlySettings settings)
         {

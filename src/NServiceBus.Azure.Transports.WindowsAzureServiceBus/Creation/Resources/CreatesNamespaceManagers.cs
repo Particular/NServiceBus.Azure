@@ -5,7 +5,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Microsoft.ServiceBus;
     using Support;
 
-    public class CreatesNamespaceManagers : ICreateNamespaceManagers
+    internal class CreatesNamespaceManagers : ICreateNamespaceManagers
     {
         readonly Configure config;
         private static readonly Dictionary<string, NamespaceManager> NamespaceManagers = new Dictionary<string, NamespaceManager>();

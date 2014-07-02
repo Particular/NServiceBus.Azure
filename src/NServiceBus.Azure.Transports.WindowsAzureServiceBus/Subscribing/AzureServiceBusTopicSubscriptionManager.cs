@@ -10,7 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Unicast.Routing;
     using Unicast.Transport;
 
-    public class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
+    internal class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
     {
         readonly Configure config;
         readonly ITopology topology;

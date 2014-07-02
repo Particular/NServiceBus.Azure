@@ -4,7 +4,7 @@
     using Config.ConfigurationSource;
     using Settings;
 
-    public class OverrideMaxRetries : IProvideConfiguration<TransportConfig>
+    internal class OverrideMaxRetries : IProvideConfiguration<TransportConfig>
     {
         readonly ReadOnlySettings settings;
 

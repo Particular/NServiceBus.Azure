@@ -6,7 +6,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Settings;
     using Unicast;
 
-    public static class BrokeredMessageConverter
+    internal static class BrokeredMessageConverter
     {
         public static TransportMessage ToTransportMessage(this BrokeredMessage message)
         {

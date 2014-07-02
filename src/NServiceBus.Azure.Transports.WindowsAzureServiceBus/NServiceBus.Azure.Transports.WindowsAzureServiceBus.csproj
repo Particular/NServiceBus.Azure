@@ -78,7 +78,6 @@
     <Compile Include="Creation\Resources\ICreateNamespaceManagers.cs" />
     <Compile Include="Creation\Clients\ICreateQueueClients.cs" />
     <Compile Include="Creation\Resources\AzureServicebusSubscriptionCreator.cs" />
-    <Compile Include="Creation\QueueAutoCreation.cs" />
     <Compile Include="Creation\Resources\ICreateSubscriptions.cs" />
     <Compile Include="Creation\Resources\SubscriptionAlreadyInUseException.cs" />
     <Compile Include="Publishing\AzureServiceBusTopicPublisher.cs" />
@@ -106,7 +105,6 @@
     <Compile Include="Config\AzureServiceBusTransport.cs" />
     <Compile Include="Config\ConfigureAzureServiceBusMessageQueue.cs" />
     <Compile Include="Config\DeterminesBestConnectionStringForAzureServiceBus.cs" />
-    <Compile Include="Creation\TopicAutoCreation.cs" />
     <Compile Include="Creation\Resources\AzureServiceBusQueueCreator.cs" />
     <Compile Include="Creation\Clients\AzureServicebusSubscriptionClientCreator.cs" />
     <Compile Include="Creation\Clients\AzureServicebusTopicClientCreator.cs" />

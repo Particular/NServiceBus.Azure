@@ -4,7 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Microsoft.ServiceBus.Messaging;
     using Transports;
 
-    public class AzureServicebusTopicCreator : ICreateTopics
+    internal class AzureServicebusTopicCreator : ICreateTopics
     {
         readonly ICreateNamespaceManagers createNamespaceManagers;
 

@@ -15,7 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// Azure service bus implementation if <see cref="IDequeueMessages" />.
     /// </summary>
-    public class AzureServiceBusDequeueStrategy : IDequeueMessages
+    internal class AzureServiceBusDequeueStrategy : IDequeueMessages
     {
         readonly ITopology topology;
         private Address address;

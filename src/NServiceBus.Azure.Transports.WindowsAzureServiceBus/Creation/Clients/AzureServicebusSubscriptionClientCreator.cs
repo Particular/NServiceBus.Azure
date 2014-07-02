@@ -1,12 +1,11 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using System;
     using Microsoft.ServiceBus.Messaging;
 
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServicebusSubscriptionClientCreator : ICreateSubscriptionClients
+    internal class AzureServicebusSubscriptionClientCreator : ICreateSubscriptionClients
     {
         readonly Configure config;
 

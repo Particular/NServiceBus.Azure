@@ -10,7 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusSender : ISendMessages, IDeferMessages
+    internal class AzureServiceBusSender : ISendMessages, IDeferMessages
     {
         readonly ITopology topology;
         readonly Configure config;

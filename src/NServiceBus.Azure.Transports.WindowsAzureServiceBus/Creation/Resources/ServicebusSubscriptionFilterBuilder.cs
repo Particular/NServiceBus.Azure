@@ -2,7 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
 
-    public class ServicebusSubscriptionFilterBuilder
+    internal class ServicebusSubscriptionFilterBuilder
     {
         public string BuildFor(Type eventType)
         {

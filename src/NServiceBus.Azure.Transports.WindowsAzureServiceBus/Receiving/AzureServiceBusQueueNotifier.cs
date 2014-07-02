@@ -7,7 +7,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusQueueNotifier : INotifyReceivedBrokeredMessages
+    internal class AzureServiceBusQueueNotifier : INotifyReceivedBrokeredMessages
     {
         private Action<BrokeredMessage> _tryProcessMessage;
         private bool cancelRequested;

@@ -2,7 +2,7 @@
 {
     using System.Diagnostics;
 
-    public static class IsHostedIn
+    internal static class IsHostedIn
     {
         public static string HostProcessName = "NServiceBus.Hosting.Azure.HostProcess";
 

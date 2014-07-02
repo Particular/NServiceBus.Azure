@@ -4,7 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Collections.Generic;
     using Microsoft.ServiceBus.Messaging;
 
-    public class CreatesMessagingFactories : ICreateMessagingFactories
+    internal class CreatesMessagingFactories : ICreateMessagingFactories
     {
         readonly Configure config;
 

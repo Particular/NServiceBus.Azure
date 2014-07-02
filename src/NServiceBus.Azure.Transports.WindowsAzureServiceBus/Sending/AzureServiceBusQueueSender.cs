@@ -4,7 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Threading;
     using Microsoft.ServiceBus.Messaging;
 
-    public class AzureServiceBusQueueSender : ISendBrokeredMessages
+    internal class AzureServiceBusQueueSender : ISendBrokeredMessages
     {
         const int DefaultBackoffTimeInSeconds = 10;
 

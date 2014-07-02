@@ -2,8 +2,8 @@
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
-    
-    public class AzureServiceBusQueueCreator : NServiceBus.Transports.ICreateQueues, Transports.ICreateQueues
+
+    internal class AzureServiceBusQueueCreator : NServiceBus.Transports.ICreateQueues, Transports.ICreateQueues
     {
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }

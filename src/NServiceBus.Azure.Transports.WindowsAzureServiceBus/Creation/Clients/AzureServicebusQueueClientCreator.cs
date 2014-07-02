@@ -2,7 +2,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    public class AzureServicebusQueueClientCreator : ICreateQueueClients
+    internal class AzureServicebusQueueClientCreator : ICreateQueueClients
     {
         readonly Configure config;
 

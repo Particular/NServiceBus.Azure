@@ -9,7 +9,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public static class BrokeredMessageExtensions
+    internal static class BrokeredMessageExtensions
     {
         /// <summary>
         /// 

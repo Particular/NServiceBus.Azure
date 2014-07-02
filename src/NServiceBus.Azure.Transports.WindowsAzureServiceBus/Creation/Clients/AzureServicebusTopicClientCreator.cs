@@ -2,7 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using Microsoft.ServiceBus.Messaging;
 
-    public class AzureServicebusTopicClientCreator : ICreateTopicClients
+    internal class AzureServicebusTopicClientCreator : ICreateTopicClients
     {
         public TopicClient Create(TopicDescription topic, MessagingFactory factory)
         {

@@ -9,7 +9,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// 
     /// </summary>
-    public class AzureServiceBusPublisher : IPublishMessages
+    internal class AzureServiceBusPublisher : IPublishMessages
     {
         readonly Configure config;
         readonly ITopology topology;
