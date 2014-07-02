@@ -126,7 +126,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 if (!RenewLockIfNeeded(brokeredMessage)) continue;
 
-                var transportMessage = BrokeredMessageConverter.ToTransportMessage(brokeredMessage);
+                var transportMessage = brokeredMessage.ToTransportMessage();
 
                 try
                 {

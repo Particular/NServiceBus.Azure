@@ -20,6 +20,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         INotifyReceivedBrokeredMessages GetReceiver(Address address);
 
         ISendBrokeredMessages GetSender();
-        IPublishBrokeredMessages GetPublisher();
+        IPublishBrokeredMessages GetPublisher(Address local);
     }
 }

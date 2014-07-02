@@ -23,6 +23,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         readonly ICreateTopics topicCreator;
         readonly ICreateQueueClients queueClients; 
         readonly ICreateSubscriptionClients subscriptionClients;
+        readonly ICreateTopicClients topicClients;
 
         internal QueueAndTopicByEndpointTopology(
             Configure config, 
@@ -32,7 +33,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             ICreateQueues queueCreator,
             ICreateTopics topicCreator, 
             ICreateQueueClients queueClients, 
-            ICreateSubscriptionClients subscriptionClients)
+            ICreateSubscriptionClients subscriptionClients,
+            ICreateTopicClients topicClients)
         {
             this.config = config;
             this.messagingFactories = messagingFactories;
@@ -42,6 +44,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             this.topicCreator = topicCreator;
             this.queueClients = queueClients;
             this.subscriptionClients = subscriptionClients;
+            this.topicClients = topicClients;
         }
 
         public Func<Type, string, string> QueueNamingConvention {
@@ -186,8 +189,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             subscriptionCreator.Delete(notifier.Address, subscriptionname);
         }
 
-        public INotifyReceivedBrokeredMessages GetReceiver(Address address)
+        public INotifyReceivedBrokeredMessages GetReceiver(Address original)
         {
+            var address = QueueAddressConvention(original);
             var factory = messagingFactories.Create(address.Machine);
             var description = queueCreator.Create(address);
             var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
@@ -202,10 +206,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             throw new NotImplementedException();
         }
 
-        public IPublishBrokeredMessages GetPublisher()
+        public IPublishBrokeredMessages GetPublisher(Address original)
         {
-            throw new NotImplementedException();
+            var address = PublisherAddressConvention(original);
+            var description = topicCreator.Create(address);
+            var factory = messagingFactories.Create(address.Machine);
+            var publisher = (AzureServiceBusTopicPublisher)config.Builder.Build(typeof(AzureServiceBusTopicPublisher));
+            publisher.TopicClient = topicClients.Create(description, factory);
+            return publisher;
         }
 
     }
+
 }

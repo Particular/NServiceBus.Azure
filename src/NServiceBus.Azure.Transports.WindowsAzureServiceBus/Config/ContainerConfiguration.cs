@@ -42,6 +42,7 @@
 
         private void ConfigurePublishingInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
+            context.Container.ConfigureComponent<AzureServiceBusPublisher>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureServiceBusTopicPublisher>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureProperty<AzureServiceBusTopicPublisher>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
 
