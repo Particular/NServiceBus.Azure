@@ -16,6 +16,7 @@
 
             Scenario.Define(context)
                     .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.Send(Address.Local, new MyRequest())))
+                    .AllowExceptions()
                     .Done(c => c.ReceivedAgain)
                     .Run();
         }
