@@ -229,6 +229,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public void TrackNotifier(Type eventType, Address original, INotifyReceivedBrokeredMessages notifier)
         {
             var key = CreateKeyFor(eventType, original);
+            if (notifiers.ContainsKey(key)) return;
 
             notifier.Start(EnqueueMessage);
             notifiers.Add(key, notifier);

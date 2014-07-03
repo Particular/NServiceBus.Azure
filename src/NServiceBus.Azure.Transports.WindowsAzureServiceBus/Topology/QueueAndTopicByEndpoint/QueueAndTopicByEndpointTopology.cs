@@ -14,7 +14,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
     internal class QueueAndTopicByEndpointTopology : ITopology
     {
-
         readonly Configure config;
         readonly ICreateMessagingFactories messagingFactories;
         readonly ICreateNamespaceManagers namespaceManagers;

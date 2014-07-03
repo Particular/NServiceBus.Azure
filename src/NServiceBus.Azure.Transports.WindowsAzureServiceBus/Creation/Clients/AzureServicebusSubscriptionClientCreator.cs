@@ -14,17 +14,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.config = config;
         }
 
-
-       
-
         public SubscriptionClient Create(SubscriptionDescription description, MessagingFactory factory)
         {
-            //if (ShouldAutoCreate)
-            //{
-            //    subscriptionCreator.Create(topic, eventType, subscriptionname);
-            //}
-            //var factory = createMessagingFactories.Create(topic.Machine);
-            
             return factory.CreateSubscriptionClient(description.TopicPath, description.Name, ShouldRetry() ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
         }
 
