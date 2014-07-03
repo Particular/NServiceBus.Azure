@@ -120,5 +120,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             return publisher;
         }
 
+        public void Create(Address address)
+        {
+            queueCreator.Create(address);
+            topicCreator.Create(address);
+        }
     }
 }

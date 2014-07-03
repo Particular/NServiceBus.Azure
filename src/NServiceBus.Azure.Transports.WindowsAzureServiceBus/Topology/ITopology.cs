@@ -15,5 +15,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         ISendBrokeredMessages GetSender(Address destination);
         IPublishBrokeredMessages GetPublisher(Address local);
+        void Create(Address address);
     }
 }

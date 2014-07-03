@@ -3,7 +3,7 @@
     using System;
     using Microsoft.ServiceBus.Messaging;
 
-    internal class AzureServiceBusQueueCreator : NServiceBus.Transports.ICreateQueues, Transports.ICreateQueues
+    internal class AzureServiceBusQueueCreator : Transports.ICreateQueues
     {
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }
@@ -65,11 +65,5 @@
 
             return description;
         }
-
-        public void CreateQueueIfNecessary(Address address, string account)
-        {
-            Create(address);
-        }
     }
-
 }
