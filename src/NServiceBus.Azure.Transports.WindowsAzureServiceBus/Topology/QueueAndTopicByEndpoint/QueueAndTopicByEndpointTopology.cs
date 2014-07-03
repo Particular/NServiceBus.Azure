@@ -1,7 +1,6 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint
 {
     using System;
-    using Config;
     using Microsoft.ServiceBus.Messaging;
     using Settings;
     using Transports;
@@ -16,7 +15,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     {
         readonly Configure config;
         readonly ICreateMessagingFactories messagingFactories;
-        readonly ICreateNamespaceManagers namespaceManagers;
         readonly ICreateSubscriptions subscriptionCreator;
         readonly ICreateQueues queueCreator;
         readonly ICreateTopics topicCreator;
@@ -27,7 +25,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         internal QueueAndTopicByEndpointTopology(
             Configure config, 
             ICreateMessagingFactories messagingFactories,
-            ICreateNamespaceManagers namespaceManagers,
             ICreateSubscriptions subscriptionCreator, 
             ICreateQueues queueCreator,
             ICreateTopics topicCreator, 
@@ -37,7 +34,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         {
             this.config = config;
             this.messagingFactories = messagingFactories;
-            this.namespaceManagers = namespaceManagers;
             this.subscriptionCreator = subscriptionCreator;
             this.queueCreator = queueCreator;
             this.topicCreator = topicCreator;
@@ -46,110 +42,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             this.topicClients = topicClients;
         }
 
-        public Func<Type, string, string> QueueNamingConvention {
-            get
-            {
-                return (messagetype, endpointname) =>
-                {
-                    var queueName = endpointname;
-
-                    var configSection = config != null ? config.Settings.GetConfigSection<AzureServiceBusQueueConfig>() : null;
-
-                    if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
-                    {
-                        queueName = configSection.QueueName;
-                    }
-
-                    if (queueName.Length >= 283) // 290 - a spot for the "-" & 6 digits for the individualizer
-                        queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
-
-                    if (config != null && !config.Settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
-                        queueName = QueueIndividualizer.Individualize(queueName);
-
-                    return queueName;
-                };
-            }
-        }
-
-        public Func<Type, string, string> SubscriptionNamingConvention
-        {
-            get
-            {
-                return (messagetype, endpointname) =>
-                {
-                    var subscriptionName = messagetype != null ? endpointname + "." + messagetype.Name : endpointname;
-
-                    if (subscriptionName.Length >= 50)
-                        subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
-
-                    return subscriptionName;
-                };
-            }
-        }
-        public Func<Type, string, string> SubscriptionFullNamingConvention
-        {
-            get
-            {
-                return (messagetype, endpointname) =>
-                {
-                    var subscriptionName = messagetype != null ? endpointname + "." + messagetype.FullName : endpointname;
-
-                    if (subscriptionName.Length >= 50)
-                        subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
-
-                    return subscriptionName;
-                };
-            }
-        }
-
-        public Func<Type, string, string> TopicNamingConvention
-        {
-            get
-            {
-                return (messagetype, endpointname) =>
-                {
-                    var name = endpointname;
-
-                    if (name.Length >= 290)
-                        name = new DeterministicGuidBuilder().Build(name).ToString();
-
-                    return name;
-                };
-            }
-        }
-        public Func<Address, Address> PublisherAddressConvention
-        {
-            get
-            {
-                return address => Address.Parse(TopicNamingConvention(null, address.Queue + ".events") + "@" + address.Machine);
-            }
-        }
-        public Func<Address, Address> PublisherAddressConventionForSubscriptions
-        {
-            get { return PublisherAddressConvention; }
-        }
-        public Func<Address, Address> QueueAddressConvention
-        {
-            get
-            {
-                return address => Address.Parse(QueueNamingConvention(null, address.Queue) + "@" + address.Machine);
-            }
-        }
-
         public void Initialize(ReadOnlySettings settings)
         {
-            var queuename = QueueNamingConvention(null, settings.EndpointName());
+            var queuename = NamingConventions.QueueNamingConvention(config, null, settings.EndpointName());
             Address.InitializeLocalAddress(queuename);
-        }
-
-        public void Create()
-        {
-            throw new NotImplementedException();
         }
 
         public INotifyReceivedBrokeredMessages Subscribe(Type eventType, Address address)
         {
-            var publisherAddress = PublisherAddressConventionForSubscriptions(address);
+            var publisherAddress = NamingConventions.PublisherAddressConventionForSubscriptions(config, address);
             var notifier = config.Builder.Build<AzureServiceBusSubscriptionNotifier>();
             notifier.SubscriptionClient = CreateSubscriptionClient(eventType, publisherAddress);
             //todo: notifier.BatchSize = maximumConcurrencyLevel;
@@ -160,7 +61,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         private SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
         {
-            var subscriptionname = SubscriptionNamingConvention(eventType, config.Settings.EndpointName());
+            var subscriptionname = NamingConventions.SubscriptionNamingConvention(config, eventType, config.Settings.EndpointName());
             var factory = messagingFactories.Create(address.Machine);
 
             try
@@ -174,7 +75,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                 // so let's differenatiate including this namespace, odds are very likely that we will get a guid instead
                 // that's why we're not defaulting to this convention.
 
-                subscriptionname = SubscriptionFullNamingConvention(eventType, config.Settings.EndpointName());
+                subscriptionname = NamingConventions.SubscriptionFullNamingConvention(config, eventType, config.Settings.EndpointName());
                 var description = subscriptionCreator.Create(address, eventType, subscriptionname);
                 return subscriptionClients.Create(description, factory);
             }
@@ -183,14 +84,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public void Unsubscribe(INotifyReceivedBrokeredMessages notifier)
         {
-            var subscriptionname = SubscriptionNamingConvention(notifier.MessageType, config.Settings.EndpointName());
+            var subscriptionname = NamingConventions.SubscriptionNamingConvention(config, notifier.MessageType, config.Settings.EndpointName());
 
             subscriptionCreator.Delete(notifier.Address, subscriptionname);
         }
 
         public INotifyReceivedBrokeredMessages GetReceiver(Address original)
         {
-            var address = QueueAddressConvention(original);
+            var address = NamingConventions.QueueAddressConvention(config, original);
             var factory = messagingFactories.Create(address.Machine);
             var description = queueCreator.Create(address);
             var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
@@ -202,7 +103,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public ISendBrokeredMessages GetSender(Address original)
         {
-            var address = QueueAddressConvention(original);
+            var address = NamingConventions.QueueAddressConvention(config, original);
             var factory = messagingFactories.Create(address.Machine);
             var description = queueCreator.Create(address);
             var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));
@@ -212,7 +113,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public IPublishBrokeredMessages GetPublisher(Address original)
         {
-            var address = PublisherAddressConvention(original);
+            var address = NamingConventions.PublisherAddressConvention(config, original);
             var description = topicCreator.Create(address);
             var factory = messagingFactories.Create(address.Machine);
             var publisher = (AzureServiceBusTopicPublisher)config.Builder.Build(typeof(AzureServiceBusTopicPublisher));
@@ -221,5 +122,4 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         }
 
     }
-
 }

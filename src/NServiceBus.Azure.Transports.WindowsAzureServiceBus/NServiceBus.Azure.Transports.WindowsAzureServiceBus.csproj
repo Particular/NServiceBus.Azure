@@ -87,6 +87,7 @@
     <Compile Include="Sending\MessageTooLargeException.cs" />
     <Compile Include="Topology\DefaultTopology.cs" />
     <Compile Include="Topology\ITopology.cs" />
+    <Compile Include="Topology\QueueAndTopicByEndpoint\NamingConventions.cs" />
     <Compile Include="Topology\QueueAndTopicByEndpoint\QueueAndTopicByEndpointTopology.cs" />
     <Compile Include="Utils\DeterministicGuidBuilder.cs" />
     <Compile Include="Utils\IsHostedIn.cs" />
@@ -123,9 +124,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="NamingConventions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)..\BuildSupport\RippleRestoreTask.targets" />
   <Import Project="$(SolutionDir)..\BuildSupport\GitVersionTask\Build\GitVersionTask.targets" />

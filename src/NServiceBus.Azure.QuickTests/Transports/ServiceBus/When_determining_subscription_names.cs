@@ -11,9 +11,7 @@
         [Test]
         public void Should_not_exceed_50_characters_and_replace_by_a_deterministic_guid()
         {
-            var topology = new QueueAndTopicByEndpointTopology(null, null, null, null, null, null, null, null, null);
-
-            var subscriptionname = topology.SubscriptionNamingConvention(typeof(SomeEventWithAnInsanelyLongName), "Should_not_exceed_50_characters_and_replace_by_a_deterministic_guid");
+            var subscriptionname = NamingConventions.SubscriptionNamingConvention(null, typeof(SomeEventWithAnInsanelyLongName), "Should_not_exceed_50_characters_and_replace_by_a_deterministic_guid");
 
             Guid guid;
             Assert.IsTrue(Guid.TryParse(subscriptionname, out guid));

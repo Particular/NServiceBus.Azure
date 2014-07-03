@@ -22,7 +22,6 @@
             {
                 var config = b.Build<Configure>();
                 var messagingFactories = b.Build<ICreateMessagingFactories>();
-                var namespaceManagers = b.Build<ICreateNamespaceManagers>();
                 var subscriptionCreator = b.Build<ICreateSubscriptions>();
                 var queueCreator = b.Build<ICreateQueues>();
                 var topicCreator = b.Build<ICreateTopics>();
@@ -32,7 +31,7 @@
 
                 // isn't there a better way to call initialize on object creation?
                 var topology = new QueueAndTopicByEndpointTopology(config, 
-                    messagingFactories, namespaceManagers, 
+                    messagingFactories, 
                     subscriptionCreator,queueCreator, topicCreator, 
                     queueClients, subscriptionClients, topicClients);
                 
