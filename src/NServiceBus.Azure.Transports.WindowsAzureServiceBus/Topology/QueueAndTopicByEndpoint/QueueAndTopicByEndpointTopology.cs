@@ -101,9 +101,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             return notifier;
         }
 
-        public ISendBrokeredMessages GetSender(Address original)
+        public ISendBrokeredMessages GetSender(Address address)
         {
-            var address = NamingConventions.QueueAddressConvention(config, original);
             var factory = messagingFactories.Create(address.Machine);
             var description = queueCreator.Create(address);
             var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));

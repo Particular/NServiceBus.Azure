@@ -1,6 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System.Globalization;
+    using Support;
 
     internal class QueueIndividualizer
     {
@@ -18,9 +19,21 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     individualQueueName = currentQueue
                                           + (index > 0 ? "-" : "")
                                           + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
+
+                    if (queueName.Contains("@"))
+                        individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
                 }
-                if (queueName.Contains("@"))
-                    individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
+            }
+            else
+            {
+                var currentQueue = parser.ParseQueueNameFrom(queueName);
+                if (!currentQueue.EndsWith("-" + RuntimeEnvironment.MachineName)) //individualize can be applied multiple times
+                {
+                    individualQueueName = currentQueue + "-" + RuntimeEnvironment.MachineName;
+
+                    if (queueName.Contains("@"))
+                        individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
+                }
             }
 
             return individualQueueName;
