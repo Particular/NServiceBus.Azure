@@ -15,17 +15,19 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             if (message.Properties.Count > 0)
             {
-                t = new TransportMessage(message.MessageId,
-                    message.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value as string),
-                    !String.IsNullOrWhiteSpace( message.ReplyTo ) ? Address.Parse( message.ReplyTo ) : null)
+                var headers = message.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value as string);
+                if (!String.IsNullOrWhiteSpace(message.ReplyTo))
+                {
+                    headers[Headers.ReplyToAddress] = message.ReplyTo;
+                }
+
+                t = new TransportMessage(message.MessageId, headers)
                 {
                     CorrelationId = message.CorrelationId,
                     TimeToBeReceived = message.TimeToLive,
-                    MessageIntent = (MessageIntentEnum)
-                        Enum.Parse(typeof(MessageIntentEnum), message.Properties[Headers.MessageIntent].ToString())
+                    MessageIntent = (MessageIntentEnum)Enum.Parse(typeof(MessageIntentEnum), message.Properties[Headers.MessageIntent].ToString()),
+                    Body = rawMessage
                 };
-
-                t.Body = rawMessage;
             }
             else
             {
