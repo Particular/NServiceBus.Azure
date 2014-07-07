@@ -27,12 +27,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             try
             {
-                
-                if (!namespaceclient.TopicExists(topicName))
+                if (!ConfigureQueueCreation.DontCreateQueues)
                 {
-                    
-
-                    namespaceclient.CreateTopic(description);
+                    if (!namespaceclient.TopicExists(topicName))
+                    {
+                        namespaceclient.CreateTopic(description);
+                    }
                 }
             }
             catch (MessagingEntityAlreadyExistsException)

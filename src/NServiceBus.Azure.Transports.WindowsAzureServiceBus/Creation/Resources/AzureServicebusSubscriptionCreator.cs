@@ -44,43 +44,44 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 EnableDeadLetteringOnFilterEvaluationExceptions = EnableDeadLetteringOnFilterEvaluationExceptions
             };
 
-            if (namespaceClient.TopicExists(topicPath))
+            if (!ConfigureQueueCreation.DontCreateQueues)
             {
-                try
+                if (namespaceClient.TopicExists(topicPath))
                 {
-                    if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                    try
                     {
-                       
+                        if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                        {
 
-                        if (filter != string.Empty)
-                        {
-                            namespaceClient.CreateSubscription(description, new SqlFilter(filter));
-                        }
-                        else
-                        {
-                            namespaceClient.CreateSubscription(description);
+                            if (filter != string.Empty)
+                            {
+                                namespaceClient.CreateSubscription(description, new SqlFilter(filter));
+                            }
+                            else
+                            {
+                                namespaceClient.CreateSubscription(description);
+                            }
                         }
                     }
-                }
-                catch (MessagingEntityAlreadyExistsException)
-                {
-                    // the queue already exists or another node beat us to it, which is ok
-                }
-                catch (TimeoutException)
-                {
-                    // there is a chance that the timeout occurs, but the subscription is created still
-                    // check for this
-                    if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
-                        throw;
-                }
+                    catch (MessagingEntityAlreadyExistsException)
+                    {
+                        // the queue already exists or another node beat us to it, which is ok
+                    }
+                    catch (TimeoutException)
+                    {
+                        // there is a chance that the timeout occurs, but the subscription is created still
+                        // check for this
+                        if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                            throw;
+                    }
 
-                GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
+                    GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
+                }
+                else
+                {
+                    throw new InvalidOperationException(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist", topicPath));
+                }
             }
-            else
-            {
-                throw new InvalidOperationException(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist", topicPath));
-            }
-
             return description;
         }
 

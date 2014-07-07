@@ -45,10 +45,13 @@
 
             try
             {
-                path = description.Path;
-                if (!namespaceClient.QueueExists(path))
+                if (!ConfigureQueueCreation.DontCreateQueues)
                 {
-                    namespaceClient.CreateQueue(description);
+                    path = description.Path;
+                    if (!namespaceClient.QueueExists(path))
+                    {
+                        namespaceClient.CreateQueue(description);
+                    }
                 }
             }
             catch (MessagingEntityAlreadyExistsException)
@@ -65,5 +68,6 @@
 
             return description;
         }
+
     }
 }
