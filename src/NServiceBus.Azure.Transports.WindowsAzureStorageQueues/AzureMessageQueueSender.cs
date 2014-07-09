@@ -8,6 +8,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
+    using Microsoft.WindowsAzure.Storage.RetryPolicies;
     using NServiceBus.Transports;
     using Unicast;
     using Unicast.Queuing;
@@ -18,8 +19,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     public class AzureMessageQueueSender : ISendMessages
     {
         readonly Configure config;
-        private readonly Dictionary<string, CloudQueueClient> destinationQueueClients = new Dictionary<string, CloudQueueClient>();
+        private static readonly Dictionary<string, CloudQueueClient> destinationQueueClients = new Dictionary<string, CloudQueueClient>();
+        private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
         private static readonly object SenderLock = new Object();
+        private static readonly object ExistanceLock = new Object();
 
         /// <summary>
         /// Gets or sets the message serializer
@@ -33,7 +36,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             this.config = config;
         }
 
-        public void Send(TransportMessage message, SendOptions options)
+        public async void Send(TransportMessage message, SendOptions options)
         {
            var address = options.Destination;
 
@@ -41,7 +44,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             var sendQueue = sendClient.GetQueueReference(AzureMessageQueueUtils.GetQueueName(address));
 
-            if (!sendQueue.Exists())
+            if (!Exists(sendQueue))
                 throw new QueueNotFoundException { Queue = address };
 
             var timeToBeReceived = options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue ? options.TimeToBeReceived : null;
@@ -50,10 +53,32 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
-                sendQueue.AddMessage(rawMessage, timeToBeReceived);
+                //sendQueue.AddMessage(rawMessage, timeToBeReceived);
+                await sendQueue.AddMessageAsync(rawMessage, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext() ).ConfigureAwait(false);
+
             }
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(sendQueue, rawMessage, timeToBeReceived), EnlistmentOptions.None);
+        }
+
+        bool Exists(CloudQueue sendQueue)
+        {
+            var key = sendQueue.Uri.ToString();
+            bool exists;
+            if (!rememberExistance.ContainsKey(key))
+            {
+                lock (ExistanceLock)
+                {
+                    exists = sendQueue.Exists();
+                    rememberExistance[key] = exists;
+                }
+            }
+            else
+            {
+                 exists = rememberExistance[key];
+            }
+
+            return exists;
         }
 
         private CloudQueueClient GetClientForConnectionString(string connectionString)

@@ -2,6 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
     using System.Transactions;
+    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     
     public class SendResourceManager : IEnlistmentNotification
@@ -22,9 +23,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             preparingEnlistment.Prepared();
         }
 
-        public void Commit(Enlistment enlistment)
+        public async void Commit(Enlistment enlistment)
         {
-            queue.AddMessage(message, timeToBeReceived);
+           // queue.AddMessage(message, timeToBeReceived);
+            await queue.AddMessageAsync(message, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext()).ConfigureAwait(false);
             enlistment.Done();
         }
 
