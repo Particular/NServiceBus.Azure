@@ -8,7 +8,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
-    using Microsoft.WindowsAzure.Storage.RetryPolicies;
     using NServiceBus.Transports;
     using Unicast;
     using Unicast.Queuing;
@@ -19,6 +18,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     public class AzureMessageQueueSender : ISendMessages
     {
         readonly Configure config;
+
         private static readonly Dictionary<string, CloudQueueClient> destinationQueueClients = new Dictionary<string, CloudQueueClient>();
         private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
         private static readonly object SenderLock = new Object();
@@ -29,8 +29,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         /// </summary>
         public IMessageSerializer MessageSerializer { get; set; }
 
-        public CloudQueueClient Client { get; set; }
-
         public AzureMessageQueueSender(Configure config)
         {
             this.config = config;
@@ -40,7 +38,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         {
            var address = options.Destination;
 
-            var sendClient = GetClientForConnectionString(address.Machine) ?? Client;
+            var sendClient = GetClientForConnectionString(address.Machine);
 
             var sendQueue = sendClient.GetQueueReference(AzureMessageQueueUtils.GetQueueName(address));
 
@@ -53,7 +51,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
-                //sendQueue.AddMessage(rawMessage, timeToBeReceived);
                 await sendQueue.AddMessageAsync(rawMessage, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext() ).ConfigureAwait(false);
 
             }
