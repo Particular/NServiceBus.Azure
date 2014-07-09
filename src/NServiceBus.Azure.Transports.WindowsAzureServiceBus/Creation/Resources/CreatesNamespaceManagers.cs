@@ -19,20 +19,20 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public NamespaceManager Create(string potentialConnectionstring)
         {
-            var connectionStringParser = new DeterminesBestConnectionStringForAzureServiceBus();
-            var connectionstring = potentialConnectionstring != RuntimeEnvironment.MachineName && connectionStringParser.IsPotentialServiceBusConnectionString(potentialConnectionstring)
-                                      ? potentialConnectionstring
-                                      : connectionStringParser.Determine(config.Settings);
-
             NamespaceManager manager;
-            if (!NamespaceManagers.TryGetValue(connectionstring, out manager))
+            if (!NamespaceManagers.TryGetValue(potentialConnectionstring, out manager))
             {
                 lock (NamespaceLock)
                 {
-                    if (!NamespaceManagers.TryGetValue(connectionstring, out manager))
+                    var connectionStringParser = new DeterminesBestConnectionStringForAzureServiceBus();
+                    var connectionstring = potentialConnectionstring != RuntimeEnvironment.MachineName && connectionStringParser.IsPotentialServiceBusConnectionString(potentialConnectionstring)
+                                              ? potentialConnectionstring
+                                              : connectionStringParser.Determine(config.Settings);
+                    
+                    if (!NamespaceManagers.TryGetValue(potentialConnectionstring, out manager))
                     {
                         manager = NamespaceManager.CreateFromConnectionString(connectionstring);
-                        NamespaceManagers[connectionstring] = manager;
+                        NamespaceManagers[potentialConnectionstring] = manager;
                     }
                 }
             }

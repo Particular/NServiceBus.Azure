@@ -1,12 +1,17 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using System.Collections.Generic;
+    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
     using Transports;
 
     internal class AzureServicebusTopicCreator : ICreateTopics
     {
         readonly ICreateNamespaceManagers createNamespaceManagers;
+
+        private static readonly Dictionary<string, bool> rememberTopicExistance = new Dictionary<string, bool>();
+        private static readonly object TopicExistanceLock = new Object();
 
         public bool EnablePartitioning { get; set; }
 
@@ -29,7 +34,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 if (!ConfigureQueueCreation.DontCreateQueues)
                 {
-                    if (!namespaceclient.TopicExists(topicName))
+                    if (!TopicExists(namespaceclient, topicName))
                     {
                         namespaceclient.CreateTopic(description);
                     }
@@ -43,11 +48,31 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 // there is a chance that the timeout occurs, but the queue is created still
                 // check for this
-                if (!namespaceclient.QueueExists(topicName))
+                if (!TopicExists(namespaceclient, topicName))
                     throw;
             }
 
             return description;
+        }
+
+        bool TopicExists(NamespaceManager namespaceClient, string topicpath)
+        {
+            var key = topicpath;
+            bool exists;
+            if (!rememberTopicExistance.ContainsKey(key))
+            {
+                lock (TopicExistanceLock)
+                {
+                    exists = namespaceClient.TopicExists(key);
+                    rememberTopicExistance[key] = exists;
+                }
+            }
+            else
+            {
+                exists = rememberTopicExistance[key];
+            }
+
+            return exists;
         }
 
     }

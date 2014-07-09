@@ -1,6 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
 
@@ -15,6 +16,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public bool EnableDeadLetteringOnFilterEvaluationExceptions { get; set; }
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
+
+        private static readonly Dictionary<string, bool> rememberTopicExistance = new Dictionary<string, bool>();
+        private static readonly Dictionary<string, bool> rememberSubscriptionExistance = new Dictionary<string, bool>();
+        private static readonly object TopicExistanceLock = new Object();
+        private static readonly object SubscriptionExistanceLock = new Object();
 
         public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers)
         {
@@ -46,11 +52,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             if (!ConfigureQueueCreation.DontCreateQueues)
             {
-                if (namespaceClient.TopicExists(topicPath))
+                if (TopicExists(namespaceClient, topicPath))
                 {
                     try
                     {
-                        if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                        if (!SubscriptionExists(namespaceClient, topicPath, subscriptionname))
                         {
 
                             if (filter != string.Empty)
@@ -103,10 +109,50 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public void Delete(Address topic, string subscriptionname)
         {
             var namespaceClient = createNamespaceManagers.Create(topic.Machine);
-            if (namespaceClient.SubscriptionExists(topic.Queue, subscriptionname))
+            if (SubscriptionExists(namespaceClient, topic.Queue, subscriptionname))
             {
                 namespaceClient.DeleteSubscription(topic.Queue, subscriptionname);
             }
+        }
+
+        bool TopicExists(NamespaceManager namespaceClient, string topicpath)
+        {
+            var key = topicpath;
+            bool exists;
+            if (!rememberTopicExistance.ContainsKey(key))
+            {
+                lock (TopicExistanceLock)
+                {
+                    exists = namespaceClient.TopicExists(key);
+                    rememberTopicExistance[key] = exists;
+                }
+            }
+            else
+            {
+                exists = rememberTopicExistance[key];
+            }
+
+            return exists;
+        }
+
+        bool SubscriptionExists(NamespaceManager namespaceClient, string topicpath, string subscriptionname)
+        {
+            var key = topicpath + subscriptionname;
+            bool exists;
+            if (!rememberSubscriptionExistance.ContainsKey(key))
+            {
+                lock (SubscriptionExistanceLock)
+                {
+                    exists = namespaceClient.SubscriptionExists(topicpath, subscriptionname);
+                    rememberSubscriptionExistance[key] = exists;
+                }
+            }
+            else
+            {
+                exists = rememberSubscriptionExistance[key];
+            }
+
+            return exists;
         }
     }
 }

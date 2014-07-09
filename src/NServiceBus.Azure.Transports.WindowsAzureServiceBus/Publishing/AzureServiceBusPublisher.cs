@@ -34,10 +34,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         private void Publish(IPublishBrokeredMessages publisher, TransportMessage message, PublishOptions options)
         {
-            using (var brokeredMessage = message.ToBrokeredMessage(options, config.Settings))
-            {
-                publisher.Publish(brokeredMessage);
-            }
+            var brokeredMessage = message.ToBrokeredMessage(options, config.Settings);
+            publisher.Publish(brokeredMessage);
         }
     }
 }

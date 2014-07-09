@@ -62,7 +62,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         private SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
         {
             var subscriptionname = NamingConventions.SubscriptionNamingConvention(config, eventType, config.Settings.EndpointName());
-            var factory = messagingFactories.Create(address.Machine);
+            var factory = messagingFactories.Create(address);
 
             try
             {
@@ -92,7 +92,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         public INotifyReceivedBrokeredMessages GetReceiver(Address original)
         {
             var address = NamingConventions.QueueAddressConvention(config, original);
-            var factory = messagingFactories.Create(address.Machine);
+            var factory = messagingFactories.Create(address);
             var description = queueCreator.Create(address);
             var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
             notifier.QueueClient = queueClients.Create(description, factory);
@@ -103,7 +103,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public ISendBrokeredMessages GetSender(Address address)
         {
-            var factory = messagingFactories.Create(address.Machine);
+            var factory = messagingFactories.Create(address);
             var description = queueCreator.Create(address);
             var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));
             sender.QueueClient = queueClients.Create(description, factory);
@@ -114,7 +114,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         {
             var address = NamingConventions.PublisherAddressConvention(config, original);
             var description = topicCreator.Create(address);
-            var factory = messagingFactories.Create(address.Machine);
+            var factory = messagingFactories.Create(address);
             var publisher = (AzureServiceBusTopicPublisher)config.Builder.Build(typeof(AzureServiceBusTopicPublisher));
             publisher.TopicClient = topicClients.Create(description, factory);
             return publisher;

@@ -11,7 +11,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
 
-        public void Publish(BrokeredMessage brokeredMessage)
+        public async void Publish(BrokeredMessage brokeredMessage)
         {
             var numRetries = 0;
             var sent = false;
@@ -20,8 +20,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    TopicClient.Send(brokeredMessage);
-
+                    await TopicClient.SendAsync(brokeredMessage).ConfigureAwait(false);
+                   
                     sent = true;
                 }
                 // todo, outbox

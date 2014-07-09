@@ -12,7 +12,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public QueueClient QueueClient { get; set; }
 
-        public void Send(BrokeredMessage brokeredMessage)
+        public async void Send(BrokeredMessage brokeredMessage)
         {
             var numRetries = 0;
             var sent = false;
@@ -21,7 +21,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    QueueClient.Send(brokeredMessage);
+                    await QueueClient.SendAsync(brokeredMessage).ConfigureAwait(false);
                     sent = true;
                 }
                     // todo: outbox

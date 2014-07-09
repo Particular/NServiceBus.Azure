@@ -6,33 +6,40 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     internal class CreatesMessagingFactories : ICreateMessagingFactories
     {
-        readonly Configure config;
+        readonly ICreateNamespaceManagers createNamespaceManagers;
 
         private static readonly Dictionary<string, MessagingFactory> MessagingFactories = new Dictionary<string, MessagingFactory>();
 
         private static readonly object FactoryLock = new Object();
 
-        public CreatesMessagingFactories(Configure config)
+        public CreatesMessagingFactories(ICreateNamespaceManagers createNamespaceManagers)
         {
-            this.config = config;
+            this.createNamespaceManagers = createNamespaceManagers;
         }
 
-        public MessagingFactory Create(string potentialConnectionString)
+        public MessagingFactory Create(Address address)
         {
-            var validation = new DeterminesBestConnectionStringForAzureServiceBus();
-            var connectionstring = validation.IsPotentialServiceBusConnectionString(potentialConnectionString)
-                                     ? potentialConnectionString
-                                     : validation.Determine(config.Settings); 
-
             MessagingFactory factory;
-            if (!MessagingFactories.TryGetValue(connectionstring, out factory))
+            if (!MessagingFactories.TryGetValue(address.ToString(), out factory))
             {
                 lock (FactoryLock)
                 {
-                    if (!MessagingFactories.TryGetValue(connectionstring, out factory))
+                    if (!MessagingFactories.TryGetValue(address.ToString(), out factory))
                     {
-                        factory = MessagingFactory.CreateFromConnectionString(connectionstring);
-                        MessagingFactories[connectionstring] = factory;
+                        var potentialConnectionString = address.Machine;
+                        var namespaceManager = createNamespaceManagers.Create(potentialConnectionString);
+
+                        var settings = new MessagingFactorySettings
+                        {
+                            TokenProvider = namespaceManager.Settings.TokenProvider,
+                            NetMessagingTransportSettings =
+                            {
+                                BatchFlushInterval = TimeSpan.FromSeconds(0.1)
+                            }
+                        };
+                        factory = MessagingFactory.Create(namespaceManager.Address, settings);
+                        
+                        MessagingFactories[address.ToString()] = factory;
                     }
                 }
             }

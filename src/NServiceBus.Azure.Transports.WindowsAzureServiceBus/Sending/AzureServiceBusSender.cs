@@ -54,10 +54,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             try
             {
-                using (var brokeredMessage = message.ToBrokeredMessage(options, config.Settings, expectDelay))
-                {
-                    sender.Send(brokeredMessage);
-                }
+                var brokeredMessage = message.ToBrokeredMessage(options, config.Settings, expectDelay);
+                sender.Send(brokeredMessage);
             }
             catch (MessagingEntityNotFoundException)
             {

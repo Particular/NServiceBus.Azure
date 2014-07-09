@@ -1,6 +1,8 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using System.Collections.Generic;
+    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
 
     internal class AzureServiceBusQueueCreator : Transports.ICreateQueues
@@ -17,6 +19,9 @@
         public bool EnablePartitioning { get; set; }
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
+
+        private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
+        private static readonly object ExistanceLock = new Object();
 
         public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers)
         {
@@ -48,7 +53,7 @@
                 if (!ConfigureQueueCreation.DontCreateQueues)
                 {
                     path = description.Path;
-                    if (!namespaceClient.QueueExists(path))
+                    if (!Exists(namespaceClient, path))
                     {
                         namespaceClient.CreateQueue(description);
                     }
@@ -62,11 +67,31 @@
             {
                 // there is a chance that the timeout occurs, but the queue is created still
                 // check for this
-                if (!namespaceClient.QueueExists(path))
+                if (!Exists(namespaceClient, path))
                     throw;
             }
 
             return description;
+        }
+
+        bool Exists(NamespaceManager namespaceClient, string path)
+        {
+            var key = path;
+            bool exists;
+            if (!rememberExistance.ContainsKey(key))
+            {
+                lock (ExistanceLock)
+                {
+                    exists = namespaceClient.QueueExists(key);
+                    rememberExistance[key] = exists;
+                }
+            }
+            else
+            {
+                exists = rememberExistance[key];
+            }
+
+            return exists;
         }
 
     }
