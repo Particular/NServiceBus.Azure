@@ -5,6 +5,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public interface IPublishBrokeredMessages
     {
-        Task Publish(BrokeredMessage brokeredMessage);
+        void Publish(BrokeredMessage brokeredMessage);
     }
 }
