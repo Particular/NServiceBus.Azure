@@ -23,10 +23,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             preparingEnlistment.Prepared();
         }
 
-        public async void Commit(Enlistment enlistment)
+        public void Commit(Enlistment enlistment)
         {
-           // queue.AddMessage(message, timeToBeReceived);
-            await queue.AddMessageAsync(message, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext()).ConfigureAwait(false);
+            var task = queue.AddMessageAsync(message, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext());
+            task.Wait();
+
             enlistment.Done();
         }
 

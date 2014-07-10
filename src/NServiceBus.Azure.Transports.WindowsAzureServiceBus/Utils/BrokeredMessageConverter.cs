@@ -101,7 +101,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 brokeredMessage.TimeToLive = options.TimeToBeReceived.Value;
             }
 
-            if (brokeredMessage.Size > 256*1024)
+            if (brokeredMessage.Size > 256 * 1024)
             {
                 throw new MessageTooLargeException(string.Format("The message with id {0} is larger that the maximum message size allowed by Azure ServiceBus, consider using the databus instead", message.Id));
             }

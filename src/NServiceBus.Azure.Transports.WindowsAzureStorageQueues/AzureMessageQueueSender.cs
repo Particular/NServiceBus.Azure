@@ -6,6 +6,7 @@ using NServiceBus.Serialization;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
+    using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using NServiceBus.Transports;
@@ -34,9 +35,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             this.config = config;
         }
 
-        public async void Send(TransportMessage message, SendOptions options)
+        public void Send(TransportMessage message, SendOptions options)
         {
-           var address = options.Destination;
+            var address = options.Destination;
 
             var sendClient = GetClientForConnectionString(address.Machine);
 
@@ -51,8 +52,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
-                await sendQueue.AddMessageAsync(rawMessage, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext() ).ConfigureAwait(false);
-
+                var task = sendQueue.AddMessageAsync(rawMessage, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext());
+                task.Wait();
             }
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(sendQueue, rawMessage, timeToBeReceived), EnlistmentOptions.None);
