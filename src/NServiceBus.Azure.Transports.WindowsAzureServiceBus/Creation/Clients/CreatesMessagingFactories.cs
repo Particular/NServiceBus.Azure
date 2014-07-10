@@ -1,16 +1,14 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using Microsoft.ServiceBus.Messaging;
 
     internal class CreatesMessagingFactories : ICreateMessagingFactories
     {
         readonly ICreateNamespaceManagers createNamespaceManagers;
 
-        private static readonly Dictionary<string, MessagingFactory> MessagingFactories = new Dictionary<string, MessagingFactory>();
-
-        private static readonly object FactoryLock = new Object();
+        private readonly ConcurrentDictionary<string, MessagingFactory> MessagingFactories = new ConcurrentDictionary<string, MessagingFactory>();
 
         public CreatesMessagingFactories(ICreateNamespaceManagers createNamespaceManagers)
         {
@@ -19,31 +17,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public MessagingFactory Create(Address address)
         {
-            MessagingFactory factory;
-            if (!MessagingFactories.TryGetValue(address.ToString(), out factory))
+            return MessagingFactories.GetOrAdd(address.ToString(), s =>
             {
-                lock (FactoryLock)
-                {
-                    if (!MessagingFactories.TryGetValue(address.ToString(), out factory))
-                    {
-                        var potentialConnectionString = address.Machine;
-                        var namespaceManager = createNamespaceManagers.Create(potentialConnectionString);
+                var potentialConnectionString = address.Machine;
+                var namespaceManager = createNamespaceManagers.Create(potentialConnectionString);
 
-                        var settings = new MessagingFactorySettings
-                        {
-                            TokenProvider = namespaceManager.Settings.TokenProvider,
-                            NetMessagingTransportSettings =
-                            {
-                                BatchFlushInterval = TimeSpan.FromSeconds(0.1)
-                            }
-                        };
-                        factory = MessagingFactory.Create(namespaceManager.Address, settings);
-                        
-                        MessagingFactories[address.ToString()] = factory;
+                var settings = new MessagingFactorySettings
+                {
+                    TokenProvider = namespaceManager.Settings.TokenProvider,
+                    NetMessagingTransportSettings =
+                    {
+                        BatchFlushInterval = TimeSpan.FromSeconds(0.1)
                     }
-                }
-            }
-            return factory;
+                };
+                return MessagingFactory.Create(namespaceManager.Address, settings);
+            });
+       
         }
     }
 }

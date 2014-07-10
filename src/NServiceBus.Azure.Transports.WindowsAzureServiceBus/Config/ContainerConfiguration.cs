@@ -58,8 +58,8 @@
 
         private void ConfigureCreationInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
-            context.Container.ConfigureComponent<CreatesMessagingFactories>(DependencyLifecycle.InstancePerCall);
-            context.Container.ConfigureComponent<CreatesNamespaceManagers>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureComponent<CreatesMessagingFactories>(DependencyLifecycle.SingleInstance);
+            context.Container.ConfigureComponent<CreatesNamespaceManagers>(DependencyLifecycle.SingleInstance);
 
             context.Container.ConfigureComponent<AzureServicebusQueueClientCreator>(DependencyLifecycle.InstancePerCall);
 

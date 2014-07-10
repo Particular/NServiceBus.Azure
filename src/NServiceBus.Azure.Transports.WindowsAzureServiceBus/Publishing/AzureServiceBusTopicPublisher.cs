@@ -2,6 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.ServiceBus.Messaging;
 
     internal class AzureServiceBusTopicPublisher : IPublishBrokeredMessages
@@ -11,7 +12,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
 
-        public void Publish(BrokeredMessage brokeredMessage)
+        public async Task Publish(BrokeredMessage brokeredMessage)
         {
             var numRetries = 0;
             var sent = false;
@@ -20,8 +21,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    var task = TopicClient.SendAsync(brokeredMessage);
-                    task.Wait();
+                    await TopicClient.SendAsync(brokeredMessage);
                    
                     sent = true;
                 }

@@ -2,6 +2,7 @@ using System.Transactions;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System.Threading.Tasks;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Transports;
     using Unicast;
@@ -23,12 +24,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void Send(TransportMessage message, SendOptions options)
         {
-            SendInternal(message, options);
+            SendInternal(message, options).Wait();
         }
 
         public void Defer(TransportMessage message, SendOptions options)
         {
-            SendInternal(message, options, expectDelay:true);
+            SendInternal(message, options, expectDelay: true).Wait();
         }
 
         public void ClearDeferredMessages(string headerKey, string headerValue)
@@ -36,27 +37,27 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             //? throw new NotSupportedException();
         }
 
-        void SendInternal(TransportMessage message, SendOptions options, bool expectDelay = false)
+        async Task SendInternal(TransportMessage message, SendOptions options, bool expectDelay = false)
         {
             var sender = topology.GetSender(options.Destination);
        
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
-                SendInternal(message, sender, options, expectDelay);
+                await SendInternal(message, sender, options, expectDelay);
             }
             else
             {
-                Transaction.Current.EnlistVolatile(new SendResourceManager(() => SendInternal(message, sender, options, expectDelay)), EnlistmentOptions.None);
+                Transaction.Current.EnlistVolatile(new SendResourceManager(() => SendInternal(message, sender, options, expectDelay).Wait()), EnlistmentOptions.None);
             }
         }
 
-        void SendInternal(TransportMessage message, ISendBrokeredMessages sender, SendOptions options, bool expectDelay)
+        async Task SendInternal(TransportMessage message, ISendBrokeredMessages sender, SendOptions options, bool expectDelay)
         {
             try
             {
                 using(var brokeredMessage = message.ToBrokeredMessage(options, config.Settings, expectDelay))
                 {
-                    sender.Send(brokeredMessage);
+                    await sender.Send(brokeredMessage);
                 }
             }
             catch (MessagingEntityNotFoundException)

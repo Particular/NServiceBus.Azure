@@ -2,6 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.ServiceBus.Messaging;
 
     internal class AzureServiceBusQueueSender : ISendBrokeredMessages
@@ -12,7 +13,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public QueueClient QueueClient { get; set; }
 
-        public void Send(BrokeredMessage brokeredMessage)
+        public async Task Send(BrokeredMessage brokeredMessage)
         {
             var numRetries = 0;
             var sent = false;
@@ -21,10 +22,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    var task = QueueClient.SendAsync(brokeredMessage);
-                    task.Wait();
-
-                    sent = true;
+                   await QueueClient.SendAsync(brokeredMessage);
+                    
+                   sent = true;
                 }
                     // todo: outbox
                 catch (MessagingEntityDisabledException)

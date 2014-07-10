@@ -1,9 +1,10 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System.Threading.Tasks;
     using Microsoft.ServiceBus.Messaging;
 
     public interface ISendBrokeredMessages
     {
-        void Send(BrokeredMessage brokeredMessage);
+        Task Send(BrokeredMessage brokeredMessage);
     }
 }

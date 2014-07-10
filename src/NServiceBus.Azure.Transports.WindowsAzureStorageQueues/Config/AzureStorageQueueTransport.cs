@@ -58,6 +58,7 @@
 
             var recieverConfig = context.Container.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
             recieverConfig.ConfigureProperty(p => p.PurgeOnStartup, ConfigurePurging.PurgeRequested);
+            context.Container.ConfigureComponent<CreateQueueClients>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);

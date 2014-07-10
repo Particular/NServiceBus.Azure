@@ -6,7 +6,7 @@ using NServiceBus.Serialization;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
-    using System.Threading.Tasks;
+    using System.Collections.Concurrent;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using NServiceBus.Transports;
@@ -19,10 +19,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     public class AzureMessageQueueSender : ISendMessages
     {
         readonly Configure config;
+        readonly ICreateQueueClients createQueueClients;
 
-        private static readonly Dictionary<string, CloudQueueClient> destinationQueueClients = new Dictionary<string, CloudQueueClient>();
+
         private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
-        private static readonly object SenderLock = new Object();
+        
         private static readonly object ExistanceLock = new Object();
 
         /// <summary>
@@ -30,16 +31,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         /// </summary>
         public IMessageSerializer MessageSerializer { get; set; }
 
-        public AzureMessageQueueSender(Configure config)
+        public AzureMessageQueueSender(Configure config, ICreateQueueClients createQueueClients)
         {
             this.config = config;
+            this.createQueueClients = createQueueClients;
         }
 
         public void Send(TransportMessage message, SendOptions options)
         {
             var address = options.Destination;
 
-            var sendClient = GetClientForConnectionString(address.Machine);
+            var sendClient = createQueueClients.Create(address.Machine);
 
             var sendQueue = sendClient.GetQueueReference(AzureMessageQueueUtils.GetQueueName(address));
 
@@ -79,40 +81,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             return exists;
         }
 
-        private CloudQueueClient GetClientForConnectionString(string connectionString)
-        {
-            CloudQueueClient sendClient;
-
-            var validation = new DeterminesBestConnectionStringForStorageQueues();
-            if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
-            {
-                connectionString = validation.Determine(config.Settings); 
-            }
-
-            if (!destinationQueueClients.TryGetValue(connectionString, out sendClient))
-            {
-                lock (SenderLock)
-                {
-                    if (!destinationQueueClients.TryGetValue(connectionString, out sendClient))
-                    {
-                        CloudStorageAccount account;
-
-                        if (CloudStorageAccount.TryParse(connectionString, out account))
-                        {
-                            sendClient = account.CreateCloudQueueClient();
-                        }
-
-                        // sendClient could be null, this is intentional 
-                        // so that it remembers a connectionstring was invald 
-                        // and doesn't try to parse it again.
-
-                        destinationQueueClients.Add(connectionString, sendClient);
-                    }
-                }
-            }
-
-            return sendClient;
-        }
+      
 
         private CloudQueueMessage SerializeMessage(TransportMessage message, SendOptions options)
         {
@@ -137,6 +106,44 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 MessageSerializer.Serialize(toSend, stream);
                 return new CloudQueueMessage(stream.ToArray());
             }
+        }
+    }
+
+    public interface ICreateQueueClients
+    {
+        CloudQueueClient Create(string connectionString);
+    }
+
+    public class CreateQueueClients : ICreateQueueClients
+    {
+        private readonly ConcurrentDictionary<string, CloudQueueClient> destinationQueueClients = new ConcurrentDictionary<string, CloudQueueClient>();
+        private readonly Configure config;
+
+        public CreateQueueClients(Configure config)
+        {
+            this.config = config;
+        }
+
+        public CloudQueueClient Create(string connectionString)
+        {
+            return destinationQueueClients.GetOrAdd(connectionString, s =>
+            {
+                var validation = new DeterminesBestConnectionStringForStorageQueues();
+                if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
+                {
+                    connectionString = validation.Determine(config.Settings);
+                }
+
+                CloudQueueClient sendClient = null;
+                CloudStorageAccount account;
+
+                if (CloudStorageAccount.TryParse(connectionString, out account))
+                {
+                    sendClient = account.CreateCloudQueueClient();
+                }
+
+                return sendClient;
+            });
         }
     }
 }
