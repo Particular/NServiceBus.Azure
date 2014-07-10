@@ -25,8 +25,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
         public void Commit(Enlistment enlistment)
         {
-            var task = queue.AddMessageAsync(message, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext());
-            task.Wait();
+            queue.AddMessage(message, timeToBeReceived);
 
             enlistment.Done();
         }

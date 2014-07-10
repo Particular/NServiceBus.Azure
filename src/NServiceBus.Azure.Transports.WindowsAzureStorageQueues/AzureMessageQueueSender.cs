@@ -54,8 +54,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
-                var task = sendQueue.AddMessageAsync(rawMessage, timeToBeReceived, null, new QueueRequestOptions(), new OperationContext());
-                task.Wait();
+                sendQueue.AddMessage(rawMessage, timeToBeReceived);
+                
             }
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(sendQueue, rawMessage, timeToBeReceived), EnlistmentOptions.None);
