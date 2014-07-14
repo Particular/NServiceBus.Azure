@@ -79,7 +79,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
             setting = string.Empty;
-            var result = false;
+            bool result;
             try
             {
                 setting = (string)roleEnvironmentType.GetMethod("GetConfigurationSettingValue").Invoke(null, new object[] { name });
@@ -87,7 +87,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             catch
             {
-                isAvailable = false;
+                result = false;
             }
 
             return result;

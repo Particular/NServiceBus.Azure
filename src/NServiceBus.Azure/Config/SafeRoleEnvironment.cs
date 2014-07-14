@@ -77,7 +77,7 @@ namespace NServiceBus.Config
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
             setting = string.Empty;
-            var result = false;
+            bool result;
             try
             {
                 setting = (string)roleEnvironmentType.GetMethod("GetConfigurationSettingValue").Invoke(null, new object[] { name });
@@ -85,7 +85,7 @@ namespace NServiceBus.Config
             }
             catch
             {
-                isAvailable = false;
+                result = false;
             }
 
             return result;
@@ -110,7 +110,7 @@ namespace NServiceBus.Config
         {
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
-            var result = false;
+            bool result;
             path = string.Empty;
 
             try
@@ -120,7 +120,7 @@ namespace NServiceBus.Config
             }
             catch
             {
-                isAvailable = false;
+                result = false;
             }
 
             return result;
