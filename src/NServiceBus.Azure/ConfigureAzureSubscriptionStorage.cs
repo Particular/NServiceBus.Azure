@@ -45,7 +45,7 @@ namespace NServiceBus
     {
         internal AzureStorageSubscriptionPersistence()
         {
-            DependsOn<Features.Sagas>();
+            DependsOn<MessageDrivenSubscriptions>();
         }
 
         /// <summary>
