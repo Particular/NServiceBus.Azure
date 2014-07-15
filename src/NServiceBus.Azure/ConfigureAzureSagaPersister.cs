@@ -2,27 +2,60 @@
 
 namespace NServiceBus
 {
+    using Features;
     using Microsoft.WindowsAzure.Storage;
+    using Persistence;
     using SagaPersisters.Azure;
     
     /// <summary>
-    /// Contains extension methods to NServiceBus.Configure for the NHibernate saga persister on top of Azure table storage.
+    /// Contains extension methods to NServiceBus.Configure for the saga persister on top of Azure table storage.
     /// </summary>
     public static class ConfigureAzureSagaPersister
     {
         /// <summary>
-        /// Use the NHibernate backed saga persister implementation.
-        /// Be aware that this implementation deletes sagas that complete so as not to have the database fill up.
-        /// SagaData classes are automatically mapped using Fluent NHibernate Conventions.
+        /// Use the table storage backed saga persister implementation.
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
         public static Configure AzureSagaPersister(this Configure config)
+        {
+            return config.UsePersistence<AzureStorage>();
+        }
+
+        /// <summary>
+        /// Use the table storage backed saga persister implementation on top of Azure table storage.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="connectionString"></param>
+        /// <param name="autoUpdateSchema"></param>
+        /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
+        public static Configure AzureSagaPersister(this Configure config,
+            string connectionString,
+            bool autoUpdateSchema)
+        {
+            return config.UsePersistence<AzureStorage>();
+        }
+
+    }
+
+    public class AzureStorageSagaPersistence : Feature
+    {
+        internal AzureStorageSagaPersistence()
+        {
+            DependsOn<Features.Sagas>();
+        }
+
+        /// <summary>
+        /// See <see cref="Feature.Setup"/>
+        /// </summary>
+        protected override void Setup(FeatureConfigurationContext context)
         {
             var connectionstring = string.Empty;
             var updateSchema = false;
 
-            var configSection = config.Settings.GetConfigSection<AzureSagaPersisterConfig>();
+            var configSection = context.Settings.GetConfigSection<AzureSagaPersisterConfig>();
 
             if (configSection != null)
             {
@@ -30,27 +63,9 @@ namespace NServiceBus
                 updateSchema = configSection.CreateSchema;
             }
 
-            return AzureSagaPersister(config, connectionstring, updateSchema);
-        }
+            var account = CloudStorageAccount.Parse(connectionstring);
 
-        /// <summary>
-        /// Use the NHibernate backed saga persister implementation on top of Azure table storage.
-        /// SagaData classes are automatically mapped using Fluent NHibernate conventions
-        /// and there persistence schema is automatically generated if requested.
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="connectionString"></param>
-        /// <param name="autoUpdateSchema"></param>
-        /// <returns></returns>
-        public static Configure AzureSagaPersister(this Configure config,
-            string connectionString,
-            bool autoUpdateSchema)
-        {
-            var account = CloudStorageAccount.Parse(connectionString);
-
-            config.Configurer.ConfigureComponent(() => new AzureSagaPersister(account, autoUpdateSchema), DependencyLifecycle.InstancePerCall);
-
-            return config;
+            context.Container.ConfigureComponent(() => new AzureSagaPersister(account, updateSchema), DependencyLifecycle.InstancePerCall);
         }
     }
 }

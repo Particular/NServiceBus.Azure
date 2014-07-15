@@ -1,11 +1,9 @@
-using NServiceBus.Timeout.Core;
-using NServiceBus.Timeout.Hosting.Windows;
-
 namespace NServiceBus
 {
-    using System;
     using Azure;
     using Config;
+    using Features;
+    using Persistence;
 
     public static class ConfigureTimeoutManager
     {
@@ -14,23 +12,35 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
         public static Configure UseAzureTimeoutPersister(this Configure config)
         {
-            var configSection = config.Settings.GetConfigSection<AzureTimeoutPersisterConfig>() ?? new AzureTimeoutPersisterConfig();
+            return config.UsePersistence<AzureStorage>();
+        }
+    }
 
-            //todo: refactor this
-            //config.Configurer.ConfigureComponent<TimeoutPersisterReceiver>(DependencyLifecycle.SingleInstance);
-            //config.Configurer.ConfigureComponent<DefaultTimeoutManager>(DependencyLifecycle.SingleInstance);
+    public class AzureStorageTimeoutPersistence : Feature
+    {
+        internal AzureStorageTimeoutPersistence()
+        {
+            DependsOn<TimeoutManager>();
+        }
 
+        /// <summary>
+        /// See <see cref="Feature.Setup"/>
+        /// </summary>
+        protected override void Setup(FeatureConfigurationContext context)
+        {
+            var configSection = context.Settings.GetConfigSection<AzureTimeoutPersisterConfig>() ?? new AzureTimeoutPersisterConfig();
+
+            //TODO: get rid of these statics
             ServiceContext.TimeoutDataTableName = configSection.TimeoutDataTableName;
             ServiceContext.TimeoutManagerDataTableName = configSection.TimeoutManagerDataTableName;
 
-            config.Configurer.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.InstancePerCall)
+            context.Container.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.InstancePerCall)
                 .ConfigureProperty(tp => tp.ConnectionString, configSection.ConnectionString)
                 .ConfigureProperty(tp => tp.CatchUpInterval, configSection.CatchUpInterval)
-                .ConfigureProperty(tp => tp.PartitionKeyScope, configSection.PartitionKeyScope); 
-
-            return config;
+                .ConfigureProperty(tp => tp.PartitionKeyScope, configSection.PartitionKeyScope);
         }
     }
 }

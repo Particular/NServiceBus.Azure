@@ -6,11 +6,9 @@
     using System.Net;
     using System.Reflection;
     using System.Runtime.Caching;
-    using Features;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using NServiceBus.Azure;
-    using Persistence;
     using Saga;
 
     /// <summary>
@@ -352,7 +350,7 @@
             return toCreate;
         }
     }
-
+    
     //todo: refactor to feature, similar to this
     //public class AzureTablesSagaStorage : Feature
     //{

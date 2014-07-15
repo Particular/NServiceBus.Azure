@@ -1,7 +1,9 @@
 namespace NServiceBus
 {
     using Config;
+    using Features;
     using Microsoft.WindowsAzure.Storage;
+    using Persistence;
     using Unicast.Subscriptions;
 
     /// <summary>
@@ -14,12 +16,10 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
         public static Configure AzureSubscriptionStorage(this Configure config)
         {
-            var configSection = config.Settings.GetConfigSection<AzureSubscriptionStorageConfig>();
-            if (configSection == null) { return config; }
-
-            return config.AzureSubscriptionStorage(configSection.ConnectionString, configSection.CreateSchema, configSection.TableName);
+            return config.UsePersistence<AzureStorage>();
         }
 
         /// <summary>
@@ -31,21 +31,39 @@ namespace NServiceBus
         /// <param name="createSchema"></param>
         /// <param name="tableName"> </param>
         /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
         public static Configure AzureSubscriptionStorage(this Configure config,
             string connectionString,
             bool createSchema, 
             string tableName)
         {
-            SubscriptionServiceContext.SubscriptionTableName = tableName;
-            SubscriptionServiceContext.CreateIfNotExist = createSchema;
+            return config.UsePersistence<AzureStorage>();
+        }        
+    }
 
-            var account = CloudStorageAccount.Parse(connectionString);
+    public class AzureStorageSubscriptionPersistence : Feature
+    {
+        internal AzureStorageSubscriptionPersistence()
+        {
+            DependsOn<Features.Sagas>();
+        }
+
+        /// <summary>
+        /// See <see cref="Feature.Setup"/>
+        /// </summary>
+        protected override void Setup(FeatureConfigurationContext context)
+        {
+            var configSection = context.Settings.GetConfigSection<AzureSubscriptionStorageConfig>();
+            if (configSection == null) { return; }
+
+            //TODO: get rid of these statics
+            SubscriptionServiceContext.SubscriptionTableName = configSection.TableName;
+            SubscriptionServiceContext.CreateIfNotExist = configSection.CreateSchema;
+
+            var account = CloudStorageAccount.Parse(configSection.ConnectionString);
             SubscriptionServiceContext.Init(account.CreateCloudTableClient());
 
-            config.Configurer.ConfigureComponent(() => new AzureSubscriptionStorage(account), DependencyLifecycle.InstancePerCall);
-
-            return config;
-
-        }        
+            context.Container.ConfigureComponent(() => new AzureSubscriptionStorage(account), DependencyLifecycle.InstancePerCall);
+        }
     }
 }

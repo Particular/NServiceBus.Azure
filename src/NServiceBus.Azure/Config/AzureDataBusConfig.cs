@@ -30,7 +30,6 @@ namespace NServiceBus.Config
             }
         }
 
-
         [ConfigurationProperty("NumberOfIOThreads", IsRequired = false, DefaultValue = ConfigureAzureBlobStorageDataBus.DefaultNumberOfIOThreads)]
         public int NumberOfIOThreads
         {

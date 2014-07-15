@@ -43,6 +43,5 @@ namespace NServiceBus.Config
                 this["TableName"] = value;
             }
         }
-
     }
 }
