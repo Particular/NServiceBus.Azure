@@ -1,12 +1,7 @@
-﻿using NServiceBus.Config;
-
-namespace NServiceBus
+﻿namespace NServiceBus
 {
-    using Features;
-    using Microsoft.WindowsAzure.Storage;
     using Persistence;
-    using SagaPersisters.Azure;
-    
+
     /// <summary>
     /// Contains extension methods to NServiceBus.Configure for the saga persister on top of Azure table storage.
     /// </summary>
@@ -38,34 +33,5 @@ namespace NServiceBus
             return config.UsePersistence<AzureStorage>();
         }
 
-    }
-
-    public class AzureStorageSagaPersistence : Feature
-    {
-        internal AzureStorageSagaPersistence()
-        {
-            DependsOn<Features.Sagas>();
-        }
-
-        /// <summary>
-        /// See <see cref="Feature.Setup"/>
-        /// </summary>
-        protected override void Setup(FeatureConfigurationContext context)
-        {
-            var connectionstring = string.Empty;
-            var updateSchema = false;
-
-            var configSection = context.Settings.GetConfigSection<AzureSagaPersisterConfig>();
-
-            if (configSection != null)
-            {
-                connectionstring = configSection.ConnectionString;
-                updateSchema = configSection.CreateSchema;
-            }
-
-            var account = CloudStorageAccount.Parse(connectionstring);
-
-            context.Container.ConfigureComponent(() => new AzureSagaPersister(account, updateSchema), DependencyLifecycle.InstancePerCall);
-        }
     }
 }

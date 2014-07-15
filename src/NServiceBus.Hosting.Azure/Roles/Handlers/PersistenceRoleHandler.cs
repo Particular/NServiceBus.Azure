@@ -6,7 +6,7 @@ namespace NServiceBus.Hosting.Roles.Handlers
     /// <summary>
     /// Configuring the right persistence based on  <see cref="UsingPersistence{T}"/> role on the endpoint config
     /// </summary>
-    public class PersistenceRoleHandler : IConfigureRole<UsingPersistence<PersistenceDefinition>>
+    class PersistenceRoleHandler : IConfigureRole<UsingPersistence<PersistenceDefinition>>
     {
         public void ConfigureRole(IConfigureThisEndpoint specifier, Configure config)
         {

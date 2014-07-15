@@ -4,7 +4,7 @@ namespace NServiceBus.Config
 {
     public class AzureDataBusConfig : ConfigurationSection
     {
-        [ConfigurationProperty("MaxRetries", IsRequired = false, DefaultValue = ConfigureAzureBlobStorageDataBus.DefaultMaxRetries)]
+        [ConfigurationProperty("MaxRetries", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultMaxRetries)]
         public int MaxRetries
         {
             get
@@ -17,7 +17,7 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("BlockSize", IsRequired = false, DefaultValue = ConfigureAzureBlobStorageDataBus.DefaultBlockSize)]
+        [ConfigurationProperty("BlockSize", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultBlockSize)]
         public int BlockSize
         {
             get
@@ -30,7 +30,7 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("NumberOfIOThreads", IsRequired = false, DefaultValue = ConfigureAzureBlobStorageDataBus.DefaultNumberOfIOThreads)]
+        [ConfigurationProperty("NumberOfIOThreads", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultNumberOfIOThreads)]
         public int NumberOfIOThreads
         {
             get
@@ -43,7 +43,7 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("ConnectionString", IsRequired = false, DefaultValue = ConfigureAzureBlobStorageDataBus.DefaultConnectionString)]
+        [ConfigurationProperty("ConnectionString", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultConnectionString)]
         public string ConnectionString
         {
             get
@@ -56,7 +56,7 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("Container", IsRequired = false, DefaultValue = ConfigureAzureBlobStorageDataBus.Defaultcontainer)]
+        [ConfigurationProperty("Container", IsRequired = false, DefaultValue = AzureDataBusDefaults.Defaultcontainer)]
         public string Container
         {
             get
@@ -69,7 +69,7 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("BasePath", IsRequired = false, DefaultValue = ConfigureAzureBlobStorageDataBus.DefaultBasePath)]
+        [ConfigurationProperty("BasePath", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultBasePath)]
         public string BasePath
         {
             get

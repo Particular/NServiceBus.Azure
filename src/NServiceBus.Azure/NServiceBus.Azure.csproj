@@ -14,7 +14,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
-	<FodyPath>..\packages\Fody</FodyPath>
+    <FodyPath>..\packages\Fody</FodyPath>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -43,7 +43,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-	<None Include="Fody.targets" />
+    <None Include="Fody.targets" />
     <None Include="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </None>
@@ -92,16 +92,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataBus\AzureDataBusDefaults.cs" />
+    <Compile Include="DataBus\AzureDataBusPersistence.cs" />
     <Compile Include="AzureStorage.cs" />
     <Compile Include="AzureStoragePersistence.cs" />
-    <Compile Include="ConfigureAzureBlobStorageDataBus.cs" />
+    <Compile Include="SagaPersisters\Azure\AzureStorageSagaPersistence.cs" />
+    <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
+    <Compile Include="Obsoletes\ConfigureAzureBlobStorageDataBus.cs" />
     <Compile Include="Config\IsHostedIn.cs" />
     <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Logging\Azure\TraceLogger.cs" />
     <Compile Include="Logging\Azure\TraceLoggerFactory.cs" />
-    <Compile Include="ConfigureAzureSagaPersister.cs" />
-    <Compile Include="ConfigureAzureSubscriptionStorage.cs" />
+    <Compile Include="Obsoletes\ConfigureAzureSagaPersister.cs" />
+    <Compile Include="Obsoletes\ConfigureAzureSubscriptionStorage.cs" />
     <Compile Include="Config\AzureDataBusConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
@@ -116,7 +120,8 @@
     <Compile Include="SagaPersisters\Azure\AzureSagaPersister.cs" />
     <Compile Include="SagaPersisters\Azure\DictionaryTableEntity.cs" />
     <Compile Include="SafeLinqExtensions.cs" />
-    <Compile Include="Timeout\Config\ConfigureTimeoutManager.cs" />
+    <Compile Include="Timeout\Config\AzureStorageTimeoutPersistence.cs" />
+    <Compile Include="Obsoletes\ConfigureTimeoutManager.cs" />
     <Compile Include="Timeout\TimeoutLogic\AutoRenewLease.cs" />
     <Compile Include="Timeout\TimeoutLogic\IDetermineWhoCanSend.cs" />
     <Compile Include="Timeout\TimeoutLogic\LeaseExtensions.cs" />
