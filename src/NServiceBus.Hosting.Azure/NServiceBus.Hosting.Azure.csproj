@@ -107,8 +107,10 @@
     <Compile Include="Roles\AsA_Host.cs" />
     <Compile Include="Roles\AsA_Worker.cs" />
     <Compile Include="RoleHost\Config\DefaultTransportForHost.cs" />
+    <Compile Include="Roles\Handlers\PersistenceRoleHandler.cs" />
     <Compile Include="Roles\Handlers\TransportRoleHandler.cs" />
     <Compile Include="Roles\Handlers\WorkerRoleHandler.cs" />
+    <Compile Include="Roles\UsingPersistence.cs" />
     <Compile Include="Roles\UsingTransport.cs" />
   </ItemGroup>
   <ItemGroup>
