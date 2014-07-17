@@ -14,10 +14,10 @@
     <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
     <dependencies>
-      <dependency id="WindowsAzure.Storage" version="2.1.0.0" />
+      <dependency id="WindowsAzure.Storage" version="[3.1.0.1, 4.0.0.0)" />
       <dependency id="Microsoft.Data.Edm" version="[5.6.0.0, 6.0.0.0)" />
       <dependency id="Microsoft.Data.OData" version="[5.6.0.0, 6.0.0.0)" />
-      <dependency id="NServiceBus" version="[4.7.0.0-Unstable0327, 5.0.0.0)" />
+      <dependency id="NServiceBus" version="[5.0.0.0, 6.0.0.0)" />
       <dependency id="System.Spatial" version="[5.6.0.0, 6.0.0.0)" />
     </dependencies>
   </metadata>
