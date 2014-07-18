@@ -30,7 +30,8 @@ namespace NServiceBus.Hosting
                                                    UseShellExecute = false,
                                                    CreateNoWindow = true,
                                                    RedirectStandardInput = true,
-                                                   RedirectStandardOutput = true
+                                                   RedirectStandardOutput = true,
+                                                   RedirectStandardError = true
                                                };
                     
                     var process = new Process {StartInfo = processStartInfo, EnableRaisingEvents = true};
@@ -54,11 +55,10 @@ namespace NServiceBus.Hosting
 
                     process.Start();
 
+                    service.ProcessId = process.Id;
+
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
-
-                    service.ProcessId = process.Id;
-                    
                 }
                 catch (Exception e)
                 {
