@@ -123,9 +123,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         public void Create(Address original)
         {
             var queue = NamingConventions.QueueAddressConvention(config, original);
-            var topic = NamingConventions.PublisherAddressConvention(config, original);
             queueCreator.Create(queue);
-            topicCreator.Create(topic);
+
+            if (original == Address.Local)
+            {
+                var topic = NamingConventions.PublisherAddressConvention(config, original);
+                topicCreator.Create(topic);
+            }
         }
     }
 }
