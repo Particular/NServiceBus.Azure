@@ -190,7 +190,10 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
         private static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner();
+            var assemblyScanner = new AssemblyScanner
+            {
+                ThrowExceptions = false
+            };
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
