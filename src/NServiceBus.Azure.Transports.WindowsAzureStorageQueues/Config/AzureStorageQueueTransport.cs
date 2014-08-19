@@ -8,31 +8,12 @@
     using Settings;
     using Transports;
 
-    internal class AzureStorageQueueTransport : ConfigureTransport<AzureStorageQueue>
+    internal class AzureStorageQueueTransport : ConfigureTransport
     {
-        protected override void InternalConfigure(Configure config)
+
+        protected override void Configure(FeatureConfigurationContext context, string connectionString)
         {
-            config.EnableFeature<AzureStorageQueueTransport>();
-            config.EnableFeature<TimeoutManagerBasedDeferral>();
-                
-            config.Settings.EnableFeatureByDefault<MessageDrivenSubscriptions>();
-            config.Settings.EnableFeatureByDefault<StorageDrivenPublishing>();
-            config.Settings.EnableFeatureByDefault<TimeoutManager>();
-
-            config.Settings.SetDefault("SelectedSerializer", typeof(Json));
-
-            config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
-
-            var configSection = config.Settings.GetConfigSection<AzureQueueConfig>();
-
-            if(configSection == null)
-                return;
-
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PurgeOnStartup, configSection.PurgeOnStartup);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, configSection.MaximumWaitTimeWhenIdle);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, configSection.MessageInvisibleTime);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PeekInterval, configSection.PeekInterval);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
+            
         }
 
         protected override void Setup(FeatureConfigurationContext context)
