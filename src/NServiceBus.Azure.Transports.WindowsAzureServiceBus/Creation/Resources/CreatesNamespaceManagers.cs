@@ -1,6 +1,5 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using System;
     using System.Collections.Concurrent;
     using Microsoft.ServiceBus;
     using Support;

@@ -1,5 +1,11 @@
 namespace NServiceBus
 {
+    using System;
+    using System.Transactions;
+    using Azure.Transports.WindowsAzureServiceBus;
+    using Config;
+    using Configuration.AdvanceExtensibility;
+    using Features;
     using Transports;
 
     /// <summary>
@@ -12,6 +18,28 @@ namespace NServiceBus
             HasNativePubSubSupport = true;
             HasSupportForCentralizedPubSub = false;
             HasSupportForDistributedTransactions = false;
+        }
+
+        protected override void Configure(ConfigurationBuilder config)
+        {
+            config.GetSettings().SetDefault("SelectedSerializer", typeof(Json));
+
+            var configSection = config.GetSettings().GetConfigSection<AzureServiceBusQueueConfig>();
+            var serverWaitTime = configSection != null ? configSection.ServerWaitTime : AzureServicebusDefaults.DefaultServerWaitTime;
+
+            if (configSection != null)
+            {
+                config.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", !configSection.QueuePerInstance);
+            }
+            else
+            {
+                config.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true);
+            }
+
+            // make sure the transaction stays open a little longer than the long poll.
+            config.Transactions().DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable);
+
+            config.EnableFeature<AzureServiceBusTransport>();
         }
     }
 }

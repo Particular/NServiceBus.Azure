@@ -1,38 +1,14 @@
 ﻿namespace NServiceBus.Features
 {
     using System;
-    using System.Transactions;
     using Azure.Transports.WindowsAzureServiceBus;
     using Config;
     using Microsoft.ServiceBus;
     using Transports;
 
-    internal class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
+    internal class AzureServiceBusTransport : ConfigureTransport
     {
-       protected override void InternalConfigure(Configure config)
-        {
-            config.Settings.SetDefault("SelectedSerializer", typeof(Json));
-
-            var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
-            var serverWaitTime = configSection != null ?  configSection.ServerWaitTime : AzureServicebusDefaults.DefaultServerWaitTime;
-
-           if (configSection != null)
-           {
-               config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", !configSection.QueuePerInstance);
-           }
-           else
-           {
-               config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true);
-           }
-
-           // make sure the transaction stays open a little longer than the long poll.
-            config.Transactions( s => s.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable)));
-
-            config.EnableFeature<AzureServiceBusTransport>();
-
-        }
-
-        protected override void Setup(FeatureConfigurationContext context)
+        protected override void Configure(FeatureConfigurationContext context, string connectionString)
         {
             var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)
@@ -43,10 +19,9 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
-            Address.OverrideDefaultMachine(connectionString);
-
+            var bestConnectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
             
+            Address.OverrideDefaultMachine(bestConnectionString);
         }
 
         protected override bool RequiresConnectionString
@@ -58,7 +33,5 @@
         {
             get { return "Endpoint=sb://{yournamespace}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={yourkey}"; }
         }
-
-        
     }
 }

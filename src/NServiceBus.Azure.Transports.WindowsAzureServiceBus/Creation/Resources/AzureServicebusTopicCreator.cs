@@ -9,15 +9,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     internal class AzureServicebusTopicCreator : ICreateTopics
     {
         readonly ICreateNamespaceManagers createNamespaceManagers;
+        readonly Configure config;
 
         private static readonly Dictionary<string, bool> rememberTopicExistance = new Dictionary<string, bool>();
         private static readonly object TopicExistanceLock = new Object();
 
         public bool EnablePartitioning { get; set; }
 
-        public AzureServicebusTopicCreator(ICreateNamespaceManagers createNamespaceManagers)
+        public AzureServicebusTopicCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
             this.createNamespaceManagers = createNamespaceManagers;
+            this.config = config;
         }
 
         public TopicDescription Create(Address address)
@@ -32,7 +34,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             try
             {
-                if (!ConfigureQueueCreation.DontCreateQueues)
+                if (config.CreateQueues())
                 {
                     if (!TopicExists(namespaceclient, topicName))
                     {

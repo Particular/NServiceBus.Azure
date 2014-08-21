@@ -1,10 +1,12 @@
 namespace NServiceBus
 {
+    using System;
+
     public static class ConfigureAzureServiceBusMessageQueue
     {
         public static Configure AzureServiceBusMessageQueue(this Configure config)
         {
-            return config.UseTransport<AzureServiceBus>();
+            throw new InvalidOperationException();
         }
     }
 }
