@@ -12,7 +12,9 @@
             var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
 
             if (string.IsNullOrEmpty(connectionString))
-                connectionString = settings.Get<string>("NServiceBus.Transport.ConnectionString");
+            {
+                connectionString = DefaultConnectionString.Value;
+            }
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.IssuerKey) && !string.IsNullOrEmpty(configSection.ServiceNamespace))
                 connectionString = string.Format("Endpoint=sb://{0}.servicebus.windows.net/;SharedSecretIssuer=owner;SharedSecretValue={1}", configSection.ServiceNamespace, configSection.IssuerKey);
@@ -44,5 +46,10 @@
             }
         }
 
+    }
+
+    static class DefaultConnectionString
+    {
+        internal static string Value;
     }
 }

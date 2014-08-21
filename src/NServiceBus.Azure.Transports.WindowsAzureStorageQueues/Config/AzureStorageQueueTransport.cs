@@ -10,22 +10,7 @@
 
     internal class AzureStorageQueueTransport : ConfigureTransport
     {
-        internal AzureStorageQueueTransport()
-        {
-            Defaults(settings =>
-            {
-                var configSection = settings.GetConfigSection<AzureQueueConfig>();
-
-                if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
-                {
-                    if (configSection.QueuePerInstance)
-                    {
-                        settings.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
-                    }
-                }
-            });
-        }
-
+       
         protected override void Configure(FeatureConfigurationContext context, string con)
         {
             CloudQueueClient queueClient;

@@ -20,10 +20,27 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             if (queueName.Length >= 253) // 260 - a spot for the "." & 6 digits for the individualizer
                 queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
-            if (!settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+            if (ShouldIndividualize(configSection, settings))
                 queueName = QueueIndividualizer.Individualize(queueName);
 
             return queueName;
         };
+
+        static bool ShouldIndividualize(AzureQueueConfig configSection, ReadOnlySettings settings)
+        {
+            // if explicitly set in code
+            if (settings != null && settings.HasExplicitValue("ScaleOut.UseSingleBrokerQueue"))
+                return !settings.Get<bool>("ScaleOut.UseSingleBrokerQueue");
+
+            // if explicitly set in config
+            if (configSection != null)
+                return configSection.QueuePerInstance;
+
+            // if default is set
+            if (settings != null && !settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+                return !settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue");
+
+            return false;
+        }
     }
 }

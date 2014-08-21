@@ -24,12 +24,29 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                     if (queueName.Length >= 283) // 290 - a spot for the "-" & 6 digits for the individualizer
                         queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
-                    if (settings != null && !settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+                    if(ShouldIndividualize(configSection, settings))
                         queueName = QueueIndividualizer.Individualize(queueName);
 
                     return queueName;
                 };
             }
+        }
+
+        static bool ShouldIndividualize(AzureServiceBusQueueConfig configSection, ReadOnlySettings settings)
+        {
+            // if explicitly set in code
+            if (settings != null && settings.HasExplicitValue("ScaleOut.UseSingleBrokerQueue"))
+                return !settings.Get<bool>("ScaleOut.UseSingleBrokerQueue");
+
+            // if explicitly set in config
+            if (configSection != null)
+                return configSection.QueuePerInstance;
+
+            // if default is set
+            if(settings != null && !settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+                return !settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue");
+
+            return false;
         }
 
         internal static Func<Configure, Type, string, string> SubscriptionNamingConvention
@@ -43,7 +60,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                     if (subscriptionName.Length >= 50)
                         subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
 
-                    if (config != null && !config.Settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+                    if(ShouldIndividualize(null, config.Settings))
                         subscriptionName = QueueIndividualizer.Individualize(subscriptionName);
 
                     return subscriptionName;
@@ -62,7 +79,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                     if (subscriptionName.Length >= 50)
                         subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
 
-                    if (config != null && !config.Settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+                    if (ShouldIndividualize(null, config.Settings))
                         subscriptionName = QueueIndividualizer.Individualize(subscriptionName);
 
                     return subscriptionName;

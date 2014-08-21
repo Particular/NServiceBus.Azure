@@ -58,6 +58,10 @@
     <Reference Include="NServiceBus.Core">
       <HintPath>..\packages\NServiceBus\lib\net45\NServiceBus.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Obsolete, Version=3.0.4.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Obsolete.Fody\Lib\NET35\Obsolete.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -78,6 +82,7 @@
     <Compile Include="AzureStorageQueue.cs" />
     <Compile Include="Config\AzureQueueConfig.cs" />
     <Compile Include="Config\AzureStorageQueueTransport.cs" />
+    <Compile Include="Config\AzureStorageTransportExtensions.cs" />
     <Compile Include="Config\ConfigureAzureMessageQueue.cs" />
     <Compile Include="Config\ConnectionStringParser.cs" />
     <Compile Include="Config\DeterminesBestConnectionStringForStorageQueues.cs" />

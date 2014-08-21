@@ -1,29 +1,22 @@
-using NServiceBus.Azure.Transports.WindowsAzureStorageQueues;
-
 namespace NServiceBus
 {
     using System;
 
+// ReSharper disable UnusedParameter.Global
     public static class ConfigureAzureMessageQueue
     {
-// ReSharper disable UnusedParameter.Global
+
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UseTransport<AzureStorageQueue>()")]
         public static Configure AzureMessageQueue(this Configure config)
-// ReSharper restore UnusedParameter.Global
         {
             throw new InvalidOperationException();
         }
 
-        /// <summary>
-        /// Sets the amount of time, in milliseconds, to add to the time to wait before checking for a new message
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UseTransport<AzureStorageQueue>().PeekInterval()")]
         public static Configure PeekInterval(this Configure config, int value)
         {
-            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.PeekInterval, value);
-
-            return config;
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -34,9 +27,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure MaximumWaitTimeWhenIdle(this Configure config, int value)
         {
-            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, value);
-         
-            return config;
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -47,9 +38,7 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure MessageInvisibleTime(this Configure config, int value)
         {
-            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, value);
-
-            return config;
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -60,10 +49,8 @@ namespace NServiceBus
         /// <returns></returns>
         public static Configure BatchSize(this Configure config, int value)
         {
-            config.Settings.SetProperty<AzureMessageQueueReceiver>(t => t.BatchSize, value);
-        
-            return config;
+            throw new InvalidOperationException();
         }
-
     }
+// ReSharper restore UnusedParameter.Global
 }

@@ -6,11 +6,13 @@ namespace NServiceBus
 
     public static class SetLoggingLibraryForAzure
     {
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.TraceLogger()")]
         public static Configure ConsoleLogger(this Configure config)
         {
             throw new InvalidOperationException();
         }
 
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.TraceLogger()")]
         public static Configure TraceLogger(this Configure config)
         {
             throw new InvalidOperationException();

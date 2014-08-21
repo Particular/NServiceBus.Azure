@@ -9,7 +9,7 @@
 
     internal class AzureServiceBusTransport : ConfigureTransport
     {
-        protected override void Configure(FeatureConfigurationContext context, string connectionString)
+        protected override void Configure(FeatureConfigurationContext context, string defaultconnectionString)
         {
             var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)
@@ -20,9 +20,21 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
+            // hack till I can get this from settings again
+            DefaultConnectionString.Value = defaultconnectionString;
+
             var bestConnectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
-            
-            Address.OverrideDefaultMachine(bestConnectionString);
+
+            try
+            {
+                Address.OverrideDefaultMachine(bestConnectionString);
+            }
+            catch (InvalidOperationException)
+            {
+                
+                // yes, testing warrants it
+            }
+           
 
             var queuename = NamingConventions.QueueNamingConvention(context.Settings, null, context.Settings.EndpointName());
             LocalAddress(queuename);
