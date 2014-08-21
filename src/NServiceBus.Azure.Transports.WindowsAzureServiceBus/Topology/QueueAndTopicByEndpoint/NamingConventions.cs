@@ -2,18 +2,19 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 {
     using System;
     using Config;
+    using Settings;
 
     internal static class NamingConventions
     {
-        internal static Func<Configure, Type, string, string> QueueNamingConvention
+        internal static Func<ReadOnlySettings, Type, string, string> QueueNamingConvention
         {
             get
             {
-                return (config, messagetype, endpointname) =>
+                return (settings, messagetype, endpointname) =>
                 {
                     var queueName = endpointname;
 
-                    var configSection = config != null ? config.Settings.GetConfigSection<AzureServiceBusQueueConfig>() : null;
+                    var configSection = settings != null ? settings.GetConfigSection<AzureServiceBusQueueConfig>() : null;
 
                     if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
                     {
@@ -23,7 +24,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                     if (queueName.Length >= 283) // 290 - a spot for the "-" & 6 digits for the individualizer
                         queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
-                    if (config != null && !config.Settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
+                    if (settings != null && !settings.GetOrDefault<bool>("ScaleOut.UseSingleBrokerQueue"))
                         queueName = QueueIndividualizer.Individualize(queueName);
 
                     return queueName;
@@ -102,7 +103,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         {
             get
             {
-                return (config, address) => Address.Parse(QueueNamingConvention(config, null, address.Queue) + "@" + address.Machine);
+                return (config, address) => Address.Parse(QueueNamingConvention(config.Settings, null, address.Queue) + "@" + address.Machine);
             }
         }
     }

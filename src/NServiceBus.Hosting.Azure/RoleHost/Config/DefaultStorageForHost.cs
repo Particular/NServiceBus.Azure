@@ -1,12 +1,5 @@
 namespace NServiceBus.Hosting.Azure.Roles.Handlers
 {
-    using Config;
-    using Saga;
-    using Settings;
-    using Timeout.Core;
-    using Transports;
-    using Unicast.Subscriptions.MessageDrivenSubscriptions;
-
     public class DefaultStorageForHost : IWantToRunBeforeConfigurationIsFinalized
     {
         public void Run(Configure config)

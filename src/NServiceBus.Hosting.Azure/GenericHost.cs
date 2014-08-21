@@ -8,7 +8,6 @@ namespace NServiceBus.Hosting.Azure
     using Config.ConfigurationSource;
     using Helpers;
     using Hosting.Profiles;
-    using Hosting.Roles;
     using Integration.Azure;
     using Logging;
     using NServiceBus.Azure;
@@ -52,9 +51,6 @@ namespace NServiceBus.Hosting.Azure
             args = AddProfilesFromConfiguration(args);
 
             profileManager = new ProfileManager(assembliesToScan, args, defaultProfiles);
-            ProfileActivator.ProfileManager = profileManager;
-
-            roleManager = new RoleManager(assembliesToScan);
         }
 
         /// <summary>
@@ -99,14 +95,12 @@ namespace NServiceBus.Hosting.Azure
         /// </summary>
         public void Install(string username)
         {
-            PerformConfiguration();
-            //HACK: to ensure the installer runner performs its installation
+            PerformConfiguration(builder => builder.EnableInstallers(username));
 
-            config.EnableInstallers(username);
             config.CreateBus();
         }
 
-        void PerformConfiguration()
+        void PerformConfiguration(Action<ConfigurationBuilder> moreConfiguration = null)
         {
             var loggingConfigurers = profileManager.GetLoggingConfigurer();
             foreach (var loggingConfigurer in loggingConfigurers)
@@ -114,9 +108,10 @@ namespace NServiceBus.Hosting.Azure
                 loggingConfigurer.Configure(specifier);
             }
 
-             config = Configure.With(o =>{
+            config = Configure.With(o =>
+            {
                 o.EndpointName(endpointNameToUse);
-                o.EndpointVersion(() => endpointVersionToUse);
+                o.EndpointVersion(endpointVersionToUse);
                 o.AssembliesToScan(assembliesToScan);
 
                 if (SafeRoleEnvironment.IsAvailable)
@@ -126,13 +121,15 @@ namespace NServiceBus.Hosting.Azure
                         o.AzureConfigurationSource();
                     }
                 }
-                
-                 specifier.Customize(o);
-              });
 
-            
+                if (moreConfiguration != null)
+                {
+                    moreConfiguration(o);
+                }
 
-            roleManager.ConfigureBusForEndpoint(specifier, config);
+                specifier.Customize(o);
+                RoleManager.TweakConfigurationBuilder(specifier, o);
+            });
         }
 
         private string[] AddProfilesFromConfiguration(IEnumerable<string> args)
@@ -153,7 +150,6 @@ namespace NServiceBus.Hosting.Azure
         List<Assembly> assembliesToScan;
 
         ProfileManager profileManager;
-        RoleManager roleManager;
         IConfigureThisEndpoint specifier;
         IStartableBus bus;
         Configure config;

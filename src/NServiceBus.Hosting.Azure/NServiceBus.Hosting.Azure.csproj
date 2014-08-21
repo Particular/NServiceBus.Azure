@@ -63,6 +63,9 @@
     <Reference Include="NServiceBus.Core">
       <HintPath>..\packages\NServiceBus\lib\net45\NServiceBus.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Obsolete">
+      <HintPath>..\packages\Obsolete.Fody\Lib\NET35\Obsolete.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -90,24 +93,17 @@
     <Compile Include="FileVersionRetriever.cs" />
     <Compile Include="GenericHost.cs" />
     <Compile Include="IHost.cs" />
-    <Compile Include="LoggingHandlers\DevelopmentLoggingHandler.cs" />
-    <Compile Include="Profiles\Handler\DevelopmentProfileHandler.cs" />
     <Compile Include="RoleHost\Config\DefaultStorageForHost.cs" />
     <Compile Include="RoleHost\Entrypoint.cs" />
     <Compile Include="DynamicHost\DynamicHostController.cs" />
-    <Compile Include="LoggingHandlers\ProductionLoggingHandler.cs" />
     <Compile Include="Profiles\Development.cs" />
-    <Compile Include="Profiles\Handler\ProductionProfileHandler.cs" />
     <Compile Include="Profiles\Production.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleHost\SetHostInformation.cs" />
     <Compile Include="Roles\AsA_Host.cs" />
     <Compile Include="Roles\AsA_Worker.cs" />
     <Compile Include="RoleHost\Config\DefaultTransportForHost.cs" />
-    <Compile Include="Roles\Handlers\PersistenceRoleHandler.cs" />
-    <Compile Include="Roles\Handlers\TransportRoleHandler.cs" />
-    <Compile Include="Roles\Handlers\WorkerRoleHandler.cs" />
-    <Compile Include="Roles\UsingPersistence.cs" />
+    <Compile Include="Roles\RoleManager.cs" />
     <Compile Include="Roles\UsingTransport.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -10,13 +10,23 @@
 
     internal class AzureStorageQueueTransport : ConfigureTransport
     {
-
-        protected override void Configure(FeatureConfigurationContext context, string connectionString)
+        internal AzureStorageQueueTransport()
         {
-            
+            Defaults(settings =>
+            {
+                var configSection = settings.GetConfigSection<AzureQueueConfig>();
+
+                if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
+                {
+                    if (configSection.QueuePerInstance)
+                    {
+                        settings.SetDefault("ScaleOut.UseSingleBrokerQueue", false);
+                    }
+                }
+            });
         }
 
-        protected override void Setup(FeatureConfigurationContext context)
+        protected override void Configure(FeatureConfigurationContext context, string con)
         {
             CloudQueueClient queueClient;
 
@@ -43,7 +53,7 @@
             context.Container.ConfigureComponent<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
-            var queuename = AzureQueueNamingConvention.Apply(context.Settings.EndpointName());
+            var queuename = AzureQueueNamingConvention.Apply(context.Settings);
             context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)receiverConfig);
 
             LocalAddress(queuename);

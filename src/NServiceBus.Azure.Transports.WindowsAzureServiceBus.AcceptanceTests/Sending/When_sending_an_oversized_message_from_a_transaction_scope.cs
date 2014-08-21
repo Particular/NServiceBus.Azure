@@ -20,7 +20,7 @@
                 {
                     using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew))
                     {
-                        bus.Send(Address.Local, new OversizedRequest());
+                        bus.SendLocal(new OversizedRequest());
                         scope.Complete();
                     }
                 }))

@@ -44,8 +44,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public void Initialize(ReadOnlySettings settings)
         {
-            var queuename = NamingConventions.QueueNamingConvention(config, null, settings.EndpointName());
-            Address.InitializeLocalAddress(queuename);
+            
         }
 
         public INotifyReceivedBrokeredMessages Subscribe(Type eventType, Address address)

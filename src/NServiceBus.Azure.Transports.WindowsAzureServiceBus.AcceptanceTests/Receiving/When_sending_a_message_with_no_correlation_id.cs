@@ -15,7 +15,7 @@
             var context = new Context();
 
             Scenario.Define(context)
-                    .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.Send(Address.Local, new MyRequest())))
+                    .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.SendLocal(new MyRequest())))
                     .AllowExceptions()
                     .Done(c => c.ReceivedAgain)
                     .Run();

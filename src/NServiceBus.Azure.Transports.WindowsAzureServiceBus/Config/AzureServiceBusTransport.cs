@@ -2,6 +2,7 @@
 {
     using System;
     using Azure.Transports.WindowsAzureServiceBus;
+    using Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint;
     using Config;
     using Microsoft.ServiceBus;
     using Transports;
@@ -22,6 +23,9 @@
             var bestConnectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
             
             Address.OverrideDefaultMachine(bestConnectionString);
+
+            var queuename = NamingConventions.QueueNamingConvention(context.Settings, null, context.Settings.EndpointName());
+            LocalAddress(queuename);
         }
 
         protected override bool RequiresConnectionString
