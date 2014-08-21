@@ -35,18 +35,18 @@
                 Address.OverrideDefaultMachine(connectionString);                
             }
 
-            context.Container.RegisterSingleton<CloudQueueClient>(queueClient);
+            context.Container.RegisterSingleton(queueClient);
 
-            var recieverConfig = context.Container.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
-            recieverConfig.ConfigureProperty(p => p.PurgeOnStartup, ConfigurePurging.PurgeRequested);
+            var receiverConfig = context.Container.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<CreateQueueClients>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
             var queuename = AzureQueueNamingConvention.Apply(context.Settings.EndpointName());
-            context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)recieverConfig);
-            Address.InitializeLocalAddress(queuename);
+            context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)receiverConfig);
+
+            LocalAddress(queuename);
         }
 
         static string TryGetConnectionString(AzureQueueConfig configSection, ReadOnlySettings config)

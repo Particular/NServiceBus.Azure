@@ -2,11 +2,15 @@ using NServiceBus.Azure.Transports.WindowsAzureStorageQueues;
 
 namespace NServiceBus
 {
+    using System;
+
     public static class ConfigureAzureMessageQueue
     {
+// ReSharper disable UnusedParameter.Global
         public static Configure AzureMessageQueue(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UseTransport<AzureStorageQueue>();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
