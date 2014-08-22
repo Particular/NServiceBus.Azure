@@ -1,5 +1,6 @@
 namespace NServiceBus
 {
+    using System.Configuration;
     using Azure.Transports.WindowsAzureStorageQueues;
     using Config;
     using Configuration.AdvanceExtensibility;
@@ -31,17 +32,7 @@ namespace NServiceBus
             config.GetSettings().SetDefault("SelectedSerializer", typeof(Json));
 
             config.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
-
-            var configSection = config.GetSettings().GetConfigSection<AzureQueueConfig>();
-
-            if (configSection == null)
-                return;
-
-            config.GetSettings().SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PurgeOnStartup, configSection.PurgeOnStartup);
-            config.GetSettings().SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, configSection.MaximumWaitTimeWhenIdle);
-            config.GetSettings().SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, configSection.MessageInvisibleTime);
-            config.GetSettings().SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PeekInterval, configSection.PeekInterval);
-            config.GetSettings().SetPropertyDefault<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
+            
         }
     }
 }
