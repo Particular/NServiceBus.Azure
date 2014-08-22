@@ -6,6 +6,13 @@
 
     internal class DeterminesBestConnectionStringForAzureServiceBus
     {
+        string defaultconnectionString;
+
+        public DeterminesBestConnectionStringForAzureServiceBus(string defaultconnectionString)
+        {
+            this.defaultconnectionString = defaultconnectionString;
+        }
+
         public string Determine(ReadOnlySettings settings)
         {
             var configSection = settings.GetConfigSection<AzureServiceBusQueueConfig>();
@@ -13,7 +20,7 @@
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = DefaultConnectionString.Value;
+                connectionString = defaultconnectionString;
             }
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.IssuerKey) && !string.IsNullOrEmpty(configSection.ServiceNamespace))
@@ -48,8 +55,4 @@
 
     }
 
-    static class DefaultConnectionString
-    {
-        internal static string Value;
-    }
 }

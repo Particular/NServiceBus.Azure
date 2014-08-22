@@ -9,6 +9,15 @@
 
     internal class AzureServiceBusTransport : ConfigureTransport
     {
+        //internal AzureServiceBusTransport()
+        //{
+        //    Defaults(a =>
+        //    {
+        //        var section = a.GetConfigSection<AzureServiceBusQueueConfig>();
+        //        a.SetDefault("AzureServiceBus.DefaultConnectionString", defaultconnectionString);
+        //    });
+        //}
+
         protected override void Configure(FeatureConfigurationContext context, string defaultconnectionString)
         {
             var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
@@ -20,18 +29,16 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            // hack till I can get this from settings again
-            DefaultConnectionString.Value = defaultconnectionString;
 
-            var bestConnectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
+            var bestConnectionString = new DeterminesBestConnectionStringForAzureServiceBus(defaultconnectionString).Determine(context.Settings);
 
-            try
+            // this is  a bug in the core, statics reused across tests
+            try // would work on IWantToRunBeforeConfiguration, but would be better to move this method to base configuretransport
             {
                 Address.OverrideDefaultMachine(bestConnectionString);
             }
             catch (InvalidOperationException)
             {
-                
                 // yes, testing warrants it
             }
            
@@ -50,4 +57,6 @@
             get { return "Endpoint=sb://{yournamespace}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={yourkey}"; }
         }
     }
+
+    
 }

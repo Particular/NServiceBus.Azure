@@ -1,6 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint
 {
     using System;
+    using System.Text.RegularExpressions;
     using Config;
     using Settings;
 
@@ -21,6 +22,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                         queueName = configSection.QueueName;
                     }
 
+                    queueName = SanitizeEntityName(queueName);
+
                     if (queueName.Length >= 283) // 290 - a spot for the "-" & 6 digits for the individualizer
                         queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
@@ -30,6 +33,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                     return queueName;
                 };
             }
+        }
+
+        static string SanitizeEntityName(string queueName)
+        {
+            //*Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores */
+
+            var rgx = new Regex(@"[^a-zA-Z0\-._]");
+            var n = rgx.Replace(queueName, "");
+            return n;
         }
 
         static bool ShouldIndividualize(AzureServiceBusQueueConfig configSection, ReadOnlySettings settings)
@@ -49,18 +61,20 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             return false;
         }
 
-        internal static Func<Configure, Type, string, string> SubscriptionNamingConvention
+        internal static Func<ReadOnlySettings, Type, string, string> SubscriptionNamingConvention
         {
             get
             {
-                return (config, messagetype, endpointname) =>
+                return (settings, messagetype, endpointname) =>
                 {
                     var subscriptionName = messagetype != null ? endpointname + "." + messagetype.Name : endpointname;
 
+                    subscriptionName = SanitizeEntityName(subscriptionName);
+
                     if (subscriptionName.Length >= 50)
                         subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
 
-                    if(ShouldIndividualize(null, config.Settings))
+                    if (ShouldIndividualize(null, settings))
                         subscriptionName = QueueIndividualizer.Individualize(subscriptionName);
 
                     return subscriptionName;
@@ -68,18 +82,20 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             }
         }
 
-        internal static Func<Configure, Type, string, string> SubscriptionFullNamingConvention
+        internal static Func<ReadOnlySettings, Type, string, string> SubscriptionFullNamingConvention
         {
             get
             {
-                return (config, messagetype, endpointname) =>
+                return (settings, messagetype, endpointname) =>
                 {
                     var subscriptionName = messagetype != null ? endpointname + "." + messagetype.FullName : endpointname;
 
+                    subscriptionName = SanitizeEntityName(subscriptionName);
+
                     if (subscriptionName.Length >= 50)
                         subscriptionName = new DeterministicGuidBuilder().Build(subscriptionName).ToString();
 
-                    if (ShouldIndividualize(null, config.Settings))
+                    if (ShouldIndividualize(null, settings))
                         subscriptionName = QueueIndividualizer.Individualize(subscriptionName);
 
                     return subscriptionName;
@@ -87,13 +103,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             }
         }
 
-        internal static Func<Configure, Type, string, string> TopicNamingConvention
+        internal static Func<ReadOnlySettings, Type, string, string> TopicNamingConvention
         {
             get
             {
-                return (config, messagetype, endpointname) =>
+                return (settings, messagetype, endpointname) =>
                 {
                     var name = endpointname;
+
+                    name = SanitizeEntityName(name);
 
                     if (name.Length >= 290)
                         name = new DeterministicGuidBuilder().Build(name).ToString();
@@ -103,24 +121,24 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             }
         }
 
-        internal static Func<Configure, Address, Address> PublisherAddressConvention
+        internal static Func<ReadOnlySettings, Address, Address> PublisherAddressConvention
         {
             get
             {
-                return (config, address) => Address.Parse(TopicNamingConvention(config, null, address.Queue + ".events") + "@" + address.Machine);
+                return (settings, address) => Address.Parse(TopicNamingConvention(settings, null, address.Queue + ".events") + "@" + address.Machine);
             }
         }
 
-        internal static Func<Configure, Address, Address> PublisherAddressConventionForSubscriptions
+        internal static Func<ReadOnlySettings, Address, Address> PublisherAddressConventionForSubscriptions
         {
             get { return PublisherAddressConvention; }
         }
 
-        internal static Func<Configure, Address, Address> QueueAddressConvention
+        internal static Func<ReadOnlySettings, Address, Address> QueueAddressConvention
         {
             get
             {
-                return (config, address) => Address.Parse(QueueNamingConvention(config.Settings, null, address.Queue) + "@" + address.Machine);
+                return (settings, address) => Address.Parse(QueueNamingConvention(settings, null, address.Queue) + "@" + address.Machine);
             }
         }
     }

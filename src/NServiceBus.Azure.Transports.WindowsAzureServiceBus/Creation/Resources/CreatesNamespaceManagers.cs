@@ -19,7 +19,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             return NamespaceManagers.GetOrAdd(potentialConnectionstring, s =>
             {
-                var connectionStringParser = new DeterminesBestConnectionStringForAzureServiceBus();
+                var connectionStringParser = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString());
                 var connectionstring = s != RuntimeEnvironment.MachineName && connectionStringParser.IsPotentialServiceBusConnectionString(s)
                     ? s
                     : connectionStringParser.Determine(config.Settings);
