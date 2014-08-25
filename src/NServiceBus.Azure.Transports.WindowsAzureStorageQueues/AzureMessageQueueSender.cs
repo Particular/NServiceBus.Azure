@@ -86,7 +86,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             using (var stream = new MemoryStream())
             {
                 var validation = new DeterminesBestConnectionStringForStorageQueues();
-                var replyToAddress = validation.Determine(config.Settings, message.ReplyToAddress ?? options.ReplyToAddress ?? config.LocalAddress);
+                var replyToAddress = validation.Determine(config.Settings, message.ReplyToAddress ?? options.ReplyToAddress ?? config.LocalAddress, config.TransportConnectionString());
 
                 var toSend = new MessageWrapper
                     {
@@ -129,7 +129,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 var validation = new DeterminesBestConnectionStringForStorageQueues();
                 if (!validation.IsPotentialStorageQueueConnectionString(connectionString))
                 {
-                    connectionString = validation.Determine(config.Settings);
+                    connectionString = validation.Determine(config.Settings, config.TransportConnectionString());
                 }
 
                 CloudQueueClient sendClient = null;

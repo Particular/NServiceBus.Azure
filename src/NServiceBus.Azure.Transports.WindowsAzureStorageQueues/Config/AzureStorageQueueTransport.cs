@@ -13,6 +13,8 @@
 
         protected override void Configure(FeatureConfigurationContext context, string con)
         {
+            context.Settings.Get<Conventions>().AddSystemMessagesConventions(t => typeof(MessageWrapper).IsAssignableFrom(t));
+
             CloudQueueClient queueClient;
 
             var configSection = context.Settings.GetConfigSection<AzureQueueConfig>();

@@ -164,7 +164,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 }
                 finally
                 {
-                    endProcessMessage(transportMessage, exception);
+                    if (!cancellationToken.IsCancellationRequested && (transportMessage != null || exception != null))
+                    {
+                        endProcessMessage(transportMessage, exception);
+                    }
                 }
             }
         }

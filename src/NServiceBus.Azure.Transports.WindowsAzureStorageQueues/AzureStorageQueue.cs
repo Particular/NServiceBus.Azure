@@ -1,5 +1,6 @@
 namespace NServiceBus
 {
+    using Azure.Transports.WindowsAzureStorageQueues;
     using Configuration.AdvanceExtensibility;
     using Features;
     using Transports;
@@ -21,14 +22,16 @@ namespace NServiceBus
         {
             config.EnableFeature<AzureStorageQueueTransport>();
             config.EnableFeature<TimeoutManagerBasedDeferral>();
+            
+            var settings = config.GetSettings();
 
-            config.GetSettings().EnableFeatureByDefault<MessageDrivenSubscriptions>();
-            config.GetSettings().EnableFeatureByDefault<StorageDrivenPublishing>();
-            config.GetSettings().EnableFeatureByDefault<TimeoutManager>();
+            settings.EnableFeatureByDefault<MessageDrivenSubscriptions>();
+            settings.EnableFeatureByDefault<StorageDrivenPublishing>();
+            settings.EnableFeatureByDefault<TimeoutManager>();
 
-            config.GetSettings().SetDefault("SelectedSerializer", new JsonSerializer());
+            settings.SetDefault("SelectedSerializer", new JsonSerializer());
 
-            config.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
+            settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
             
         }
     }

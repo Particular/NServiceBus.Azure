@@ -134,7 +134,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 }
                 finally
                 {
-                    endProcessMessage(message, exception);
+                    if (!cancellationToken.IsCancellationRequested && (message != null || exception != null))
+                    {
+                        endProcessMessage(message, exception);
+                    }
                 }
             }
         }
