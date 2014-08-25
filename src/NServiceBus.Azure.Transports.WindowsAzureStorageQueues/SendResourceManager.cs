@@ -2,7 +2,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
     using System.Transactions;
-    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     
     public class SendResourceManager : IEnlistmentNotification

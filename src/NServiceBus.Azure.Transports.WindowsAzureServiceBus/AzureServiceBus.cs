@@ -3,7 +3,6 @@ namespace NServiceBus
     using System;
     using System.Transactions;
     using Azure.Transports.WindowsAzureServiceBus;
-    using Config;
     using Configuration.AdvanceExtensibility;
     using Features;
     using Transports;
@@ -20,7 +19,10 @@ namespace NServiceBus
             HasSupportForDistributedTransactions = false;
         }
 
-        protected override void Configure(ConfigurationBuilder config)
+        /// <summary>
+        /// Gives implementations access to the <see cref="T:NServiceBus.BusConfiguration"/> instance at configuration time.
+        /// </summary>
+        protected override void Configure(BusConfiguration config)
         {
             config.GetSettings().SetDefault("SelectedSerializer", typeof(Json));
 

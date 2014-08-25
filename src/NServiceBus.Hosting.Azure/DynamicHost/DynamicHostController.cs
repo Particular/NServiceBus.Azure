@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using NServiceBus.Hosting.Profiles;
-
 namespace NServiceBus.Hosting.Azure
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
     using Configuration.AdvanceExtensibility;
+    using Profiles;
+    using Unicast;
 
     internal class DynamicHostController : IHost
     {
@@ -31,36 +31,35 @@ namespace NServiceBus.Hosting.Azure
         {
             DynamicHostControllerConfig configSection = null;
 
-            var config = Configure.With(o =>
-                {
-                    o.AssembliesToScan(GetType().Assembly);
-                    o.AzureConfigurationSource();
-                    o.RegisterComponents(Configurer =>
-                    {
-                        Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
-                        Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);
-                        Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
-                        Configurer.ConfigureComponent<DynamicHostMonitor>(DependencyLifecycle.SingleInstance);
+            var o = new BusConfiguration();
+            o.AssembliesToScan(GetType().Assembly);
+            o.AzureConfigurationSource();
+            o.RegisterComponents(Configurer =>
+            {
+                Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
+                Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);
+                Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
+                Configurer.ConfigureComponent<DynamicHostMonitor>(DependencyLifecycle.SingleInstance);
 
-                        configSection = o.GetSettings().GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
+                configSection = o.GetSettings().GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
 
-                        Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.ConnectionString, configSection.ConnectionString);
-                        Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.Container, configSection.Container);
-                        Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.LocalResource, configSection.LocalResource);
-                        Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
-                        Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
-                        Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.TimeToWaitUntilProcessIsKilled, configSection.TimeToWaitUntilProcessIsKilled);
-                        Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
-                    });
+                Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.ConnectionString, configSection.ConnectionString);
+                Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.Container, configSection.Container);
+                Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.LocalResource, configSection.LocalResource);
+                Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
+                Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
+                Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.TimeToWaitUntilProcessIsKilled, configSection.TimeToWaitUntilProcessIsKilled);
+                Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
+            });
 
-                    profileManager.ActivateProfileHandlers(o);
+            profileManager.ActivateProfileHandlers(o);
+            specifier.Customize(o);
 
-                    specifier.Customize(o);
-                });
-            
-            loader = config.Builder.Build<DynamicEndpointLoader>();
-            provisioner = config.Builder.Build<DynamicEndpointProvisioner>();
-            runner = config.Builder.Build<DynamicEndpointRunner>();
+            var bus = (UnicastBus)Bus.Create(o);
+
+            loader = bus.Builder.Build<DynamicEndpointLoader>();
+            provisioner = bus.Builder.Build<DynamicEndpointProvisioner>();
+            runner = bus.Builder.Build<DynamicEndpointRunner>();
 
             var endpointsToHost = loader.LoadEndpoints();
             if (endpointsToHost == null) return;
@@ -73,7 +72,7 @@ namespace NServiceBus.Hosting.Azure
 
             if (!configSection.AutoUpdate) return;
 
-            monitor = config.Builder.Build<DynamicHostMonitor>();
+            monitor = bus.Builder.Build<DynamicHostMonitor>();
             monitor.UpdatedEndpoints += UpdatedEndpoints;
             monitor.NewEndpoints += NewEndpoints;
             monitor.RemovedEndpoints += RemovedEndpoints;

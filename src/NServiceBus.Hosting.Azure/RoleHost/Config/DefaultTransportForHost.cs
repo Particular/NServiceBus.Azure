@@ -1,7 +1,5 @@
 namespace NServiceBus.Hosting.Azure.Roles.Handlers
 {
-    using Transports;
-
     public class DefaultTransportForHost : IWantToRunBeforeConfigurationIsFinalized
     {
         public void Run(Configure config)

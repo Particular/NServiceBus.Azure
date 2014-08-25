@@ -19,7 +19,7 @@ namespace NServiceBus
         }
 
 // ReSharper disable UnusedParameter.Global
-        public static void TraceLogger(this ConfigurationBuilder config)
+        public static void TraceLogger(this BusConfiguration config)
 // ReSharper restore UnusedParameter.Global
         {
             LogManager.UseFactory(new TraceLoggerFactory());

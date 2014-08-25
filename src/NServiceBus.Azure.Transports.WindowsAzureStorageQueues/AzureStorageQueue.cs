@@ -1,8 +1,5 @@
 namespace NServiceBus
 {
-    using System.Configuration;
-    using Azure.Transports.WindowsAzureStorageQueues;
-    using Config;
     using Configuration.AdvanceExtensibility;
     using Features;
     using Transports;
@@ -18,9 +15,9 @@ namespace NServiceBus
         }
 
         /// <summary>
-        /// Gives implementations access to the <see cref="ConfigurationBuilder"/> instance at configuration time.
+        /// Gives implementations access to the <see cref="T:NServiceBus.BusConfiguration"/> instance at configuration time.
         /// </summary>
-        protected override void Configure(ConfigurationBuilder config)
+        protected override void Configure(BusConfiguration config)
         {
             config.EnableFeature<AzureStorageQueueTransport>();
             config.EnableFeature<TimeoutManagerBasedDeferral>();
