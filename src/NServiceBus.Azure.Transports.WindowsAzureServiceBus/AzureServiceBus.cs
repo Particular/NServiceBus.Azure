@@ -24,7 +24,7 @@ namespace NServiceBus
         /// </summary>
         protected override void Configure(BusConfiguration config)
         {
-            config.GetSettings().SetDefault("SelectedSerializer", typeof(Json));
+            config.GetSettings().SetDefault("SelectedSerializer", new JsonSerializer());
 
             // make sure the transaction stays open a little longer than the long poll.
             config.Transactions().DefaultTimeout(TimeSpan.FromSeconds(AzureServicebusDefaults.DefaultServerWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable);

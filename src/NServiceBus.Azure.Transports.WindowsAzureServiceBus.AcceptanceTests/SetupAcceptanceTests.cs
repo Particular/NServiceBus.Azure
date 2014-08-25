@@ -1,4 +1,3 @@
-    using NServiceBus.AcceptanceTests.Retries;
     using NUnit.Framework;
 
     /// <summary>
@@ -10,7 +9,7 @@
         [SetUp]
         public void SetUp()
         {
-            When_doing_flr_with_default_settings.X = () => 4;
+            
         }
     }
 

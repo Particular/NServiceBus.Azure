@@ -26,7 +26,7 @@ namespace NServiceBus
             config.GetSettings().EnableFeatureByDefault<StorageDrivenPublishing>();
             config.GetSettings().EnableFeatureByDefault<TimeoutManager>();
 
-            config.GetSettings().SetDefault("SelectedSerializer", typeof(Json));
+            config.GetSettings().SetDefault("SelectedSerializer", new JsonSerializer());
 
             config.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
             
