@@ -25,13 +25,11 @@
         [TestCase("-TestQueue")]
         [TestCase("TestQueue-")]
         [TestCase("TQ")]
-        public void Should_throw_exception_with_enough_information_about_invalid_queue_name(string queueName)
+        public void Should_fix_queue_name_when_invalid(string queueName)
         {
             address = new Address(queueName, "UseDevelopmentStorage=true");
 
-            var exception = Assert.Throws<ConfigurationErrorsException>(() => AzureMessageQueueUtils.GetQueueName(address));
-            Assert.That(exception.Message, Contains.Substring(address.Queue.ToLowerInvariant()));
-            Assert.That(exception.Message, Contains.Substring("http://msdn.microsoft.com/en-us/library/windowsazure/dd179349.aspx"));
+            Assert.DoesNotThrow(() => AzureMessageQueueUtils.GetQueueName(address));
         }
 
     }
