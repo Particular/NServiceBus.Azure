@@ -13,10 +13,11 @@
         public static string GetQueueName(Address address)
         {
             var name = SanitizeQueueName(address.Queue.ToLowerInvariant());
+            var guidinput = address.Queue.Replace('.', '-').ToLowerInvariant(); // this string was used in the past to calculate guid, should stay backward compat
                 
             if (name.Length > 63)
             {
-                var nameGuid = DeterministicGuidBuilder(name).ToString();
+                var nameGuid = DeterministicGuidBuilder(guidinput).ToString();
                 name = name.Substring(0, 63 - nameGuid.Length - 1).Trim('-') + "-" + nameGuid;
             }
             
