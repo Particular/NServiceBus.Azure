@@ -28,7 +28,9 @@
             //rules for naming queues can be found at http://msdn.microsoft.com/en-us/library/windowsazure/dd179349.aspx"
 
             var rgx = new Regex(@"[^a-zA-Z0\-]");
-            var n = rgx.Replace(queueName, "-");
+            var n = rgx.Replace(queueName, "-"); // this can lead to multiple - occurences in a row
+            var oc = new Regex(@"\-+");
+            n = oc.Replace(n, "-");
             return n;
         }
 
