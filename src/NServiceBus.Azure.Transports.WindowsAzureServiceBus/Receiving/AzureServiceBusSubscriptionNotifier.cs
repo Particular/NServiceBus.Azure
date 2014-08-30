@@ -4,11 +4,15 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using Logging;
+
     /// <summary>
     /// 
     /// </summary>
     public class AzureServiceBusSubscriptionNotifier : INotifyReceivedMessages
     {
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusSubscriptionNotifier));
+
         private SubscriptionClient subscriptionClient;
         private Action<BrokeredMessage> tryProcessMessage;
         private bool cancelRequested;
@@ -77,25 +81,49 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             catch (MessagingEntityDisabledException)
             {
+                logger.Warn(string.Format("Subscription {0} is disabled", subscriptionClient.Name)); 
+
                 if (cancelRequested) return;
+
+                logger.Warn("Will retry after backoff period");
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
-            catch (ServerBusyException)
+            catch (ServerBusyException ex)
             {
+                logger.Warn(string.Format("Server busy exception occured on subscription {0}", subscriptionClient.Name), ex);
+
                 if (cancelRequested) return;
+
+                logger.Warn("Will retry after backoff period");
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
-            catch (MessagingCommunicationException)
+            catch (MessagingCommunicationException ex)
             {
+                logger.Warn(string.Format("Message communication exception occured on subscription {0}", subscriptionClient.Name), ex);
+
                 if (cancelRequested) return;
+
+                logger.Warn("Will retry after backoff period");
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
+                logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", subscriptionClient.Name), ex);
                 // time's up, just continue and retry
+            }
+
+            catch (MessagingException ex)
+            {
+                logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+
+                if (cancelRequested || !ex.IsTransient) return;
+
+                logger.Warn("Will retry after backoff period");
+
+                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
 
             subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);

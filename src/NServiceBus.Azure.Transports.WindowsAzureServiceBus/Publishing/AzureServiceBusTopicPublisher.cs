@@ -7,6 +7,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using Logging;
     using NServiceBus.Transports;
     using Settings;
 
@@ -15,12 +16,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusTopicPublisher : IPublishMessages
     {
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusTopicPublisher));
+
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
 
         public ICreateTopicClients TopicClientCreator { get; set; }
 
-        private readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
+        private static readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
         private static readonly object SenderLock = new Object();
         
         public bool Publish(TransportMessage message, IEnumerable<Type> eventTypes)
@@ -53,36 +56,64 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 // todo, outbox
                 catch (MessagingEntityDisabledException)
                 {
+                    logger.Warn(string.Format("Topic {0} is disabled", sender.Path)); 
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
                 // back off when we're being throttled
-                catch (ServerBusyException)
+                catch (ServerBusyException ex)
                 {
+                    logger.Warn(string.Format("Server busy exception occured on topic {0}", sender.Path), ex);
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
                 // took to long, maybe we lost connection
-                catch (TimeoutException)
+                catch (TimeoutException ex)
                 {
+                    logger.Warn(string.Format("Timeout exception occured on topic {0}", sender.Path), ex);
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
                 // connection lost
-                catch (MessagingCommunicationException)
+                catch (MessagingCommunicationException ex)
                 {
+                    logger.Warn(string.Format("Messaging Communication Exception occured on topic {0}", sender.Path), ex);
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+                }
+                catch (MessagingException ex)
+                {
+                    logger.Warn(string.Format("{1} Messaging Exception occured on topic {0}", sender.Path, (ex.IsTransient ? "Transient": "Non transient")), ex);
+
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount || !ex.IsTransient) throw;
+
+                    logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }

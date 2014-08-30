@@ -6,6 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using Logging;
     using NServiceBus.Transports;
     using Settings;
     using Unicast.Queuing;
@@ -15,9 +16,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     public class AzureServiceBusMessageQueueSender : ISendMessages
     {
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusMessageQueueSender));
+
         const int DefaultBackoffTimeInSeconds = 10;
 
-        private readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
+        private static readonly Dictionary<string, QueueClient> senders = new Dictionary<string, QueueClient>();
         
         private static readonly object SenderLock = new Object();
 
@@ -112,38 +115,67 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     // todo: outbox
                 catch (MessagingEntityDisabledException)
                 {
+                    logger.Warn(string.Format("Queue {0} is disable", sender.Path));
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
                     // back off when we're being throttled
-                catch (ServerBusyException)
+                catch (ServerBusyException ex)
                 {
+                    logger.Warn(string.Format("Server busy exception occured on queue {0}", sender.Path), ex);
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
                     // connection lost
-                catch (MessagingCommunicationException)
+                catch (MessagingCommunicationException ex)
                 {
+                    logger.Warn(string.Format("Messaging Communication exception occured on queue {0}", sender.Path), ex);
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
                 }
                     // took to long, maybe we lost connection
-                catch (TimeoutException)
+                catch (TimeoutException ex)
                 {
+                    logger.Warn(string.Format("Timeout exception occured on queue {0}", sender.Path), ex);
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
+                    logger.Warn("Will retry after backoff period");
+
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+                }
+
+                catch (MessagingException ex)
+                {
+                    logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", sender.Path, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount || !ex.IsTransient) throw;
+
+                    logger.Warn("Will retry after backoff period");
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
             }
         }
