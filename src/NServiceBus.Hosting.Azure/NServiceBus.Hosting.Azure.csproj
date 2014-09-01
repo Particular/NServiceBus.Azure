@@ -93,6 +93,13 @@
     <Compile Include="FileVersionRetriever.cs" />
     <Compile Include="GenericHost.cs" />
     <Compile Include="IHost.cs" />
+    <Compile Include="Logging\DevelopmentLoggingHandler.cs" />
+    <Compile Include="Profiles\Hosting\IConfigureLoggingForProfile.cs" />
+    <Compile Include="Profiles\Hosting\IHandleAnyProfile.cs" />
+    <Compile Include="Profiles\Hosting\IHandleProfile.cs" />
+    <Compile Include="Profiles\Hosting\IProfile.cs" />
+    <Compile Include="Profiles\Hosting\IWantTheListOfActiveProfiles.cs" />
+    <Compile Include="Profiles\Hosting\ProfileManager.cs" />
     <Compile Include="RoleHost\Config\DefaultStorageForHost.cs" />
     <Compile Include="RoleHost\Entrypoint.cs" />
     <Compile Include="DynamicHost\DynamicHostController.cs" />
@@ -105,9 +112,6 @@
     <Compile Include="RoleHost\Config\DefaultTransportForHost.cs" />
     <Compile Include="Roles\RoleManager.cs" />
     <Compile Include="Roles\UsingTransport.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="App_Packages\NServiceBus.Hosting.Profiles\**\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
