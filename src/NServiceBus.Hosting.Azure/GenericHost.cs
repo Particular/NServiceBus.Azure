@@ -83,7 +83,6 @@ namespace NServiceBus.Hosting.Azure
         {
             if (bus != null)
             {
-                bus.Shutdown();
                 bus.Dispose();
 
                 bus = null;
