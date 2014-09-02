@@ -10,15 +10,15 @@
     {
         Address address;
 
-        [TestCase("TestQueue")]
-        [TestCase("Test.Queue")]
-        [TestCase("TestQueueTestQueueTestQueueTestQueueTestQueueTestQueueTestQueue")]
-        [TestCase("Test1234Queue")]
-        public void Should_fix_queue_name_when_upper_case_letters_are_used_dots_or_longer_than_63_charachters(string queueName)
+        [TestCase("TestQueue", "testqueue")]
+        [TestCase("Test.Queue", "test-queue")]
+        [TestCase("Test1234Queue", "test1234queue")]
+        [TestCase("TestQueueTestQueueTestQueueTestQueueTestQueueTestQueueTestQueueTestQueue", "testqueuetestqueuetestqueu-7565a1c3-1977-44ef-1a56-65be23eb5232")]
+        public void Should_fix_queue_name_when_upper_case_letters_are_used_dots_or_longer_than_63_charachters(string queueName, string expectedQueueName)
         {
             address = new Address(queueName, "UseDevelopmentStorage=true");
 
-            Assert.DoesNotThrow(() => AzureMessageQueueUtils.GetQueueName(address));
+            Assert.AreEqual(expectedQueueName, AzureMessageQueueUtils.GetQueueName(address));
         }
 
         [TestCase("Test_Queue")]
