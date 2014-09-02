@@ -4,6 +4,7 @@ namespace NServiceBus.Hosting.Azure
     using System.Collections.Generic;
     using System.Reflection;
     using Configuration.AdvanceExtensibility;
+    using Persistence;
     using Profiles;
     using Unicast;
 
@@ -51,6 +52,9 @@ namespace NServiceBus.Hosting.Azure
                 Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.TimeToWaitUntilProcessIsKilled, configSection.TimeToWaitUntilProcessIsKilled);
                 Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
             });
+
+            o.UsePersistence<AzureStorage>();
+            o.DiscardFailedMessagesInsteadOfSendingToErrorQueue();
 
             profileManager.ActivateProfileHandlers(o);
             specifier.Customize(o);
