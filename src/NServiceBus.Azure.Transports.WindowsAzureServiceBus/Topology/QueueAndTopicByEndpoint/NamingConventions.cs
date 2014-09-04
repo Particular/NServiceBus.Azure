@@ -39,7 +39,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         {
             //*Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores */
 
-            var rgx = new Regex(@"[^a-zA-Z0\-._]");
+            var rgx = new Regex(@"[^a-zA-Z0-9\-._]");
             var n = rgx.Replace(queueName, "");
             return n;
         }
