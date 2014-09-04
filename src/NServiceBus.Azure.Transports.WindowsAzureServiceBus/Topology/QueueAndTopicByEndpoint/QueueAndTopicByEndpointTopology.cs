@@ -90,7 +90,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public INotifyReceivedBrokeredMessages GetReceiver(Address original)
         {
-            var address = NamingConventions.QueueAddressConvention(config.Settings, original);
+            var address = NamingConventions.QueueAddressConvention(config.Settings, original, false);
             var factory = messagingFactories.Create(address);
             var description = queueCreator.Create(address);
             var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
@@ -102,7 +102,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public ISendBrokeredMessages GetSender(Address original)
         {
-            var address = NamingConventions.QueueAddressConvention(config.Settings, original);
+            var address = NamingConventions.QueueAddressConvention(config.Settings, original, true);
             var factory = messagingFactories.Create(address);
             var description = queueCreator.Create(address);
             var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));
@@ -122,7 +122,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public void Create(Address original)
         {
-            var queue = NamingConventions.QueueAddressConvention(config.Settings, original);
+            var queue = NamingConventions.QueueAddressConvention(config.Settings, original, false);
             queueCreator.Create(queue);
 
             if (original == config.LocalAddress)

@@ -7,11 +7,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
     internal static class NamingConventions
     {
-        internal static Func<ReadOnlySettings, Type, string, string> QueueNamingConvention
+        internal static Func<ReadOnlySettings, Type, string, bool, string> QueueNamingConvention
         {
             get
             {
-                return (settings, messagetype, endpointname) =>
+                return (settings, messagetype, endpointname, doNotIndividualize) =>
                 {
                     var queueName = endpointname;
 
@@ -27,7 +27,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                     if (queueName.Length >= 283) // 290 - a spot for the "-" & 6 digits for the individualizer
                         queueName = new DeterministicGuidBuilder().Build(queueName).ToString();
 
-                    if(ShouldIndividualize(configSection, settings))
+                    if (!doNotIndividualize && ShouldIndividualize(configSection, settings))
                         queueName = QueueIndividualizer.Individualize(queueName);
 
                     return queueName;
@@ -134,11 +134,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             get { return PublisherAddressConvention; }
         }
 
-        internal static Func<ReadOnlySettings, Address, Address> QueueAddressConvention
+        internal static Func<ReadOnlySettings, Address, bool, Address> QueueAddressConvention
         {
             get
             {
-                return (settings, address) => Address.Parse(QueueNamingConvention(settings, null, address.Queue) + "@" + address.Machine);
+                return (settings, address, doNotIndividualize) => Address.Parse(QueueNamingConvention(settings, null, address.Queue, doNotIndividualize) + "@" + address.Machine);
             }
         }
     }

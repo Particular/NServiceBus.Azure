@@ -14,7 +14,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 var index = parser.ParseIndexFrom(SafeRoleEnvironment.CurrentRoleInstanceId);
 
                 var currentQueue = parser.ParseQueueNameFrom(queueName);
-                if (!currentQueue.EndsWith("-" + index.ToString(CultureInfo.InvariantCulture))) //individualize can be applied multiple times
+                if (!currentQueue.Contains("-" + index.ToString(CultureInfo.InvariantCulture))) //individualize can be applied multiple times, should exlude subqueues
                 {
                     individualQueueName = currentQueue
                                           + (index > 0 ? "-" : "")
@@ -27,7 +27,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             else
             {
                 var currentQueue = parser.ParseQueueNameFrom(queueName);
-                if (!currentQueue.EndsWith("-" + RuntimeEnvironment.MachineName)) //individualize can be applied multiple times
+                if (!currentQueue.Contains("-" + RuntimeEnvironment.MachineName)) //individualize can be applied multiple times, should exlude subqueues
                 {
                     individualQueueName = currentQueue + "-" + RuntimeEnvironment.MachineName;
 

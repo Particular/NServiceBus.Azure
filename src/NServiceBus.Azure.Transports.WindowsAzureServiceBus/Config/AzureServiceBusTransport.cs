@@ -5,22 +5,22 @@
     using Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint;
     using Config;
     using Microsoft.ServiceBus;
+    using Settings;
     using Transports;
 
     internal class AzureServiceBusTransport : ConfigureTransport
     {
-        //internal AzureServiceBusTransport()
-        //{
-        //    Defaults(a =>
-        //    {
-        //        var section = a.GetConfigSection<AzureServiceBusQueueConfig>();
-        //        a.SetDefault("AzureServiceBus.DefaultConnectionString", defaultconnectionString);
-        //    });
-        //}
-
-        protected override void Configure(FeatureConfigurationContext context, string defaultconnectionString)
+        internal AzureServiceBusTransport()
         {
-            var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
+            Defaults(a =>
+            {
+               
+            });
+        }
+
+        protected override string GetLocalAddress(SettingsHolder settings)
+        {
+            var configSection = settings.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)
             {
                 //hack: just to get the defaults, we should refactor this to support specifying the values on the NServiceBus/Transport connection string as well
@@ -29,7 +29,12 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
+            return NamingConventions.QueueNamingConvention(settings, null, settings.EndpointName(), false);
+            
+        }
 
+        protected override void Configure(FeatureConfigurationContext context, string defaultconnectionString)
+        {
             var bestConnectionString = new DeterminesBestConnectionStringForAzureServiceBus(defaultconnectionString).Determine(context.Settings);
 
             // this is  a bug in the core, statics reused across tests
@@ -41,10 +46,6 @@
             {
                 // yes, testing warrants it
             }
-           
-
-            var queuename = NamingConventions.QueueNamingConvention(context.Settings, null, context.Settings.EndpointName());
-            LocalAddress(queuename);
         }
 
         protected override bool RequiresConnectionString

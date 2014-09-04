@@ -6,6 +6,7 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using ObjectBuilder;
+    using Settings;
     using Transports;
 
     internal class AzureStorageQueueTransport : ConfigureTransport
@@ -58,10 +59,13 @@
                 context.Container.ConfigureProperty<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
             }
 
-            var queuename = AzureQueueNamingConvention.Apply(context.Settings);
+            
             context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)receiverConfig);
+        }
 
-            LocalAddress(queuename);
+        protected override string GetLocalAddress(SettingsHolder settingsHolder)
+        {
+            return AzureQueueNamingConvention.Apply(settingsHolder);
         }
 
         static string TryGetConnectionString(AzureQueueConfig configSection, string defaultConnectionString)

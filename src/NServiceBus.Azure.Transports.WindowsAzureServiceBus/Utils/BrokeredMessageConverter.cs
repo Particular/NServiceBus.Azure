@@ -93,7 +93,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             if (options.ReplyToAddress != null)
             {
-                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).Determine(settings, options.ReplyToAddress);
+                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).
+                    Determine(settings, options.ReplyToAddress);
             }
 
             if (options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue)
