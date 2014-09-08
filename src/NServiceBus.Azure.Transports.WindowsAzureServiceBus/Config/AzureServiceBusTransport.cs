@@ -18,7 +18,7 @@
             });
         }
 
-        protected override string GetLocalAddress(SettingsHolder settings)
+        protected override string GetLocalAddress(ReadOnlySettings settings)
         {
             var configSection = settings.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)

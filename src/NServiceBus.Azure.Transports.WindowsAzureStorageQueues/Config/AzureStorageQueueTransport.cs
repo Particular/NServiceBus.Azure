@@ -63,9 +63,9 @@
             context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)receiverConfig);
         }
 
-        protected override string GetLocalAddress(SettingsHolder settingsHolder)
+        protected override string GetLocalAddress(ReadOnlySettings settings)
         {
-            return AzureQueueNamingConvention.Apply(settingsHolder);
+            return AzureQueueNamingConvention.Apply(settings);
         }
 
         static string TryGetConnectionString(AzureQueueConfig configSection, string defaultConnectionString)
