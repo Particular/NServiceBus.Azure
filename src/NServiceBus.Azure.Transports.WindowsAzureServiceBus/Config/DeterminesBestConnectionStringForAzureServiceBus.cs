@@ -6,13 +6,22 @@
 
     internal class DeterminesBestConnectionStringForAzureServiceBus
     {
+        string defaultconnectionString;
+
+        public DeterminesBestConnectionStringForAzureServiceBus(string defaultconnectionString)
+        {
+            this.defaultconnectionString = defaultconnectionString;
+        }
+
         public string Determine(ReadOnlySettings settings)
         {
             var configSection = settings.GetConfigSection<AzureServiceBusQueueConfig>();
             var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
 
             if (string.IsNullOrEmpty(connectionString))
-                connectionString = settings.Get<string>("NServiceBus.Transport.ConnectionString");
+            {
+                connectionString = defaultconnectionString;
+            }
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.IssuerKey) && !string.IsNullOrEmpty(configSection.ServiceNamespace))
                 connectionString = string.Format("Endpoint=sb://{0}.servicebus.windows.net/;SharedSecretIssuer=owner;SharedSecretValue={1}", configSection.ServiceNamespace, configSection.IssuerKey);
@@ -45,4 +54,5 @@
         }
 
     }
+
 }

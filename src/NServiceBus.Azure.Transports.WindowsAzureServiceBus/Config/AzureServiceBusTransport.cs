@@ -1,40 +1,26 @@
 ﻿namespace NServiceBus.Features
 {
     using System;
-    using System.Transactions;
     using Azure.Transports.WindowsAzureServiceBus;
+    using Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint;
     using Config;
     using Microsoft.ServiceBus;
+    using Settings;
     using Transports;
 
-    internal class AzureServiceBusTransport : ConfigureTransport<AzureServiceBus>
+    internal class AzureServiceBusTransport : ConfigureTransport
     {
-       protected override void InternalConfigure(Configure config)
+        internal AzureServiceBusTransport()
         {
-            config.Settings.SetDefault("SelectedSerializer", typeof(Json));
-
-            var configSection = config.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
-            var serverWaitTime = configSection != null ?  configSection.ServerWaitTime : AzureServicebusDefaults.DefaultServerWaitTime;
-
-           if (configSection != null)
-           {
-               config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", !configSection.QueuePerInstance);
-           }
-           else
-           {
-               config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true);
-           }
-
-           // make sure the transaction stays open a little longer than the long poll.
-            config.Transactions( s => s.Advanced(settings => settings.DefaultTimeout(TimeSpan.FromSeconds(serverWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable)));
-
-            config.EnableFeature<AzureServiceBusTransport>();
-
+            Defaults(a =>
+            {
+               
+            });
         }
 
-        protected override void Setup(FeatureConfigurationContext context)
+        protected override string GetLocalAddress(ReadOnlySettings settings)
         {
-            var configSection = context.Settings.GetConfigSection<AzureServiceBusQueueConfig>();
+            var configSection = settings.GetConfigSection<AzureServiceBusQueueConfig>();
             if (configSection == null)
             {
                 //hack: just to get the defaults, we should refactor this to support specifying the values on the NServiceBus/Transport connection string as well
@@ -43,10 +29,23 @@
 
             ServiceBusEnvironment.SystemConnectivity.Mode = (ConnectivityMode)Enum.Parse(typeof(ConnectivityMode), configSection.ConnectivityMode);
 
-            var connectionString = new DeterminesBestConnectionStringForAzureServiceBus().Determine(context.Settings);
-            Address.OverrideDefaultMachine(connectionString);
-
+            return NamingConventions.QueueNamingConvention(settings, null, settings.EndpointName(), false);
             
+        }
+
+        protected override void Configure(FeatureConfigurationContext context, string defaultconnectionString)
+        {
+            var bestConnectionString = new DeterminesBestConnectionStringForAzureServiceBus(defaultconnectionString).Determine(context.Settings);
+
+            // this is  a bug in the core, statics reused across tests
+            try // would work on IWantToRunBeforeConfiguration, but would be better to move this method to base configuretransport
+            {
+                Address.OverrideDefaultMachine(bestConnectionString);
+            }
+            catch (InvalidOperationException)
+            {
+                // yes, testing warrants it
+            }
         }
 
         protected override bool RequiresConnectionString
@@ -58,7 +57,7 @@
         {
             get { return "Endpoint=sb://{yournamespace}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={yourkey}"; }
         }
-
-        
     }
+
+    
 }

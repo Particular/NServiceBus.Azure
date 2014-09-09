@@ -19,13 +19,15 @@
         public bool EnablePartitioning { get; set; }
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
+        readonly Configure config;
 
         private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
         private static readonly object ExistanceLock = new Object();
 
-        public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers)
+        public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
             this.createNamespaceManagers = createNamespaceManagers;
+            this.config = config;
         }
 
         public QueueDescription Create(Address address)
@@ -50,7 +52,7 @@
 
             try
             {
-                if (!ConfigureQueueCreation.DontCreateQueues)
+                if (config.CreateQueues())
                 {
                     path = description.Path;
                     if (!Exists(namespaceClient, path))

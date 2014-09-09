@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Features
 {
+    using System;
     using Azure.Transports.WindowsAzureStorageQueues;
     using Config;
     using Microsoft.WindowsAzure.Storage;
@@ -8,40 +9,18 @@
     using Settings;
     using Transports;
 
-    internal class AzureStorageQueueTransport : ConfigureTransport<AzureStorageQueue>
+    internal class AzureStorageQueueTransport : ConfigureTransport
     {
-        protected override void InternalConfigure(Configure config)
+
+        protected override void Configure(FeatureConfigurationContext context, string con)
         {
-            config.EnableFeature<AzureStorageQueueTransport>();
-            config.EnableFeature<TimeoutManagerBasedDeferral>();
-                
-            config.Settings.EnableFeatureByDefault<MessageDrivenSubscriptions>();
-            config.Settings.EnableFeatureByDefault<StorageDrivenPublishing>();
-            config.Settings.EnableFeatureByDefault<TimeoutManager>();
+            context.Settings.Get<Conventions>().AddSystemMessagesConventions(t => typeof(MessageWrapper).IsAssignableFrom(t));
 
-            config.Settings.SetDefault("SelectedSerializer", typeof(Json));
-
-            config.Settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
-
-            var configSection = config.Settings.GetConfigSection<AzureQueueConfig>();
-
-            if(configSection == null)
-                return;
-
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PurgeOnStartup, configSection.PurgeOnStartup);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, configSection.MaximumWaitTimeWhenIdle);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, configSection.MessageInvisibleTime);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.PeekInterval, configSection.PeekInterval);
-            config.Settings.SetPropertyDefault<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
-        }
-
-        protected override void Setup(FeatureConfigurationContext context)
-        {
             CloudQueueClient queueClient;
 
             var configSection = context.Settings.GetConfigSection<AzureQueueConfig>();
 
-            var connectionString = TryGetConnectionString(configSection, context.Settings);
+            var connectionString = TryGetConnectionString(configSection, con);
 
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -51,26 +30,47 @@
             {
                 queueClient = CloudStorageAccount.Parse(connectionString).CreateCloudQueueClient();
 
-                Address.OverrideDefaultMachine(connectionString);                
+                try
+                {
+                    Address.OverrideDefaultMachine(connectionString);  
+                }
+                catch (InvalidOperationException)
+                {
+                    //swallow till refactored
+                }
+                              
             }
 
-            context.Container.RegisterSingleton<CloudQueueClient>(queueClient);
+            context.Container.RegisterSingleton(queueClient);
 
-            var recieverConfig = context.Container.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
-            recieverConfig.ConfigureProperty(p => p.PurgeOnStartup, ConfigurePurging.PurgeRequested);
+            var receiverConfig = context.Container.ConfigureComponent<AzureMessageQueueReceiver>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<CreateQueueClients>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<AzureMessageQueueSender>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<PollingDequeueStrategy>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureMessageQueueCreator>(DependencyLifecycle.InstancePerCall);
 
-            var queuename = AzureQueueNamingConvention.Apply(context.Settings.EndpointName());
-            context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)recieverConfig);
-            Address.InitializeLocalAddress(queuename);
+            if (configSection != null)
+            {
+                context.Container.ConfigureProperty<AzureMessageQueueReceiver>(t => t.PurgeOnStartup, configSection.PurgeOnStartup);
+                context.Container.ConfigureProperty<AzureMessageQueueReceiver>(t => t.PurgeOnStartup, configSection.PurgeOnStartup);
+                context.Container.ConfigureProperty<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, configSection.MaximumWaitTimeWhenIdle);
+                context.Container.ConfigureProperty<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, configSection.MessageInvisibleTime);
+                context.Container.ConfigureProperty<AzureMessageQueueReceiver>(t => t.PeekInterval, configSection.PeekInterval);
+                context.Container.ConfigureProperty<AzureMessageQueueReceiver>(t => t.BatchSize, configSection.BatchSize);
+            }
+
+            
+            context.Settings.ApplyTo<AzureMessageQueueReceiver>((IComponentConfig)receiverConfig);
         }
 
-        static string TryGetConnectionString(AzureQueueConfig configSection, ReadOnlySettings config)
+        protected override string GetLocalAddress(ReadOnlySettings settings)
         {
-            var connectionString = config.Get<string>("NServiceBus.Transport.ConnectionString");
+            return AzureQueueNamingConvention.Apply(settings);
+        }
+
+        static string TryGetConnectionString(AzureQueueConfig configSection, string defaultConnectionString)
+        {
+            var connectionString = defaultConnectionString;
 
             if (string.IsNullOrEmpty(connectionString))
             {

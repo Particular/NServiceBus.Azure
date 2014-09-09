@@ -22,9 +22,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void Publish(TransportMessage message, PublishOptions options)
         {
-            var publisher = topology.GetPublisher(Address.Local);
+            var publisher = topology.GetPublisher(config.LocalAddress);
 
-            if (publisher == null) throw new QueueNotFoundException { Queue = Address.Local };
+            if (publisher == null) throw new QueueNotFoundException { Queue = config.LocalAddress };
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
                 Publish(publisher, message, options);
@@ -34,7 +34,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         private void Publish(IPublishBrokeredMessages publisher, TransportMessage message, PublishOptions options)
         {
-            using (var brokeredMessage = message.ToBrokeredMessage(options, config.Settings))
+            using (var brokeredMessage = message.ToBrokeredMessage(options, config.Settings, config))
             {
                 publisher.Publish(brokeredMessage);
             }

@@ -54,7 +54,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             try
             {
-                using(var brokeredMessage = message.ToBrokeredMessage(options, config.Settings, expectDelay))
+                using(var brokeredMessage = message.ToBrokeredMessage(options, config.Settings, expectDelay, config))
                 {
                     sender.Send(brokeredMessage);
                 }

@@ -100,7 +100,10 @@ namespace NServiceBus.Hosting.Azure
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner();
+            var assemblyScanner = new AssemblyScanner()
+            {
+                ThrowExceptions = false
+            };
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(NServiceBusRoleEntrypoint).Assembly);

@@ -1,12 +1,14 @@
 ﻿namespace NServiceBus
 {
-    using Persistence;
+    using System;
 
     /// <summary>
     /// Contains extension methods to NServiceBus.Configure for the saga persister on top of Azure table storage.
     /// </summary>
     public static class ConfigureAzureSagaPersister
     {
+        // ReSharper disable UnusedParameter.Global
+        
         /// <summary>
         /// Use the table storage backed saga persister implementation.
         /// </summary>
@@ -15,7 +17,7 @@
         [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
         public static Configure AzureSagaPersister(this Configure config)
         {
-            return config.UsePersistence<AzureStorage>();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -26,12 +28,14 @@
         /// <param name="autoUpdateSchema"></param>
         /// <returns></returns>
         [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
+
         public static Configure AzureSagaPersister(this Configure config,
+
             string connectionString,
             bool autoUpdateSchema)
         {
-            return config.UsePersistence<AzureStorage>();
+            throw new InvalidOperationException();
         }
-
+        // ReSharper restore UnusedParameter.Global
     }
 }

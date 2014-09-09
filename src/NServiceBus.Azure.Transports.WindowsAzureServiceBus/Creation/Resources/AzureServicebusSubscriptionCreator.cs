@@ -16,15 +16,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public bool EnableDeadLetteringOnFilterEvaluationExceptions { get; set; }
 
         readonly ICreateNamespaceManagers createNamespaceManagers;
+        readonly Configure config;
 
         private static readonly Dictionary<string, bool> rememberTopicExistance = new Dictionary<string, bool>();
         private static readonly Dictionary<string, bool> rememberSubscriptionExistance = new Dictionary<string, bool>();
         private static readonly object TopicExistanceLock = new Object();
         private static readonly object SubscriptionExistanceLock = new Object();
 
-        public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers)
+        public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
             this.createNamespaceManagers = createNamespaceManagers;
+            this.config = config;
         }
 
         public SubscriptionDescription Create(Address topic, Type eventType, string subscriptionname)
@@ -50,7 +52,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 EnableDeadLetteringOnFilterEvaluationExceptions = EnableDeadLetteringOnFilterEvaluationExceptions
             };
 
-            if (!ConfigureQueueCreation.DontCreateQueues)
+            if (config.CreateQueues())
             {
                 if (TopicExists(namespaceClient, topicPath))
                 {

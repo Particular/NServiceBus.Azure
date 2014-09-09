@@ -7,11 +7,11 @@ namespace NServiceBus.Hosting.Azure
     using Config;
     using Config.ConfigurationSource;
     using Helpers;
-    using Hosting.Profiles;
-    using Hosting.Roles;
+    using Profiles;
     using Integration.Azure;
     using Logging;
     using NServiceBus.Azure;
+    using Unicast;
 
     /// <summary>
     ///     A generic host that can be used to provide hosting services in different environments
@@ -52,9 +52,6 @@ namespace NServiceBus.Hosting.Azure
             args = AddProfilesFromConfiguration(args);
 
             profileManager = new ProfileManager(assembliesToScan, args, defaultProfiles);
-            ProfileActivator.ProfileManager = profileManager;
-
-            roleManager = new RoleManager(assembliesToScan);
         }
 
         /// <summary>
@@ -65,9 +62,8 @@ namespace NServiceBus.Hosting.Azure
             try
             {
                 PerformConfiguration();
-
-                bus = config.CreateBus();
-                if (bus != null && !config.Settings.Get<bool>("Endpoint.SendOnly"))
+                
+                if (bus != null && !bus.Settings.Get<bool>("Endpoint.SendOnly"))
                 {
                     bus.Start();
                 }
@@ -87,7 +83,6 @@ namespace NServiceBus.Hosting.Azure
         {
             if (bus != null)
             {
-                bus.Shutdown();
                 bus.Dispose();
 
                 bus = null;
@@ -99,14 +94,12 @@ namespace NServiceBus.Hosting.Azure
         /// </summary>
         public void Install(string username)
         {
-            PerformConfiguration();
-            //HACK: to ensure the installer runner performs its installation
+            PerformConfiguration(builder => builder.EnableInstallers(username));
 
-            config.EnableInstallers(username);
-            config.CreateBus();
+            bus.Builder.Dispose();
         }
 
-        void PerformConfiguration()
+        void PerformConfiguration(Action<BusConfiguration> moreConfiguration = null)
         {
             var loggingConfigurers = profileManager.GetLoggingConfigurer();
             foreach (var loggingConfigurer in loggingConfigurers)
@@ -114,25 +107,28 @@ namespace NServiceBus.Hosting.Azure
                 loggingConfigurer.Configure(specifier);
             }
 
-             config = Configure.With(o =>{
-                o.EndpointName(endpointNameToUse);
-                o.EndpointVersion(() => endpointVersionToUse);
-                o.AssembliesToScan(assembliesToScan);
+            var configuration = new BusConfiguration();
 
-                if (SafeRoleEnvironment.IsAvailable)
+            configuration.EndpointName(endpointNameToUse);
+            configuration.EndpointVersion(endpointVersionToUse);
+            configuration.AssembliesToScan(assembliesToScan);
+           
+            if (SafeRoleEnvironment.IsAvailable)
+            {
+                if (!IsHostedIn.ChildHostProcess())
                 {
-                    if (!IsHostedIn.ChildHostProcess())
-                    {
-                        o.AzureConfigurationSource();
-                    }
+                    configuration.AzureConfigurationSource();
                 }
-                
-                 specifier.Customize(o);
-              });
+            }
 
-            
+            if (moreConfiguration != null)
+                {
+                    moreConfiguration(configuration);
+                }
 
-            roleManager.ConfigureBusForEndpoint(specifier, config);
+            specifier.Customize(configuration);
+            RoleManager.TweakConfigurationBuilder(specifier, configuration);
+            bus = (UnicastBus) Bus.Create(configuration);
         }
 
         private string[] AddProfilesFromConfiguration(IEnumerable<string> args)
@@ -153,10 +149,8 @@ namespace NServiceBus.Hosting.Azure
         List<Assembly> assembliesToScan;
 
         ProfileManager profileManager;
-        RoleManager roleManager;
         IConfigureThisEndpoint specifier;
-        IStartableBus bus;
-        Configure config;
+        UnicastBus bus;
 
         string endpointNameToUse;
         string endpointVersionToUse;

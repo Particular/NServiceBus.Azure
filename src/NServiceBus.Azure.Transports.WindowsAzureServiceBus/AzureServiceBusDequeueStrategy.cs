@@ -26,16 +26,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private readonly Queue pendingMessages = Queue.Synchronized(new Queue());
         private readonly IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
         private CancellationTokenSource tokenSource;
-        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => ConfigureCriticalErrorAction.RaiseCriticalError(string.Format("Failed to receive message from Azure ServiceBus."), ex));
+        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
         
         private const int PeekInterval = 50;
         private const int MaximumWaitTimeWhenIdle = 1000;
         private int timeToDelayNextPeek;
         private int maximumConcurrencyLevel;
 
-        public AzureServiceBusDequeueStrategy(ITopology topology)
+        public AzureServiceBusDequeueStrategy(ITopology topology, CriticalError criticalError)
         {
             this.topology = topology;
+            circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => criticalError.Raise(string.Format("Failed to receive message from Azure ServiceBus."), ex));
         }
         
         /// <summary>
@@ -163,7 +164,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 }
                 finally
                 {
-                    endProcessMessage(transportMessage, exception);
+                    if (!cancellationToken.IsCancellationRequested && (transportMessage != null || exception != null))
+                    {
+                        endProcessMessage(transportMessage, exception);
+                    }
                 }
             }
         }

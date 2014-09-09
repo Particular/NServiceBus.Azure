@@ -1,12 +1,14 @@
 namespace NServiceBus
 {
-    using Persistence;
+    using System;
 
     /// <summary>
     /// Configuration extensions for the subscription storage
     /// </summary>
     public static class ConfigureAzureSubscriptionStorage
     {
+        // ReSharper disable UnusedParameter.Global
+
         /// <summary>
         /// Configures NHibernate Azure Subscription Storage , Settings etc are read from custom config section
         /// </summary>
@@ -15,7 +17,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
         public static Configure AzureSubscriptionStorage(this Configure config)
         {
-            return config.UsePersistence<AzureStorage>();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -29,11 +31,14 @@ namespace NServiceBus
         /// <returns></returns>
         [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
         public static Configure AzureSubscriptionStorage(this Configure config,
+
             string connectionString,
             bool createSchema, 
             string tableName)
         {
-            return config.UsePersistence<AzureStorage>();
-        }        
+            throw new InvalidOperationException();
+        } 
+        
+        // ReSharper restore UnusedParameter.Global      
     }
 }

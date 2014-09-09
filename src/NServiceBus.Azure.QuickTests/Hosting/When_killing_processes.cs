@@ -4,7 +4,6 @@
     using System.Linq;
     using Hosting.Azure;
     using NUnit.Framework;
-    using Hosting;
 
     [TestFixture]
     public class When_killing_processes

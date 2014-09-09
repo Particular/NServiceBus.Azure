@@ -44,11 +44,11 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="ripple.dependencies.config" />
+    <None Include="app.config" />
     <Reference Include="Ionic.Zip">
       <HintPath>..\lib\Ionic.Zip.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.OData">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Data.OData\lib\net40\Microsoft.Data.OData.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceBus">
@@ -61,8 +61,10 @@
       <HintPath>..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceBus\lib\net45\NServiceBus.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Obsolete">
+      <HintPath>..\packages\Obsolete.Fody\Lib\NET35\Obsolete.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -72,13 +74,11 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Spatial">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\System.Spatial\lib\net40\System.Spatial.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AzureProfileConfig.cs" />
@@ -93,24 +93,24 @@
     <Compile Include="FileVersionRetriever.cs" />
     <Compile Include="GenericHost.cs" />
     <Compile Include="IHost.cs" />
-    <Compile Include="LoggingHandlers\DevelopmentLoggingHandler.cs" />
-    <Compile Include="Profiles\Handler\DevelopmentProfileHandler.cs" />
+    <Compile Include="Logging\DevelopmentLoggingHandler.cs" />
+    <Compile Include="Profiles\Hosting\IConfigureLoggingForProfile.cs" />
+    <Compile Include="Profiles\Hosting\IHandleAnyProfile.cs" />
+    <Compile Include="Profiles\Hosting\IHandleProfile.cs" />
+    <Compile Include="Profiles\Hosting\IProfile.cs" />
+    <Compile Include="Profiles\Hosting\IWantTheListOfActiveProfiles.cs" />
+    <Compile Include="Profiles\Hosting\ProfileManager.cs" />
     <Compile Include="RoleHost\Config\DefaultStorageForHost.cs" />
     <Compile Include="RoleHost\Entrypoint.cs" />
     <Compile Include="DynamicHost\DynamicHostController.cs" />
-    <Compile Include="LoggingHandlers\ProductionLoggingHandler.cs" />
     <Compile Include="Profiles\Development.cs" />
-    <Compile Include="Profiles\Handler\ProductionProfileHandler.cs" />
     <Compile Include="Profiles\Production.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleHost\SetHostInformation.cs" />
     <Compile Include="Roles\AsA_Host.cs" />
     <Compile Include="Roles\AsA_Worker.cs" />
     <Compile Include="RoleHost\Config\DefaultTransportForHost.cs" />
-    <Compile Include="Roles\Handlers\PersistenceRoleHandler.cs" />
-    <Compile Include="Roles\Handlers\TransportRoleHandler.cs" />
-    <Compile Include="Roles\Handlers\WorkerRoleHandler.cs" />
-    <Compile Include="Roles\UsingPersistence.cs" />
+    <Compile Include="Roles\RoleManager.cs" />
     <Compile Include="Roles\UsingTransport.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -14,6 +14,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
     public class AzureMessageQueueReceiver
     {
+        readonly IMessageSerializer messageSerializer;
+        readonly CloudQueueClient client;
         public const int DefaultMessageInvisibleTime = 30000;
         public const int DefaultPeekInterval = 50;
         public const int DefaultMaximumWaitTimeWhenIdle = 1000;
@@ -53,19 +55,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         /// </summary>
         public int BatchSize { get; set; }
 
-        /// <summary>
-        /// Gets or sets the message serializer
-        /// </summary>
-        public IMessageSerializer MessageSerializer { get; set; }
-
-        public CloudQueueClient Client { get; set; }
-
-        public AzureMessageQueueReceiver()
+        public AzureMessageQueueReceiver(IMessageSerializer messageSerializer, CloudQueueClient client, Configure configure)
         {
+            this.messageSerializer = messageSerializer;
+            this.client = client;
             MessageInvisibleTime = DefaultMessageInvisibleTime;
             PeekInterval = DefaultPeekInterval;
             MaximumWaitTimeWhenIdle = DefaultMaximumWaitTimeWhenIdle;
             BatchSize = DefaultBatchSize;
+
+            PurgeOnStartup = configure.PurgeOnStartup();
         }
 
         public void Init(string address, bool transactional)
@@ -79,7 +78,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             var queueName = AzureMessageQueueUtils.GetQueueName(address);
 
-            azureQueue = Client.GetQueueReference(queueName);
+            azureQueue = client.GetQueueReference(queueName);
             azureQueue.CreateIfNotExists();
 
             if (PurgeOnStartup)
@@ -168,7 +167,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 object[] deserializedObjects;
                 try
                 {
-                    deserializedObjects = MessageSerializer.Deserialize(stream, new List<Type> { typeof(MessageWrapper) });
+                    deserializedObjects = messageSerializer.Deserialize(stream, new List<Type> { typeof(MessageWrapper) });
                 }
                 catch (Exception)
                 {

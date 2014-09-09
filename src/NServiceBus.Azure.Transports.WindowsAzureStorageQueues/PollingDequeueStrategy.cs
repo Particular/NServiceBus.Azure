@@ -14,11 +14,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     /// A polling implementation of <see cref="IDequeueMessages"/>.
     /// </summary>
     public class PollingDequeueStrategy : IDequeueMessages
-    {  
-        /// <summary>
-        /// See <see cref="AzureMessageQueueReceiver"/>.
-        /// </summary>
-        public AzureMessageQueueReceiver MessageReceiver { get; set; }
+    {
+        readonly AzureMessageQueueReceiver messageReceiver;
+
+        public PollingDequeueStrategy(AzureMessageQueueReceiver messageReceiver, CriticalError criticalError)
+        {
+            this.messageReceiver = messageReceiver;
+            circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => criticalError.Raise(string.Format("Failed to receive message from Azure Storage Queue."), ex));
+        }
 
         /// <summary>
         /// Initializes the <see cref="IDequeueMessages"/>.
@@ -36,7 +39,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             settings = transactionSettings;
             transactionOptions = new TransactionOptions { IsolationLevel = transactionSettings.IsolationLevel, Timeout = transactionSettings.TransactionTimeout };
 
-            MessageReceiver.Init(addressToPoll, settings.IsTransactional);
+            messageReceiver.Init(addressToPoll, settings.IsTransactional);
         }
 
         /// <summary>
@@ -94,7 +97,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     {
                         using (var scope = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
                         {
-                            message = MessageReceiver.Receive();
+                            message = messageReceiver.Receive();
 
                             if (message != null)
                             {
@@ -107,7 +110,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     }
                     else
                     {
-                        message = MessageReceiver.Receive();
+                        message = messageReceiver.Receive();
 
                         if (message != null)
                         {
@@ -131,12 +134,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 }
                 finally
                 {
-                    endProcessMessage(message, exception);
+                    if (!cancellationToken.IsCancellationRequested && (message != null || exception != null))
+                    {
+                        endProcessMessage(message, exception);
+                    }
                 }
             }
         }
 
-        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => ConfigureCriticalErrorAction.RaiseCriticalError(string.Format("Failed to receive message from Azure Storage Queue."), ex));
+        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
         Func<TransportMessage, bool> tryProcessMessage;
         CancellationTokenSource tokenSource;
         Address addressToPoll;

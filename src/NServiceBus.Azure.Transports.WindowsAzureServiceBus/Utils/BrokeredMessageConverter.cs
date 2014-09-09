@@ -40,7 +40,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             return t;
         }
 
-        public static BrokeredMessage ToBrokeredMessage(this TransportMessage message, PublishOptions options, ReadOnlySettings settings)
+        public static BrokeredMessage ToBrokeredMessage(this TransportMessage message, PublishOptions options, ReadOnlySettings settings, Configure config)
         {
             var brokeredMessage = message.Body != null ? new BrokeredMessage(message.Body) : new BrokeredMessage();
 
@@ -54,14 +54,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
             brokeredMessage.MessageId = message.Id;
-
+            
             if (message.ReplyToAddress != null)
             {
-                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(settings, message.ReplyToAddress);
+                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).Determine(settings, message.ReplyToAddress);
             }
             else if (options.ReplyToAddress != null)
             {
-                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(settings, options.ReplyToAddress);
+                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).Determine(settings, options.ReplyToAddress);
             }
 
             if (message.TimeToBeReceived < TimeSpan.MaxValue)
@@ -72,7 +72,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             return brokeredMessage;
         }
 
-        public static BrokeredMessage ToBrokeredMessage(this TransportMessage message, SendOptions options, SettingsHolder settings, bool expectDelay)
+        public static BrokeredMessage ToBrokeredMessage(this TransportMessage message, SendOptions options, SettingsHolder settings, bool expectDelay, Configure config)
         {
             var brokeredMessage = message.Body != null ? new BrokeredMessage(message.Body) : new BrokeredMessage();
 
@@ -93,7 +93,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             if (options.ReplyToAddress != null)
             {
-                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(settings, options.ReplyToAddress);
+                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).
+                    Determine(settings, options.ReplyToAddress);
             }
 
             if (options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue)

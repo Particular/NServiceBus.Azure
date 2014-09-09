@@ -18,7 +18,7 @@
             try
             {
                 Scenario.Define(context)
-                   .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.Send(Address.Local, new OversizedRequest())))
+                   .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.SendLocal(new OversizedRequest())))
                    .Run();
             }
             catch (AggregateException ex)
