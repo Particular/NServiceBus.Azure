@@ -17,7 +17,8 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         /// </summary>
         /// <param name="endpointType"></param>
         /// <param name="args"></param>
-        public WindowsHost(Type endpointType, string[] args)
+        /// <param name="scannableAssembliesFullName"></param>
+        public WindowsHost(Type endpointType, string[] args, IEnumerable<string> scannableAssembliesFullName)
         {
             var specifier = (IConfigureThisEndpoint)Activator.CreateInstance(endpointType);
 
@@ -25,7 +26,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
             args = AddProfilesFromConfiguration(args);
 
-            genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) }, Program.EndpointId);
+            genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) }, Program.EndpointId, scannableAssembliesFullName);
         }
 
         /// <summary>
