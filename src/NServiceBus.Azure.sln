@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure.HostProcess", "NServiceBus.Hosting.Azure.HostProcess\NServiceBus.Hosting.Azure.HostProcess.csproj", "{11B81F23-64C6-4341-94AC-38B3C4C6B1E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.QuickTests", "NServiceBus.Azure.QuickTests\NServiceBus.Azure.QuickTests.csproj", "{E25B5433-7166-4C10-A76E-C0546F9E2497}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Tests", "NServiceBus.Azure.QuickTests\NServiceBus.Azure.Tests.csproj", "{E25B5433-7166-4C10-A76E-C0546F9E2497}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Transports.WindowsAzureServiceBus", "NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj", "{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}"
 EndProject
