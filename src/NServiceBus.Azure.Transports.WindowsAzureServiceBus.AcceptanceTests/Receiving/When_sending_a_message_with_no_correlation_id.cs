@@ -1,10 +1,10 @@
 ﻿namespace NServiceBus.AcceptanceTests.WindowsAzureServiceBus
 {
     using System;
-    using Config;
-    using Config.ConfigurationSource;
     using EndpointTemplates;
     using AcceptanceTesting;
+    using NServiceBus.Config;
+    using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
 
     public class When_a_handler_fails_to_process_a_message : NServiceBusAcceptanceTest
