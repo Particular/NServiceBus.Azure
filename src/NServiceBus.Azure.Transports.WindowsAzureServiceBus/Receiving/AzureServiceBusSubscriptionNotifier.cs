@@ -119,7 +119,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
 
-                if (cancelRequested || !ex.IsTransient) return;
+                if (cancelRequested) return;
 
                 logger.Warn("Will retry after backoff period");
 

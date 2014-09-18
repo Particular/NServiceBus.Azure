@@ -115,7 +115,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 logger.Warn(string.Format("{1} Messaging Exception occured on queue {0}", _queueClient.Path, (ex.IsTransient ? "Transient" : "Non transient")), ex);
 
-                if (cancelRequested || !ex.IsTransient) return;
+                if (cancelRequested) return;
 
                 logger.Warn("Will retry after backoff period");
 
