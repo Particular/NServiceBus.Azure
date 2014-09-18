@@ -13,6 +13,8 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 {
     class Program
     {
+        static List<Assembly> scannedAssemblies;
+
         private static void Main(string[] args)
         {
             var commandLineArguments = Parser.ParseArgs(args);
@@ -34,6 +36,9 @@ namespace NServiceBus.Hosting.Azure.HostProcess
             var endpointConfiguration = Activator.CreateInstance(endpointConfigurationType);
 
             EndpointId = GetEndpointId(endpointConfiguration);
+
+            var assemblylist = string.Join(";", scannedAssemblies.Select((s => s.ToString())));
+            args = args.Concat(new[]{String.Format(@"/scannedAssemblies={0}", assemblylist)}).ToArray();
 
             AppDomain.CurrentDomain.SetupInformation.AppDomainInitializerArguments = args;
 
@@ -146,7 +151,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         /// <returns></returns>
         public static string GetEndpointId(object endpointConfiguration)
         {
-            string endpointName = endpointConfiguration.GetType().FullName;
+            var endpointName = endpointConfiguration.GetType().FullName;
             return string.Format("{0}_v{1}", endpointName, endpointConfiguration.GetType().Assembly.GetName().Version);
         }
 
@@ -154,10 +159,10 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         {
             if (arguments.EndpointConfigurationType != null)
             {
-                string t = arguments.EndpointConfigurationType.Value;
+                var t = arguments.EndpointConfigurationType.Value;
                 if (t != null)
                 {
-                    Type endpointType = Type.GetType(t, false);
+                    var endpointType = Type.GetType(t, false);
                     if (endpointType == null)
                         throw new ConfigurationErrorsException(string.Format("Command line argument 'endpointConfigurationType' has specified to use the type '{0}' but that type could not be loaded.", t));
 
@@ -165,7 +170,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
                 }
             }
 
-            string endpoint = ConfigurationManager.AppSettings["EndpointConfigurationType"];
+            var endpoint = ConfigurationManager.AppSettings["EndpointConfigurationType"];
             if (endpoint != null)
             {
                 var endpointType = Type.GetType(endpoint, false);
@@ -175,7 +180,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
                 return endpointType;
             }
 
-            IEnumerable<Type> endpoints = ScanAssembliesForEndpoints();
+            var endpoints = ScanAssembliesForEndpoints();
 
             ValidateEndpoints(endpoints);
 
@@ -184,16 +189,21 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
         private static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner
+            if (scannedAssemblies == null)
             {
-                ThrowExceptions = false
-            };
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
+                var assemblyScanner = new AssemblyScanner
+                {
+                    ThrowExceptions = false
+                };
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
 
-            foreach (var assembly in assemblyScanner.GetScannableAssemblies().Assemblies)
-                foreach (Type type in assembly.GetTypes().Where(
+                scannedAssemblies = assemblyScanner.GetScannableAssemblies().Assemblies;
+            }
+
+            foreach (var assembly in scannedAssemblies)
+                foreach (var type in assembly.GetTypes().Where(
                         t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
                         && t != typeof(IConfigureThisEndpoint)
                         && !t.IsAbstract))

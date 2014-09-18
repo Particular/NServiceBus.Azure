@@ -4,6 +4,8 @@ using Microsoft.Practices.ServiceLocation;
 
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
+    using System.Linq;
+
     /// <summary>
     /// Plugs into the generic service locator to return an instance of <see cref="GenericHost"/>.
     /// </summary>
@@ -23,7 +25,11 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         protected override object DoGetInstance(Type serviceType, string key)
         {
             var endpoint = Type.GetType(key,true);
-            return new WindowsHost(endpoint, Args);
+
+            var scannableString = Args.First(a => a.StartsWith("/scannedAssemblies="));
+            var scannableAssembliesFullName = scannableString.Replace("/scannedAssemblies=","").Split(';');
+
+            return new WindowsHost(endpoint, Args, scannableAssembliesFullName);
         }
 
         /// <summary>
