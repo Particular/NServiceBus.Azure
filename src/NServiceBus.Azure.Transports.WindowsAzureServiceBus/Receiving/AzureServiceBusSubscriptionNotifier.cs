@@ -16,6 +16,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private SubscriptionClient subscriptionClient;
         private Action<BrokeredMessage> tryProcessMessage;
         private bool cancelRequested;
+        Action<Exception> errorProcessingMessage;
 
         /// <summary>
         /// 
@@ -47,11 +48,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         /// <param name="address"></param>
         /// <param name="tryProcessMessage"></param>
-        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage)
+        /// <param name="errorProcessingMessage"></param>
+        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
         {
             cancelRequested = false;
 
             this.tryProcessMessage = tryProcessMessage;
+            this.errorProcessingMessage = errorProcessingMessage;
 
             subscriptionClient = SubscriptionClientCreator.Create(address, EventType);
 
@@ -119,7 +122,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
 
-                if (cancelRequested) return;
+                if (cancelRequested)
+                {
+                    return;
+                }
+
+                if (!ex.IsTransient)
+                {
+                    errorProcessingMessage(ex);
+                }
 
                 logger.Warn("Will retry after backoff period");
 

@@ -224,8 +224,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void TrackNotifier(Address address, INotifyReceivedMessages notifier)
         {
-            notifier.Start(address, EnqueueMessage);
+            notifier.Start(address, EnqueueMessage, ErrorDequeueingBatch);
             notifiers.Add(notifier);
+        }
+
+        void ErrorDequeueingBatch(Exception ex)
+        {
+            circuitBreaker.Execute(() => Configure.Instance.RaiseCriticalError("Failed to receive message!", ex));
         }
 
         void EnqueueMessage(BrokeredMessage brokeredMessage)
@@ -256,8 +261,5 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             toRemove.Stop();
             notifiers.Remove(toRemove);
         }
-
     }
-
-
 }

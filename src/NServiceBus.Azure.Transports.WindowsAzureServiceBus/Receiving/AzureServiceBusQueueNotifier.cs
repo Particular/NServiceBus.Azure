@@ -15,6 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         private QueueClient _queueClient;
         private Action<BrokeredMessage> _tryProcessMessage;
+        private Action<Exception> errorProcessingMessage;
         private bool cancelRequested;
         
         /// <summary>
@@ -42,12 +43,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         /// <param name="address"></param>
         /// <param name="tryProcessMessage"></param>
-        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage)
+        /// <param name="errorProcessingMessage"></param>
+        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
         {
             Address = address;
 
             cancelRequested = false;
 
+            this.errorProcessingMessage = errorProcessingMessage;
             _tryProcessMessage = tryProcessMessage;
             
             _queueClient = QueueClientCreator.Create(address);
@@ -115,7 +118,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 logger.Warn(string.Format("{1} Messaging Exception occured on queue {0}", _queueClient.Path, (ex.IsTransient ? "Transient" : "Non transient")), ex);
 
-                if (cancelRequested) return;
+                if (cancelRequested)
+                {
+                    return;
+                }
+
+                if (!ex.IsTransient)
+                {
+                    errorProcessingMessage(ex);
+                }
 
                 logger.Warn("Will retry after backoff period");
 
