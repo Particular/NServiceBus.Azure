@@ -82,62 +82,48 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     tryProcessMessage(receivedMessage);
                 }
             }
-            catch (MessagingEntityDisabledException)
-            {
-                logger.Warn(string.Format("Subscription {0} is disabled", subscriptionClient.Name)); 
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (ServerBusyException ex)
-            {
-                logger.Warn(string.Format("Server busy exception occured on subscription {0}", subscriptionClient.Name), ex);
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (MessagingCommunicationException ex)
-            {
-                logger.Warn(string.Format("Message communication exception occured on subscription {0}", subscriptionClient.Name), ex);
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
             catch (TimeoutException ex)
             {
                 logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", subscriptionClient.Name), ex);
                 // time's up, just continue and retry
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.Fatal(string.Format("Unauthorized Access Exception occured on subscription {0}", subscriptionClient.Name), ex);
 
+                // errorProcessingMessage(ex);
+                // return
+                // for now choosen to continue
+            }
             catch (MessagingException ex)
             {
-                logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
-
                 if (cancelRequested)
                 {
                     return;
                 }
 
-                if (!ex.IsTransient)
+                if (!ex.IsTransient && !ExceptionHandling.IsRetryable(ex))
                 {
-                    errorProcessingMessage(ex);
+                    logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+
+                    // errorProcessingMessage(ex);
+                    // return
+                    // for now choosen to continue
                 }
+                else
+                {
+                    logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+                }
+
 
                 logger.Warn("Will retry after backoff period");
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
-
-            subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            finally
+            {
+                subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            }
         }
     }
 }
