@@ -106,9 +106,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
 
-                    // errorProcessingMessage(ex);
-                    // return
-                    // for now choosen to continue
+                    errorProcessingMessage(ex);
                 }
                 else
                 {

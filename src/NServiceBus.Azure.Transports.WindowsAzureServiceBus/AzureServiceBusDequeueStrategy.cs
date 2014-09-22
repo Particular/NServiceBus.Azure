@@ -228,12 +228,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             notifiers.Add(notifier);
         }
 
-        // currently not raised by the notifiers, just kept here in code as part of discussion
         void ErrorDequeueingBatch(Exception ex)
         {
-            // no point in going through the circuit breaker as only one thread is pulling messages and that one backs off anyway, it will never hit the treshold
-            
-            Configure.Instance.RaiseCriticalError("Failed to dequeue batch!", ex);
+            Configure.Instance.RaiseCriticalError("Fatal messaging exception occured on the broker while dequeueing batch.", ex);
         }
 
         void EnqueueMessage(BrokeredMessage brokeredMessage)

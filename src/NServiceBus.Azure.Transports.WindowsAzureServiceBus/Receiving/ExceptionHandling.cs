@@ -16,7 +16,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     inner is MessageLockLostException ||
                     inner is MessageNotFoundException ||
                     inner is MessagingEntityAlreadyExistsException ||
-                   // inner is MessagingEntityDisabledException ||
+                    inner is MessagingEntityDisabledException ||
                     inner is SessionLockLostException)
                 {
                     return true;

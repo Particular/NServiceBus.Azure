@@ -88,9 +88,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 logger.Fatal(string.Format("Unauthorized Access Exception occured on queue {0}", _queueClient.Path), ex);
 
-                // errorProcessingMessage(ex);
-                // return
-                // for now choosen to continue
+                errorProcessingMessage(ex);
             }
             catch (MessagingException ex)
             {
@@ -103,9 +101,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     logger.Fatal(string.Format("{1} {2} occured on queue {0}", _queueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
 
-                    // errorProcessingMessage(ex);
-                    // return
-                    // for now choosen to continue
+                    errorProcessingMessage(ex);
                 }
                 else
                 {
