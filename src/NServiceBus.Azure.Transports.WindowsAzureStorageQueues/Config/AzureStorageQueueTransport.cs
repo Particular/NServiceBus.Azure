@@ -11,6 +11,8 @@
     {
         protected override void InternalConfigure(Configure config)
         {
+            MessageConventionExtensions.AddSystemMessagesConventions(t => typeof(MessageWrapper).IsAssignableFrom(t));
+
             Enable<AzureStorageQueueTransport>();
             EnableByDefault<MessageDrivenSubscriptions>();
             EnableByDefault<StorageDrivenPublisher>();
