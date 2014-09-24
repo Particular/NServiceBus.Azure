@@ -2,7 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using Microsoft.ServiceBus.Messaging;
 
-    internal static class ExceptionHandling
+    internal static class RetriableReceiveExceptionHandling
     {
         public static bool IsRetryable(MessagingException messagingException)
         {

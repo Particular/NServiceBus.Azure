@@ -97,7 +97,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     return;
                 }
 
-                if (!ex.IsTransient && !ExceptionHandling.IsRetryable(ex))
+                if (!ex.IsTransient && !RetriableReceiveExceptionHandling.IsRetryable(ex))
                 {
                     logger.Fatal(string.Format("{1} {2} occured on queue {0}", _queueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
 

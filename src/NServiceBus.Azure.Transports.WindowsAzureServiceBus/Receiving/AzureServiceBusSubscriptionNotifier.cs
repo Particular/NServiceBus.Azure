@@ -102,7 +102,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     return;
                 }
 
-                if (!ex.IsTransient && !ExceptionHandling.IsRetryable(ex))
+                if (!ex.IsTransient && !RetriableReceiveExceptionHandling.IsRetryable(ex))
                 {
                     logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
 
