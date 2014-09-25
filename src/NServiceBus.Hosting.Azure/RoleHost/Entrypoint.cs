@@ -100,7 +100,7 @@ namespace NServiceBus.Hosting.Azure
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner()
+            var assemblyScanner = new AssemblyScanner
             {
                 ThrowExceptions = false
             };

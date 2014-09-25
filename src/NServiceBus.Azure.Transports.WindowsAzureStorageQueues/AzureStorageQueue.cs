@@ -1,6 +1,5 @@
 namespace NServiceBus
 {
-    using Azure.Transports.WindowsAzureStorageQueues;
     using Configuration.AdvanceExtensibility;
     using Features;
     using Transports;

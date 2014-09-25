@@ -4,7 +4,6 @@ namespace NServiceBus.Hosting.Azure
     using System.Collections.Generic;
     using System.Reflection;
     using Configuration.AdvanceExtensibility;
-    using Persistence;
     using Profiles;
     using Unicast;
 
