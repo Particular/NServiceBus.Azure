@@ -198,14 +198,12 @@ namespace NServiceBus.Hosting.Azure.HostProcess
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
 
-            foreach (var assembly in assemblyScanner.GetScannableAssemblies().Assemblies)
-                foreach (var type in assembly.GetTypes().Where(
-                        t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
-                        && t != typeof(IConfigureThisEndpoint)
-                        && !t.IsAbstract))
-                {
-                    yield return type;
-                }
+            return assemblyScanner.GetScannableAssemblies()
+                .Assemblies
+                .SelectMany(assembly => assembly.GetTypes().Where(
+                t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
+                     && t != typeof(IConfigureThisEndpoint)
+                     && !t.IsAbstract));
         }
 
         private static void ValidateEndpoints(IEnumerable<Type> endpointConfigurationTypes)
