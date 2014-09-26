@@ -5,7 +5,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     using Config;
     using Settings;
 
-    internal static class NamingConventions
+    static class NamingConventions
     {
         internal static Func<ReadOnlySettings, Type, string, bool, string> QueueNamingConvention
         {

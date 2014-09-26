@@ -6,7 +6,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Reflection;
 
     [DebuggerNonUserCode]
-    internal static class SafeRoleEnvironment
+    static class SafeRoleEnvironment
     {
         static bool isAvailable = true;
         static Type roleEnvironmentType;
