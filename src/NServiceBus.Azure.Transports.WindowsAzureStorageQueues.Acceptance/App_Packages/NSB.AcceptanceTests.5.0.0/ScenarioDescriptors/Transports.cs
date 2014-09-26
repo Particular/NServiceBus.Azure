@@ -84,7 +84,7 @@
 
         static IList<RunDescriptor> availableTransports;
 
-        static readonly Dictionary<string, string> DefaultConnectionStrings = new Dictionary<string, string>
+        static Dictionary<string, string> DefaultConnectionStrings = new Dictionary<string, string>
             {
                 {"RabbitMQTransport", "host=localhost"},
                 {"SqlServerTransport", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"},

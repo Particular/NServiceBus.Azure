@@ -8,7 +8,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
     /// </summary>
     public class WindowsHost : MarshalByRefObject
     {
-        private readonly GenericHost genericHost;
+        private GenericHost genericHost;
 
         /// <summary>
         /// Accepts the type which will specify the users custom configuration.

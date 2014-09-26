@@ -13,8 +13,8 @@ namespace NServiceBus.Azure
             get { return leaseId != null; }
         }
 
-        readonly CloudBlockBlob blob;
-        readonly string leaseId;
+        CloudBlockBlob blob;
+        string leaseId;
         Thread renewalThread;
         bool disposed;
 

@@ -17,16 +17,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     internal class AzureServiceBusDequeueStrategy : IDequeueMessages
     {
-        readonly ITopology topology;
+        ITopology topology;
         private Address address;
         private TransactionSettings settings;
         private Func<TransportMessage, bool> tryProcessMessage;
         private Action<TransportMessage, Exception> endProcessMessage;
         private TransactionOptions transactionOptions;
-        private readonly Queue pendingMessages = Queue.Synchronized(new Queue());
-        private readonly IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
+        private Queue pendingMessages = Queue.Synchronized(new Queue());
+        private IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
         private CancellationTokenSource tokenSource;
-        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
+        RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
         
         private const int PeekInterval = 50;
         private const int MaximumWaitTimeWhenIdle = 1000;

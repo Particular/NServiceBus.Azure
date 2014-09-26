@@ -4,7 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     internal class AzureServicebusQueueClientCreator : ICreateQueueClients
     {
-        readonly Configure config;
+        Configure config;
 
         public AzureServicebusQueueClientCreator(Configure config)
         {

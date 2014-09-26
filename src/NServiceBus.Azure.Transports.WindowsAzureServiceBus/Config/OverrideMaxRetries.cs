@@ -6,7 +6,7 @@
 
     internal class OverrideMaxRetries : IProvideConfiguration<TransportConfig>
     {
-        readonly ReadOnlySettings settings;
+        ReadOnlySettings settings;
 
         public OverrideMaxRetries(ReadOnlySettings settings)
         {

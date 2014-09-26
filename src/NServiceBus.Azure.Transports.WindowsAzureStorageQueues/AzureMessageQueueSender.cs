@@ -18,13 +18,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     /// </summary>
     public class AzureMessageQueueSender : ISendMessages
     {
-        readonly Configure config;
-        readonly ICreateQueueClients createQueueClients;
+        Configure config;
+        ICreateQueueClients createQueueClients;
 
 
-        private static readonly Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
+        private static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
         
-        private static readonly object ExistenceLock = new Object();
+        private static object ExistenceLock = new Object();
 
         /// <summary>
         /// Gets or sets the message serializer
@@ -114,8 +114,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
     public class CreateQueueClients : ICreateQueueClients
     {
-        private readonly ConcurrentDictionary<string, CloudQueueClient> destinationQueueClients = new ConcurrentDictionary<string, CloudQueueClient>();
-        private readonly Configure config;
+        private ConcurrentDictionary<string, CloudQueueClient> destinationQueueClients = new ConcurrentDictionary<string, CloudQueueClient>();
+        private Configure config;
 
         public CreateQueueClients(Configure config)
         {

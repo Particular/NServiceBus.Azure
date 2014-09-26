@@ -16,10 +16,10 @@
     /// </summary>
     public class AzureSagaPersister : ISagaPersister
     {
-        readonly bool autoUpdateSchema;
-        readonly CloudTableClient client;
-        readonly ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
-        static readonly MemoryCache dictionaryTableCache = new MemoryCache("Entities");
+        bool autoUpdateSchema;
+        CloudTableClient client;
+        ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
+        static MemoryCache dictionaryTableCache = new MemoryCache("Entities");
         const int longevity = 60000;
 
         /// <summary>

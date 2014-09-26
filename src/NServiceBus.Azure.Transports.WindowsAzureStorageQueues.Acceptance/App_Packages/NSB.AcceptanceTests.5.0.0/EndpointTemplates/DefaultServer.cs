@@ -14,7 +14,7 @@
 
     public class DefaultServer : IEndpointSetupTemplate
     {
-        readonly List<Type> typesToInclude;
+        List<Type> typesToInclude;
 
         public DefaultServer()
         {

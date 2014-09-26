@@ -7,7 +7,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// </summary>
     internal class AzureServicebusSubscriptionClientCreator : ICreateSubscriptionClients
     {
-        readonly Configure config;
+        Configure config;
 
         public AzureServicebusSubscriptionClientCreator(Configure config)
         {

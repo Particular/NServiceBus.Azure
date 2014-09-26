@@ -8,7 +8,7 @@ namespace NServiceBus.Hosting.Azure
     
     public class SetHostInformation : IWantToRunWhenConfigurationIsComplete
     {
-        readonly UnicastBus unicastBus;
+        UnicastBus unicastBus;
 
         public SetHostInformation(UnicastBus unicastBus)
         {

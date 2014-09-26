@@ -6,9 +6,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     internal class CreatesNamespaceManagers : ICreateNamespaceManagers
     {
-        readonly Configure config;
+        Configure config;
 
-        private readonly ConcurrentDictionary<string, NamespaceManager> NamespaceManagers = new ConcurrentDictionary<string, NamespaceManager>();
+        private ConcurrentDictionary<string, NamespaceManager> NamespaceManagers = new ConcurrentDictionary<string, NamespaceManager>();
 
         public CreatesNamespaceManagers(Configure config)
         {

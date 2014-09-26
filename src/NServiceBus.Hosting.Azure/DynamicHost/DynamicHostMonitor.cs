@@ -13,7 +13,7 @@ namespace NServiceBus.Hosting.Azure
         private Thread monitorThread;
         private List<EndpointToHost> endpoints = new List<EndpointToHost>();
         private bool stop;
-        private readonly ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
+        private ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 
         public DynamicEndpointLoader Loader { get; set; }
 

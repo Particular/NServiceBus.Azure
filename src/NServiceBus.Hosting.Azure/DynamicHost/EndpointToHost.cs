@@ -8,7 +8,7 @@ namespace NServiceBus.Hosting
 
     internal class EndpointToHost
     {
-        private readonly CloudBlockBlob blob;
+        private CloudBlockBlob blob;
 
         public EndpointToHost(CloudBlockBlob blob)
         {

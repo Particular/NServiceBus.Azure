@@ -17,7 +17,7 @@
     
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
     {
-        readonly Configure config;
+        Configure config;
 
         public TimeoutPersister(Configure config)
         {
@@ -387,6 +387,6 @@
         CloudStorageAccount account;
         CloudBlobContainer container;
 
-        static readonly ILog Logger = LogManager.GetLogger(typeof(TimeoutPersister));
+        static ILog Logger = LogManager.GetLogger(typeof(TimeoutPersister));
     }
 }

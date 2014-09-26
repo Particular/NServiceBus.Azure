@@ -13,14 +13,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
     internal class QueueAndTopicByEndpointTopology : ITopology
     {
-        readonly Configure config;
-        readonly ICreateMessagingFactories messagingFactories;
-        readonly ICreateSubscriptions subscriptionCreator;
-        readonly ICreateQueues queueCreator;
-        readonly ICreateTopics topicCreator;
-        readonly ICreateQueueClients queueClients; 
-        readonly ICreateSubscriptionClients subscriptionClients;
-        readonly ICreateTopicClients topicClients;
+        Configure config;
+        ICreateMessagingFactories messagingFactories;
+        ICreateSubscriptions subscriptionCreator;
+        ICreateQueues queueCreator;
+        ICreateTopics topicCreator;
+        ICreateQueueClients queueClients; 
+        ICreateSubscriptionClients subscriptionClients;
+        ICreateTopicClients topicClients;
 
         internal QueueAndTopicByEndpointTopology(
             Configure config, 

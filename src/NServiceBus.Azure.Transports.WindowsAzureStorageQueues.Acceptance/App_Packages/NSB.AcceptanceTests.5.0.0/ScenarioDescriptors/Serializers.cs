@@ -5,7 +5,7 @@
 
     public static class Serializers
     {
-        public static readonly RunDescriptor Binary = new RunDescriptor
+        public static RunDescriptor Binary = new RunDescriptor
             {
                 Key = "Binary",
                 Settings =
@@ -17,7 +17,7 @@
                         }
             };
 
-        public static readonly RunDescriptor Bson = new RunDescriptor
+        public static RunDescriptor Bson = new RunDescriptor
             {
                 Key = "Bson",
                 Settings =
@@ -29,7 +29,7 @@
                         }
             };
 
-        public static readonly RunDescriptor Xml = new RunDescriptor
+        public static RunDescriptor Xml = new RunDescriptor
             {
                 Key = "Xml",
                 Settings =
@@ -41,7 +41,7 @@
                         }
             };
 
-        public static readonly RunDescriptor Json = new RunDescriptor
+        public static RunDescriptor Json = new RunDescriptor
             {
                 Key = "Json",
                 Settings =

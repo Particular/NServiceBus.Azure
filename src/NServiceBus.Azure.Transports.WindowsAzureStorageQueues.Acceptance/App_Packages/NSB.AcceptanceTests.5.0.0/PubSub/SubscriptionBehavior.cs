@@ -22,8 +22,8 @@
 
     class SubscriptionBehavior<TContext> : IBehavior<IncomingContext> where TContext : ScenarioContext
     {
-        readonly Action<SubscriptionEventArgs, TContext> action;
-        readonly TContext scenarioContext;
+        Action<SubscriptionEventArgs, TContext> action;
+        TContext scenarioContext;
 
         public SubscriptionBehavior(Action<SubscriptionEventArgs, TContext> action, TContext scenarioContext)
         {

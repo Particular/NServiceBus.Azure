@@ -6,8 +6,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     
     public class ReceiveResourceManager : IEnlistmentNotification
     {
-        private readonly CloudQueue queue;
-        private readonly CloudQueueMessage receivedMessage;
+        private CloudQueue queue;
+        private CloudQueueMessage receivedMessage;
 
         public ReceiveResourceManager(CloudQueue queue, CloudQueueMessage receivedMessage)
         {

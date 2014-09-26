@@ -15,13 +15,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public bool EnableBatchedOperations { get; set; }
         public bool EnableDeadLetteringOnFilterEvaluationExceptions { get; set; }
 
-        readonly ICreateNamespaceManagers createNamespaceManagers;
-        readonly Configure config;
+        ICreateNamespaceManagers createNamespaceManagers;
+        Configure config;
 
-        private static readonly Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
-        private static readonly Dictionary<string, bool> rememberSubscriptionExistence = new Dictionary<string, bool>();
-        private static readonly object TopicExistenceLock = new Object();
-        private static readonly object SubscriptionExistenceLock = new Object();
+        private static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
+        private static Dictionary<string, bool> rememberSubscriptionExistence = new Dictionary<string, bool>();
+        private static object TopicExistenceLock = new Object();
+        private static object SubscriptionExistenceLock = new Object();
 
         public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {

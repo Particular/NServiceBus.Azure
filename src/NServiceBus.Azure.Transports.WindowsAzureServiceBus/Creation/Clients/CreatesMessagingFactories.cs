@@ -6,9 +6,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     internal class CreatesMessagingFactories : ICreateMessagingFactories
     {
-        readonly ICreateNamespaceManagers createNamespaceManagers;
+        ICreateNamespaceManagers createNamespaceManagers;
 
-        private readonly ConcurrentDictionary<string, MessagingFactory> MessagingFactories = new ConcurrentDictionary<string, MessagingFactory>();
+        private ConcurrentDictionary<string, MessagingFactory> MessagingFactories = new ConcurrentDictionary<string, MessagingFactory>();
 
         public CreatesMessagingFactories(ICreateNamespaceManagers createNamespaceManagers)
         {

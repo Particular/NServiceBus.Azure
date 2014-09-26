@@ -12,8 +12,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     internal class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
     {
-        readonly Configure config;
-        readonly ITopology topology;
+        Configure config;
+        ITopology topology;
 
        
 
