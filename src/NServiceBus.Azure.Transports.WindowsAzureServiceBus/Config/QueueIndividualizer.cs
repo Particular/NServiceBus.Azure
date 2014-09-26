@@ -3,7 +3,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Globalization;
     using Support;
 
-    internal class QueueIndividualizer
+    class QueueIndividualizer
     {
         public static string Individualize(string queueName)
         {

@@ -8,7 +8,7 @@
     using Settings;
     using Transports;
 
-    internal class AzureServiceBusTransport : ConfigureTransport
+    class AzureServiceBusTransport : ConfigureTransport
     {
         internal AzureServiceBusTransport()
         {

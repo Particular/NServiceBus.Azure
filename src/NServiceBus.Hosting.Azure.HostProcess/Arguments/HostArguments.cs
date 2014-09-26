@@ -1,10 +1,10 @@
-using System.Linq;
-using Topshelf.Internal;
-using Topshelf.Internal.ArgumentParsing;
-
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
-    internal class HostArguments
+    using System.Linq;
+    using Topshelf.Internal;
+    using Topshelf.Internal.ArgumentParsing;
+
+    class HostArguments
     {
         public HostArguments(Parser.Args arguments)
         {
@@ -29,7 +29,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         public IArgument Username { get; set; }
         public IArgument Password { get; set; }
 
-        private static IArgument GetArgument(Parser.Args arguments, string key)
+        static IArgument GetArgument(Parser.Args arguments, string key)
         {
             var argument = arguments.CustomArguments.Where(x => x.Key != null).SingleOrDefault(x => x.Key.ToUpper() == key.ToUpper());
 

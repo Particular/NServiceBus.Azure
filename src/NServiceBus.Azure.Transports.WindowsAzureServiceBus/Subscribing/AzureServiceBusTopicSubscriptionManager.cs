@@ -1,7 +1,6 @@
-using System;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using MessageInterfaces;
@@ -10,13 +9,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Unicast.Routing;
     using Unicast.Transport;
 
-    internal class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
+    class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
     {
         Configure config;
         ITopology topology;
-
-       
-
         public IMessageMapper MessageMapper { get; set; }
         public StaticMessageRouter MessageRouter { get; set; }
 
@@ -26,11 +22,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.topology = topology;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="eventType"></param>
-        /// <param name="original"></param>
         public void Subscribe(Type eventType, Address original)
         {
             if (original == null)
@@ -69,11 +60,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             strategy.TrackNotifier(eventType, original, notifier);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="eventType"></param>
-        /// <param name="original"></param>
         public void Unsubscribe(Type eventType, Address original)
         {
             if (original == null)

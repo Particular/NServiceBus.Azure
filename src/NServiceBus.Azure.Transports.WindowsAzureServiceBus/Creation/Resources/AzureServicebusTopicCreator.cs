@@ -6,13 +6,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Microsoft.ServiceBus.Messaging;
     using Transports;
 
-    internal class AzureServicebusTopicCreator : ICreateTopics
+    class AzureServicebusTopicCreator : ICreateTopics
     {
         ICreateNamespaceManagers createNamespaceManagers;
         Configure config;
 
-        private static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
-        private static object TopicExistenceLock = new Object();
+        static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
+        static object TopicExistenceLock = new Object();
 
         public bool EnablePartitioning { get; set; }
 

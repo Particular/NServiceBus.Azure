@@ -5,7 +5,7 @@
     using Config;
     using Transports;
 
-    internal class ContainerConfiguration
+    class ContainerConfiguration
     {
         public void Configure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
@@ -25,7 +25,7 @@
             }
         }
 
-        private void ConfigureReceiveInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
+        void ConfigureReceiveInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
             context.Container.ConfigureComponent<AzureServiceBusDequeueStrategy>(DependencyLifecycle.InstancePerCall);
 

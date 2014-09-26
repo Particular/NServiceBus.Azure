@@ -8,9 +8,9 @@ namespace NServiceBus.Hosting.Azure
     using System.Linq;
     using Config;
 
-    internal class DynamicEndpointRunner
+    class DynamicEndpointRunner
     {
-        private ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
+        ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 
         public bool RecycleRoleOnError { get; set; }
 

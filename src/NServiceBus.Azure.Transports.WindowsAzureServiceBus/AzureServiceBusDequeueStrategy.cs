@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Transactions;
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Transactions;
+    using Microsoft.ServiceBus.Messaging;
     using System.Collections;
     using System.Threading;
     using System.Threading.Tasks;
@@ -15,7 +14,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     /// <summary>
     /// Azure service bus implementation if <see cref="IDequeueMessages" />.
     /// </summary>
-    internal class AzureServiceBusDequeueStrategy : IDequeueMessages
+    class AzureServiceBusDequeueStrategy : IDequeueMessages
     {
         ITopology topology;
         private Address address;

@@ -7,11 +7,11 @@ namespace NServiceBus.Hosting.Azure
 {
     using Config;
 
-    internal class DynamicEndpointProvisioner
+    class DynamicEndpointProvisioner
     {
         public string LocalResource { get; set; }
 
-        private ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
+        ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 
         public bool RecycleRoleOnError { get; set; }
 

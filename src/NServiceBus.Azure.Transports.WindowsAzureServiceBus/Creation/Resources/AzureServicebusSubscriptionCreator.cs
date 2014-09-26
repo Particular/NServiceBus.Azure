@@ -5,7 +5,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
 
-    internal class AzureServicebusSubscriptionCreator : ICreateSubscriptions
+    class AzureServicebusSubscriptionCreator : ICreateSubscriptions
     {
         public TimeSpan LockDuration { get; set; }
         public bool RequiresSession { get; set; }

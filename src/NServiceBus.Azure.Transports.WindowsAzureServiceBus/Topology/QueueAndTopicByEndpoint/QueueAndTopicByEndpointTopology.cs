@@ -10,8 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     /// publishes through a topic per endpoint, 
     /// receives on both it's own queue &amp; subscriptions per datatype
     /// </summary>
-
-    internal class QueueAndTopicByEndpointTopology : ITopology
+    class QueueAndTopicByEndpointTopology : ITopology
     {
         Configure config;
         ICreateMessagingFactories messagingFactories;

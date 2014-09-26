@@ -1,12 +1,11 @@
-using System;
-using System.IO;
-using Ionic.Zip;
-
 namespace NServiceBus.Hosting
 {
+    using System;
+    using System.IO;
+    using Ionic.Zip;
     using Microsoft.WindowsAzure.Storage.Blob;
 
-    internal class EndpointToHost
+    class EndpointToHost
     {
         private CloudBlockBlob blob;
 

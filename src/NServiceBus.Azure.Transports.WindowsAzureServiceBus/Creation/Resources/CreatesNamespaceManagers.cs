@@ -4,11 +4,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Microsoft.ServiceBus;
     using Support;
 
-    internal class CreatesNamespaceManagers : ICreateNamespaceManagers
+    class CreatesNamespaceManagers : ICreateNamespaceManagers
     {
         Configure config;
 
-        private ConcurrentDictionary<string, NamespaceManager> NamespaceManagers = new ConcurrentDictionary<string, NamespaceManager>();
+        ConcurrentDictionary<string, NamespaceManager> NamespaceManagers = new ConcurrentDictionary<string, NamespaceManager>();
 
         public CreatesNamespaceManagers(Configure config)
         {

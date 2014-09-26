@@ -4,11 +4,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Collections.Concurrent;
     using Microsoft.ServiceBus.Messaging;
 
-    internal class CreatesMessagingFactories : ICreateMessagingFactories
+    class CreatesMessagingFactories : ICreateMessagingFactories
     {
         ICreateNamespaceManagers createNamespaceManagers;
-
-        private ConcurrentDictionary<string, MessagingFactory> MessagingFactories = new ConcurrentDictionary<string, MessagingFactory>();
+        ConcurrentDictionary<string, MessagingFactory> MessagingFactories = new ConcurrentDictionary<string, MessagingFactory>();
 
         public CreatesMessagingFactories(ICreateNamespaceManagers createNamespaceManagers)
         {

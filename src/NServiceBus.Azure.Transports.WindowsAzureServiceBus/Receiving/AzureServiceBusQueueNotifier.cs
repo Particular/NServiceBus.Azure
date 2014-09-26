@@ -1,60 +1,38 @@
-using System;
-using System.Threading;
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    internal class AzureServiceBusQueueNotifier : INotifyReceivedBrokeredMessages
+    using System;
+    using System.Threading;
+    using Microsoft.ServiceBus.Messaging;
+
+    class AzureServiceBusQueueNotifier : INotifyReceivedBrokeredMessages
     {
-        private Action<BrokeredMessage> _tryProcessMessage;
-        private bool cancelRequested;
+        Action<BrokeredMessage> tryProcessMessage;
+        bool cancelRequested;
         
-        /// <summary>
-        /// 
-        /// </summary>
         public QueueClient QueueClient { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public int ServerWaitTime { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
         public int BatchSize { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
         public int BackoffTimeInSeconds { get; set; }
 
         public Type MessageType { get; set; }
         public Address Address { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tryProcessMessage"></param>
         public void Start(Action<BrokeredMessage> tryProcessMessage)
         {
             cancelRequested = false;
 
-            _tryProcessMessage = tryProcessMessage;
+            this.tryProcessMessage = tryProcessMessage;
             
             QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Stop()
         {
             cancelRequested = true;
         }
 
-        private void OnMessage(IAsyncResult ar)
+        void OnMessage(IAsyncResult ar)
         {
             try
             {
@@ -64,7 +42,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 foreach (var receivedMessage in receivedMessages)
                 {
-                    _tryProcessMessage(receivedMessage);
+                    tryProcessMessage(receivedMessage);
                 }
             }
             catch (MessagingEntityDisabledException)

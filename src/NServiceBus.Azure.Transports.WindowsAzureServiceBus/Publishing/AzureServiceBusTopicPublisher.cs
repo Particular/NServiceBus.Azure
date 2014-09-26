@@ -4,7 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Threading;
     using Microsoft.ServiceBus.Messaging;
 
-    internal class AzureServiceBusTopicPublisher : IPublishBrokeredMessages
+    class AzureServiceBusTopicPublisher : IPublishBrokeredMessages
     {
         public TopicClient TopicClient { get; set; }
 

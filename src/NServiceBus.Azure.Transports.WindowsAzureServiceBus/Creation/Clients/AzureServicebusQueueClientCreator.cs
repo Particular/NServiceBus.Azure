@@ -1,8 +1,8 @@
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    internal class AzureServicebusQueueClientCreator : ICreateQueueClients
+    using Microsoft.ServiceBus.Messaging;
+
+    class AzureServicebusQueueClientCreator : ICreateQueueClients
     {
         Configure config;
 

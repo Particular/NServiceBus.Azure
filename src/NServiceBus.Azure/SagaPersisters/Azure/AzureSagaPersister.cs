@@ -370,7 +370,7 @@
     //{
     //}
 
-    //internal class AzureTableStorageConfigurer: IConfigurePersistence<AzureTableStorage>
+    //class AzureTableStorageConfigurer: IConfigurePersistence<AzureTableStorage>
     //{
     //    public void Enable(Configure config)
     //    {

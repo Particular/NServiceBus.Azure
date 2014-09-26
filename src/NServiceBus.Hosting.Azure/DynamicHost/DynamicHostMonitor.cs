@@ -1,19 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using NServiceBus.Logging;
-
 namespace NServiceBus.Hosting.Azure
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using NServiceBus.Logging;
     using Microsoft.WindowsAzure.Storage;
 
-    internal class DynamicHostMonitor
+    class DynamicHostMonitor
     {
-        private Thread monitorThread;
-        private List<EndpointToHost> endpoints = new List<EndpointToHost>();
-        private bool stop;
-        private ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
+        Thread monitorThread;
+        List<EndpointToHost> endpoints = new List<EndpointToHost>();
+        bool stop;
+        ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 
         public DynamicEndpointLoader Loader { get; set; }
 
