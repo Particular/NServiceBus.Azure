@@ -18,10 +18,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         ICreateNamespaceManagers createNamespaceManagers;
         Configure config;
 
-        private static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
-        private static Dictionary<string, bool> rememberSubscriptionExistence = new Dictionary<string, bool>();
-        private static object TopicExistenceLock = new Object();
-        private static object SubscriptionExistenceLock = new Object();
+        static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
+        static Dictionary<string, bool> rememberSubscriptionExistence = new Dictionary<string, bool>();
+        static object TopicExistenceLock = new Object();
+        static object SubscriptionExistenceLock = new Object();
 
         public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {

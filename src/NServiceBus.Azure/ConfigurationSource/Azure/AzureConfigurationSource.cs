@@ -58,14 +58,14 @@ namespace NServiceBus.Integration.Azure
             return section;
         }
 
-        private static Configuration GetConfigurationHandler()
+        static Configuration GetConfigurationHandler()
         {
             if (IsWebsite()) return WebConfigurationManager.OpenWebConfiguration(HostingEnvironment.ApplicationVirtualPath);
 
             return ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         }
 
-        private static bool IsWebsite()
+        static bool IsWebsite()
         {
             return HostingEnvironment.IsHosted;
         }

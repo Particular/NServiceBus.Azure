@@ -57,7 +57,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             return notifier;
         }
 
-        private SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
+        SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
         {
             var subscriptionname = NamingConventions.SubscriptionNamingConvention(config.Settings, eventType, config.Settings.EndpointName());
             var factory = messagingFactories.Create(address);

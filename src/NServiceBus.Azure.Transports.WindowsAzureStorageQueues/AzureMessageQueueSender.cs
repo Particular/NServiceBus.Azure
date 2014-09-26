@@ -21,9 +21,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         ICreateQueueClients createQueueClients;
 
 
-        private static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
+        static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
         
-        private static object ExistenceLock = new Object();
+        static object ExistenceLock = new Object();
 
         /// <summary>
         /// Gets or sets the message serializer
@@ -80,7 +80,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             return exists;
         }
 
-        private CloudQueueMessage SerializeMessage(TransportMessage message, SendOptions options)
+        CloudQueueMessage SerializeMessage(TransportMessage message, SendOptions options)
         {
             using (var stream = new MemoryStream())
             {
@@ -113,8 +113,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
     public class CreateQueueClients : ICreateQueueClients
     {
-        private ConcurrentDictionary<string, CloudQueueClient> destinationQueueClients = new ConcurrentDictionary<string, CloudQueueClient>();
-        private Configure config;
+        ConcurrentDictionary<string, CloudQueueClient> destinationQueueClients = new ConcurrentDictionary<string, CloudQueueClient>();
+        Configure config;
 
         public CreateQueueClients(Configure config)
         {

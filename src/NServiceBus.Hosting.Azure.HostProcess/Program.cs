@@ -13,7 +13,7 @@
 
     class Program
     {
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
             var commandLineArguments = Parser.ParseArgs(args);
             var arguments = new HostArguments(commandLineArguments);
@@ -95,7 +95,7 @@
             Runner.Host(cfg, args);
         }
 
-        private static void DisplayHelpContent()
+        static void DisplayHelpContent()
         {
             try
             {
@@ -119,12 +119,12 @@
         /// </summary>
         public static string EndpointId { get; set; }
 
-        private static void SetHostServiceLocatorArgs(string[] args)
+        static void SetHostServiceLocatorArgs(string[] args)
         {
             HostServiceLocator.Args = args;
         }
 
-        private static void AssertThatEndpointConfigurationTypeHasDefaultConstructor(Type type)
+        static void AssertThatEndpointConfigurationTypeHasDefaultConstructor(Type type)
         {
             var constructor = type.GetConstructor(Type.EmptyTypes);
 
@@ -132,7 +132,7 @@
                 throw new InvalidOperationException("Endpoint configuration type needs to have a default constructor: " + type.FullName);
         }
 
-        private static string GetEndpointConfigurationFile(Type endpointConfigurationType)
+        static string GetEndpointConfigurationFile(Type endpointConfigurationType)
         {
             return Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
@@ -150,7 +150,7 @@
             return string.Format("{0}_v{1}", endpointName, endpointConfiguration.GetType().Assembly.GetName().Version);
         }
 
-        private static Type GetEndpointConfigurationType(HostArguments arguments)
+        static Type GetEndpointConfigurationType(HostArguments arguments)
         {
             if (arguments.EndpointConfigurationType != null)
             {
@@ -188,7 +188,7 @@
             return endpoints.First();
         }
 
-        private static IEnumerable<Type> ScanAssembliesForEndpoints()
+        static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
             var assemblyScanner = new AssemblyScanner
             {
@@ -206,7 +206,7 @@
                      && !t.IsAbstract));
         }
 
-        private static void ValidateEndpoints(IEnumerable<Type> endpointConfigurationTypes)
+        static void ValidateEndpoints(IEnumerable<Type> endpointConfigurationTypes)
         {
             if (endpointConfigurationTypes.Count() == 0)
             {

@@ -10,8 +10,8 @@
     [Category("Azure")]
     public class When_using_the_azure_configuration_source
     {
-        private IAzureConfigurationSettings azureSettings;
-        private IConfigurationSource configSource;
+        IAzureConfigurationSettings azureSettings;
+        IConfigurationSource configSource;
 
         [SetUp]
         public void SetUp()

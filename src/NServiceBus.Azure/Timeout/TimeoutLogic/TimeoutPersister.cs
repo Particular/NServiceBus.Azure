@@ -208,7 +208,7 @@
 
         }
 
-        private bool TryGetTimeoutData(ServiceContext context, string partitionKey, string rowKey, out TimeoutDataEntity result)
+        bool TryGetTimeoutData(ServiceContext context, string partitionKey, string rowKey, out TimeoutDataEntity result)
         {
             result = (from c in context.TimeoutData
                         where c.PartitionKey == partitionKey && c.RowKey == rowKey

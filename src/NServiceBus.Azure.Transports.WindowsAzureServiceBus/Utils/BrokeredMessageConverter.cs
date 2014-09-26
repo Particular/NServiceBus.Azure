@@ -110,7 +110,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             return brokeredMessage;
         }
         
-        private static DateTime? DelayIfNeeded(SendOptions options, bool expectDelay)
+        static DateTime? DelayIfNeeded(SendOptions options, bool expectDelay)
         {
             DateTime? deliverAt = null;
 

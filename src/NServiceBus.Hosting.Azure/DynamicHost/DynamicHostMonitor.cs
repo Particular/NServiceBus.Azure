@@ -67,7 +67,7 @@ namespace NServiceBus.Hosting.Azure
             monitorThread.Start();
         }
 
-        private void CheckForUpdates()
+        void CheckForUpdates()
         {
             try
             {

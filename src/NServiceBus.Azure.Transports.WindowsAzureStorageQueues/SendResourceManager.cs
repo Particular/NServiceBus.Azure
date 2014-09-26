@@ -6,8 +6,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     
     public class SendResourceManager : IEnlistmentNotification
     {
-        private CloudQueue queue;
-        private CloudQueueMessage message;
+        CloudQueue queue;
+        CloudQueueMessage message;
         TimeSpan? timeToBeReceived;
 
         public SendResourceManager(CloudQueue queue, CloudQueueMessage message, TimeSpan? timeToBeReceived)

@@ -17,20 +17,20 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     class AzureServiceBusDequeueStrategy : IDequeueMessages
     {
         ITopology topology;
-        private Address address;
-        private TransactionSettings settings;
-        private Func<TransportMessage, bool> tryProcessMessage;
-        private Action<TransportMessage, Exception> endProcessMessage;
-        private TransactionOptions transactionOptions;
-        private Queue pendingMessages = Queue.Synchronized(new Queue());
-        private IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
-        private CancellationTokenSource tokenSource;
+        Address address;
+        TransactionSettings settings;
+        Func<TransportMessage, bool> tryProcessMessage;
+        Action<TransportMessage, Exception> endProcessMessage;
+        TransactionOptions transactionOptions;
+        Queue pendingMessages = Queue.Synchronized(new Queue());
+        IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
+        CancellationTokenSource tokenSource;
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
         
-        private const int PeekInterval = 50;
-        private const int MaximumWaitTimeWhenIdle = 1000;
-        private int timeToDelayNextPeek;
-        private int maximumConcurrencyLevel;
+        const int PeekInterval = 50;
+        const int MaximumWaitTimeWhenIdle = 1000;
+        int timeToDelayNextPeek;
+        int maximumConcurrencyLevel;
 
         public AzureServiceBusDequeueStrategy(ITopology topology, CriticalError criticalError)
         {
@@ -95,7 +95,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         }
 
 
-        private void TryProcessMessage(object obj)
+        void TryProcessMessage(object obj)
         {
             var cancellationToken = (CancellationToken)obj;
 

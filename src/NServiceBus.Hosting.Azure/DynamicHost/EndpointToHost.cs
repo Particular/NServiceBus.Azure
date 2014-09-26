@@ -7,7 +7,7 @@ namespace NServiceBus.Hosting
 
     class EndpointToHost
     {
-        private CloudBlockBlob blob;
+        CloudBlockBlob blob;
 
         public EndpointToHost(CloudBlockBlob blob)
         {

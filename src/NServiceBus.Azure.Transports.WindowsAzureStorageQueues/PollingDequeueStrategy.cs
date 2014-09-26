@@ -82,7 +82,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        private void Action(object obj)
+        void Action(object obj)
         {
             var cancellationToken = (CancellationToken)obj;
 

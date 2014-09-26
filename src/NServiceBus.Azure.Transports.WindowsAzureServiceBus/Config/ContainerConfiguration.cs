@@ -40,7 +40,7 @@
             context.Container.ConfigureProperty<AzureServiceBusSubscriptionNotifier>(t => t.BackoffTimeInSeconds, configSection.BackoffTimeInSeconds);
         }
 
-        private void ConfigurePublishingInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
+        void ConfigurePublishingInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
             context.Container.ConfigureComponent<AzureServiceBusPublisher>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureServiceBusTopicPublisher>(DependencyLifecycle.InstancePerCall);
@@ -49,14 +49,14 @@
             context.Container.ConfigureComponent<AzureServiceBusTopicSubscriptionManager>(DependencyLifecycle.InstancePerCall);
         }
 
-        private void ConfigureSendInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
+        void ConfigureSendInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
             context.Container.ConfigureComponent<AzureServiceBusSender>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureServiceBusQueueSender>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureProperty<AzureServiceBusQueueSender>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
         }
 
-        private void ConfigureCreationInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
+        void ConfigureCreationInfrastructure(FeatureConfigurationContext context, AzureServiceBusQueueConfig configSection)
         {
             context.Container.ConfigureComponent<CreatesMessagingFactories>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<CreatesNamespaceManagers>(DependencyLifecycle.SingleInstance);

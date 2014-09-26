@@ -7,7 +7,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     class ReceiveResourceManager : IEnlistmentNotification
     {
-        private BrokeredMessage receivedMessage;
+        BrokeredMessage receivedMessage;
 
         public ReceiveResourceManager(BrokeredMessage receivedMessage)
         {
