@@ -1,23 +1,18 @@
-using System;
-using System.Threading;
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System;
+    using System.Threading;
+    using Microsoft.ServiceBus.Messaging;
+
     class AzureServiceBusSubscriptionNotifier : INotifyReceivedBrokeredMessages
     {
-        private Action<BrokeredMessage> tryProcessMessage;
-        private bool cancelRequested;
-
+        Action<BrokeredMessage> tryProcessMessage;
+        bool cancelRequested;
         public int ServerWaitTime { get; set; }
-
         public int BatchSize { get; set; }
-
         public int BackoffTimeInSeconds { get; set; }
         public SubscriptionClient SubscriptionClient { get; set; }
-
         public Type MessageType { get; set; }
-
         public Address Address { get; set; }
 
         public void Start(Action<BrokeredMessage> tryProcessMessage)

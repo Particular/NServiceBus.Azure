@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
-
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// A windows implementation of the NServiceBus hosting solution
     /// </summary>

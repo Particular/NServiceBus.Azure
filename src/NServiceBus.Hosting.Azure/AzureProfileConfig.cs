@@ -1,7 +1,7 @@
-﻿using System.Configuration;
-
-namespace NServiceBus.Config
+﻿namespace NServiceBus.Config
 {
+    using System.Configuration;
+
     /// <summary>
     /// Configuration section for Azure host.
     /// </summary>

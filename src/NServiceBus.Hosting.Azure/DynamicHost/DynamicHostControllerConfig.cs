@@ -1,7 +1,7 @@
-using System.Configuration;
-
 namespace NServiceBus.Hosting
 {
+    using System.Configuration;
+
     public class DynamicHostControllerConfig : ConfigurationSection
     {
         [ConfigurationProperty("ConnectionString", IsRequired = false, DefaultValue = "UseDevelopmentStorage=true")]

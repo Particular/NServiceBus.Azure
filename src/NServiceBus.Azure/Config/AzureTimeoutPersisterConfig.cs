@@ -1,7 +1,6 @@
-using System.Configuration;
-
 namespace NServiceBus.Config
 {
+    using System.Configuration;
     /// <summary>
     /// 
     /// </summary>

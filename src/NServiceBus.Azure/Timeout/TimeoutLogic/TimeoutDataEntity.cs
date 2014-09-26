@@ -1,7 +1,6 @@
-using System;
-
 namespace NServiceBus.Azure
 {
+    using System;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
 
     public class TimeoutDataEntity : TableServiceEntity

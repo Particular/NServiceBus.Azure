@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading;
-
-namespace NServiceBus.Azure
+﻿namespace NServiceBus.Azure
 {
+    using System;
+    using System.Threading;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 

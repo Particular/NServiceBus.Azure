@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using NServiceBus.Hosting.Helpers;
-using Topshelf;
-using Topshelf.Configuration;
-using Topshelf.Internal;
-
-namespace NServiceBus.Hosting.Azure.HostProcess
+﻿namespace NServiceBus.Hosting.Azure.HostProcess
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using NServiceBus.Hosting.Helpers;
+    using Topshelf;
+    using Topshelf.Configuration;
+    using Topshelf.Internal;
+
     class Program
     {
         private static void Main(string[] args)

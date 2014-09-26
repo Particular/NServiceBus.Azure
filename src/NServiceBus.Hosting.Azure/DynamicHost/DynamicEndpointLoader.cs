@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace NServiceBus.Hosting.Azure
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 

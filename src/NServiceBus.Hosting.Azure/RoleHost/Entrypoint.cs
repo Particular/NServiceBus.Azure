@@ -1,14 +1,14 @@
-using NServiceBus.Config;
-using NServiceBus.Hosting.Helpers;
-using NServiceBus.Integration.Azure;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-
 namespace NServiceBus.Hosting.Azure
 {
+    using NServiceBus.Config;
+    using NServiceBus.Hosting.Helpers;
+    using NServiceBus.Integration.Azure;
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.Diagnostics;
+
     public class NServiceBusRoleEntrypoint
     {
         const string ProfileSetting = "AzureProfileConfig.Profiles";

@@ -1,5 +1,4 @@
-﻿
-namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
+﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
     using Settings;

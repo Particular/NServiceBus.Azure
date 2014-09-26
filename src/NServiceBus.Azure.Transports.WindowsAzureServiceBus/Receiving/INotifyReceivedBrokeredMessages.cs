@@ -1,8 +1,8 @@
-using System;
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System;
+    using Microsoft.ServiceBus.Messaging;
+
     public interface INotifyReceivedBrokeredMessages
     {
         void Start(Action<BrokeredMessage> tryProcessMessage);
