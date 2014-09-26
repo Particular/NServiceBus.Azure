@@ -120,7 +120,7 @@ namespace NServiceBus.Hosting.Azure
             var count = endpointConfigurationTypes.Count();
             if (count == 0)
             {
-                throw new InvalidOperationException("No endpoint configuration found in scanned assemlies. " +
+                throw new InvalidOperationException("No endpoint configuration found in scanned assemblies. " +
                                                     "This usually happens when NServiceBus fails to load your assembly containing IConfigureThisEndpoint." +
                                                     " Try specifying the type explicitly in the roles config using the appsetting key: EndpointConfigurationType, " +
                                                     "Scanned path: " + AppDomain.CurrentDomain.BaseDirectory);

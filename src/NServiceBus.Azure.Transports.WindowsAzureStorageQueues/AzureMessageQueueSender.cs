@@ -22,9 +22,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         readonly ICreateQueueClients createQueueClients;
 
 
-        private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
+        private static readonly Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
         
-        private static readonly object ExistanceLock = new Object();
+        private static readonly object ExistenceLock = new Object();
 
         /// <summary>
         /// Gets or sets the message serializer
@@ -65,17 +65,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         {
             var key = sendQueue.Uri.ToString();
             bool exists;
-            if (!rememberExistance.ContainsKey(key))
+            if (!rememberExistence.ContainsKey(key))
             {
-                lock (ExistanceLock)
+                lock (ExistenceLock)
                 {
                     exists = sendQueue.Exists();
-                    rememberExistance[key] = exists;
+                    rememberExistence[key] = exists;
                 }
             }
             else
             {
-                 exists = rememberExistance[key];
+                 exists = rememberExistence[key];
             }
 
             return exists;

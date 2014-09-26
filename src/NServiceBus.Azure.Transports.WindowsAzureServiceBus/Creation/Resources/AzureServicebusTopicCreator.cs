@@ -11,8 +11,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         readonly ICreateNamespaceManagers createNamespaceManagers;
         readonly Configure config;
 
-        private static readonly Dictionary<string, bool> rememberTopicExistance = new Dictionary<string, bool>();
-        private static readonly object TopicExistanceLock = new Object();
+        private static readonly Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
+        private static readonly object TopicExistenceLock = new Object();
 
         public bool EnablePartitioning { get; set; }
 
@@ -61,17 +61,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var key = topicpath;
             bool exists;
-            if (!rememberTopicExistance.ContainsKey(key))
+            if (!rememberTopicExistence.ContainsKey(key))
             {
-                lock (TopicExistanceLock)
+                lock (TopicExistenceLock)
                 {
                     exists = namespaceClient.TopicExists(key);
-                    rememberTopicExistance[key] = exists;
+                    rememberTopicExistence[key] = exists;
                 }
             }
             else
             {
-                exists = rememberTopicExistance[key];
+                exists = rememberTopicExistence[key];
             }
 
             return exists;
