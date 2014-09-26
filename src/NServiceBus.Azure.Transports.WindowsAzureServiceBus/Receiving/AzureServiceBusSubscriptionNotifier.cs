@@ -16,6 +16,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private SubscriptionClient subscriptionClient;
         private Action<BrokeredMessage> tryProcessMessage;
         private bool cancelRequested;
+        Action<Exception> errorProcessingMessage;
 
         /// <summary>
         /// 
@@ -47,11 +48,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         /// <param name="address"></param>
         /// <param name="tryProcessMessage"></param>
-        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage)
+        /// <param name="errorProcessingMessage"></param>
+        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
         {
             cancelRequested = false;
 
             this.tryProcessMessage = tryProcessMessage;
+            this.errorProcessingMessage = errorProcessingMessage;
 
             subscriptionClient = SubscriptionClientCreator.Create(address, EventType);
 
@@ -79,54 +82,46 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     tryProcessMessage(receivedMessage);
                 }
             }
-            catch (MessagingEntityDisabledException)
-            {
-                logger.Warn(string.Format("Subscription {0} is disabled", subscriptionClient.Name)); 
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (ServerBusyException ex)
-            {
-                logger.Warn(string.Format("Server busy exception occured on subscription {0}", subscriptionClient.Name), ex);
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (MessagingCommunicationException ex)
-            {
-                logger.Warn(string.Format("Message communication exception occured on subscription {0}", subscriptionClient.Name), ex);
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
             catch (TimeoutException ex)
             {
                 logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", subscriptionClient.Name), ex);
                 // time's up, just continue and retry
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.Fatal(string.Format("Unauthorized Access Exception occured on subscription {0}", subscriptionClient.Name), ex);
 
+                // errorProcessingMessage(ex);
+                // return
+                // for now choosen to continue
+            }
             catch (MessagingException ex)
             {
-                logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+                if (cancelRequested)
+                {
+                    return;
+                }
 
-                if (cancelRequested) return;
+                if (!ex.IsTransient && !RetriableReceiveExceptionHandling.IsRetryable(ex))
+                {
+                    logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+
+                    errorProcessingMessage(ex);
+                }
+                else
+                {
+                    logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+                }
+
 
                 logger.Warn("Will retry after backoff period");
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
-
-            subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            finally
+            {
+                subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            }
         }
     }
 }

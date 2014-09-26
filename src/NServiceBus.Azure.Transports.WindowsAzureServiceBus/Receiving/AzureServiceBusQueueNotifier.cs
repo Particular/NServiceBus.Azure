@@ -15,6 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         private QueueClient _queueClient;
         private Action<BrokeredMessage> _tryProcessMessage;
+        private Action<Exception> errorProcessingMessage;
         private bool cancelRequested;
         
         /// <summary>
@@ -42,12 +43,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         /// <param name="address"></param>
         /// <param name="tryProcessMessage"></param>
-        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage)
+        /// <param name="errorProcessingMessage"></param>
+        public void Start(Address address, Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
         {
             Address = address;
 
             cancelRequested = false;
 
+            this.errorProcessingMessage = errorProcessingMessage;
             _tryProcessMessage = tryProcessMessage;
             
             _queueClient = QueueClientCreator.Create(address);
@@ -76,53 +79,44 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     _tryProcessMessage(receivedMessage);
                 }
             }
-            catch (MessagingEntityDisabledException)
-            {
-                logger.Warn(string.Format("Queue {0} is disable", _queueClient.Path));
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (ServerBusyException ex)
-            {
-                logger.Warn(string.Format("Server Busy Exception occured on queue {0}", _queueClient.Path), ex);
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (MessagingCommunicationException ex)
-            {
-                logger.Warn(string.Format("Messaging Communication Exception occured on queue {0}", _queueClient.Path), ex);
-
-                if (cancelRequested) return;
-
-                logger.Warn("Will retry after backoff period");
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
             catch (TimeoutException ex)
             {
                 // time's up, just continue and retry
                 logger.Warn(string.Format("Timeout Exception occured on queue {0}", _queueClient.Path), ex);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.Fatal(string.Format("Unauthorized Access Exception occured on queue {0}", _queueClient.Path), ex);
+
+                errorProcessingMessage(ex);
+            }
             catch (MessagingException ex)
             {
-                logger.Warn(string.Format("{1} Messaging Exception occured on queue {0}", _queueClient.Path, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+                if (cancelRequested)
+                {
+                    return;
+                }
 
-                if (cancelRequested) return;
+                if (!ex.IsTransient && !RetriableReceiveExceptionHandling.IsRetryable(ex))
+                {
+                    logger.Fatal(string.Format("{1} {2} occured on queue {0}", _queueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+
+                    errorProcessingMessage(ex);
+                }
+                else
+                {
+                    logger.Warn(string.Format("{1} {2} occured on queue {0}", _queueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                }
+
 
                 logger.Warn("Will retry after backoff period");
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
-
-            _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            finally
+            {
+                _queueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            }
         }
     }
 }
