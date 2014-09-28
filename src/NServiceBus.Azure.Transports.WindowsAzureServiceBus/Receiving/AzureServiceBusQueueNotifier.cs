@@ -3,11 +3,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System;
     using System.Threading;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Logging;
 
     class AzureServiceBusQueueNotifier : INotifyReceivedBrokeredMessages
     {
         Action<BrokeredMessage> tryProcessMessage;
         bool cancelRequested;
+
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusQueueNotifier));
         
         public QueueClient QueueClient { get; set; }
 
@@ -18,11 +21,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public Type MessageType { get; set; }
         public Address Address { get; set; }
 
-        public void Start(Action<BrokeredMessage> tryProcessMessage)
+        Action<Exception> errorProcessingMessage;
+
+        public void Start(Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
         {
             cancelRequested = false;
 
             this.tryProcessMessage = tryProcessMessage;
+            this.errorProcessingMessage = errorProcessingMessage;
             
             QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
@@ -45,30 +51,44 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     tryProcessMessage(receivedMessage);
                 }
             }
-            catch (MessagingEntityDisabledException)
-            {
-                if (cancelRequested) return;
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (ServerBusyException)
-            {
-                if (cancelRequested) return;
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (MessagingException)
-            {
-                if (cancelRequested) return;
-
-                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
-            }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
                 // time's up, just continue and retry
+                logger.Warn(string.Format("Timeout Exception occured on queue {0}", QueueClient.Path), ex);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.Fatal(string.Format("Unauthorized Access Exception occured on queue {0}", QueueClient.Path), ex);
 
-            QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+                errorProcessingMessage(ex);
+            }
+            catch (MessagingException ex)
+            {
+                if (cancelRequested)
+                {
+                    return;
+                }
+
+                if (!ex.IsTransient && !RetriableReceiveExceptionHandling.IsRetryable(ex))
+                {
+                    logger.Fatal(string.Format("{1} {2} occured on queue {0}", QueueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+
+                    errorProcessingMessage(ex);
+                }
+                else
+                {
+                    logger.Warn(string.Format("{1} {2} occured on queue {0}", QueueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                }
+
+
+                logger.Warn("Will retry after backoff period");
+
+                Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
+            }
+            finally
+            {
+                QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            }
         }
     }
 }

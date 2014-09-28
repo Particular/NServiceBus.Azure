@@ -17,6 +17,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     class AzureServiceBusDequeueStrategy : IDequeueMessages
     {
         ITopology topology;
+        readonly CriticalError criticalError;
         Address address;
         TransactionSettings settings;
         Func<TransportMessage, bool> tryProcessMessage;
@@ -35,6 +36,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public AzureServiceBusDequeueStrategy(ITopology topology, CriticalError criticalError)
         {
             this.topology = topology;
+            this.criticalError = criticalError;
             circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => criticalError.Raise(string.Format("Failed to receive message from Azure ServiceBus."), ex));
         }
         
@@ -234,7 +236,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var key = CreateKeyFor(eventType, original);
             if (notifiers.ContainsKey(key)) return;
 
-            notifier.Start(EnqueueMessage);
+            notifier.Start(EnqueueMessage, ErrorDequeueingBatch);
             notifiers.Add(key, notifier);
         }
 
@@ -282,6 +284,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 key += eventType.FullName;
             }
             return key;
+        }
+
+        void ErrorDequeueingBatch(Exception ex)
+        {
+            criticalError.Raise("Fatal messaging exception occured on the broker while dequeueing batch.", ex);
         }
     }
 
