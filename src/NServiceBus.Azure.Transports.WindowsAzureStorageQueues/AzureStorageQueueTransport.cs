@@ -7,9 +7,9 @@ namespace NServiceBus
     /// <summary>
     /// Transport definition for AzureStorageQueue
     /// </summary>
-    public class AzureStorageQueue : TransportDefinition
+    public class AzureStorageQueueTransport : TransportDefinition
     {
-        public AzureStorageQueue()
+        public AzureStorageQueueTransport()
         {
             HasSupportForDistributedTransactions = false;
         }
@@ -19,7 +19,7 @@ namespace NServiceBus
         /// </summary>
         protected override void Configure(BusConfiguration config)
         {
-            config.EnableFeature<AzureStorageQueueTransport>();
+            config.EnableFeature<AzureStorageQueueTransportConfiguration>();
             config.EnableFeature<TimeoutManagerBasedDeferral>();
             
             var settings = config.GetSettings();

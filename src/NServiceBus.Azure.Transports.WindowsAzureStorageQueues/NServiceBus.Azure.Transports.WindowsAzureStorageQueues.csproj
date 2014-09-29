@@ -81,9 +81,9 @@
     <Compile Include="AzureMessageQueueReceiver.cs" />
     <Compile Include="AzureMessageQueueSender.cs" />
     <Compile Include="AzureMessageQueueUtils.cs" />
-    <Compile Include="AzureStorageQueue.cs" />
+    <Compile Include="AzureStorageQueueTransport.cs" />
     <Compile Include="Config\AzureQueueConfig.cs" />
-    <Compile Include="Config\AzureStorageQueueTransport.cs" />
+    <Compile Include="Config\AzureStorageQueueTransportConfiguration.cs" />
     <Compile Include="Config\AzureStorageTransportExtensions.cs" />
     <Compile Include="Config\ConfigureAzureMessageQueue.cs" />
     <Compile Include="Config\ConnectionStringParser.cs" />

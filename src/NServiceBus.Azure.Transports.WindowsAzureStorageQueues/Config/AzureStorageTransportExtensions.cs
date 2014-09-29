@@ -11,7 +11,7 @@ namespace NServiceBus
         /// <param name="config"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static TransportExtensions<AzureStorageQueue> PeekInterval(this TransportExtensions<AzureStorageQueue> config, int value)
+        public static TransportExtensions<AzureStorageQueueTransport> PeekInterval(this TransportExtensions<AzureStorageQueueTransport> config, int value)
         {
             config.GetSettings().SetProperty<AzureMessageQueueReceiver>(t => t.PeekInterval, value);
             return config;
@@ -23,7 +23,7 @@ namespace NServiceBus
         /// <param name="config"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static TransportExtensions MaximumWaitTimeWhenIdle(this TransportExtensions<AzureStorageQueue> config, int value)
+        public static TransportExtensions MaximumWaitTimeWhenIdle(this TransportExtensions<AzureStorageQueueTransport> config, int value)
         {
             config.GetSettings().SetProperty<AzureMessageQueueReceiver>(t => t.MaximumWaitTimeWhenIdle, value);
 
@@ -36,7 +36,7 @@ namespace NServiceBus
         /// <param name="config"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static TransportExtensions<AzureStorageQueue> MessageInvisibleTime(this TransportExtensions<AzureStorageQueue> config, int value)
+        public static TransportExtensions<AzureStorageQueueTransport> MessageInvisibleTime(this TransportExtensions<AzureStorageQueueTransport> config, int value)
         {
             config.GetSettings().SetProperty<AzureMessageQueueReceiver>(t => t.MessageInvisibleTime, value);
 
@@ -49,7 +49,7 @@ namespace NServiceBus
         /// <param name="config"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static TransportExtensions<AzureStorageQueue> BatchSize(this TransportExtensions<AzureStorageQueue> config, int value)
+        public static TransportExtensions<AzureStorageQueueTransport> BatchSize(this TransportExtensions<AzureStorageQueueTransport> config, int value)
         {
             config.GetSettings().SetProperty<AzureMessageQueueReceiver>(t => t.BatchSize, value);
 

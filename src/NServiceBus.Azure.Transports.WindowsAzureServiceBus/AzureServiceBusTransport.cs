@@ -10,9 +10,9 @@ namespace NServiceBus
     /// <summary>
     /// Transport definition for WindowsAzureServiceBus    
     /// </summary>
-    public class AzureServiceBus : TransportDefinition
+    public class AzureServiceBusTransport : TransportDefinition
     {
-        public AzureServiceBus()
+        public AzureServiceBusTransport()
         {
             HasNativePubSubSupport = true;
             HasSupportForCentralizedPubSub = false;
@@ -29,7 +29,7 @@ namespace NServiceBus
             // make sure the transaction stays open a little longer than the long poll.
             config.Transactions().DefaultTimeout(TimeSpan.FromSeconds(AzureServicebusDefaults.DefaultServerWaitTime * 1.1)).IsolationLevel(IsolationLevel.Serializable);
 
-            config.EnableFeature<AzureServiceBusTransport>();
+            config.EnableFeature<AzureServiceBusTransportConfiguration>();
         }
     }
 }

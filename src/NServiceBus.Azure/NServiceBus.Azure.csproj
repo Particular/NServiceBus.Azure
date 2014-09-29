@@ -92,8 +92,7 @@
   <ItemGroup>
     <Compile Include="DataBus\AzureDataBusDefaults.cs" />
     <Compile Include="DataBus\AzureDataBusPersistence.cs" />
-    <Compile Include="AzureStorage.cs" />
-    <Compile Include="AzureStoragePersistence.cs" />
+    <Compile Include="AzureStoragePeristence.cs" />
     <Compile Include="SagaPersisters\Azure\AzureStorageSagaPersistence.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
     <Compile Include="Obsoletes\ConfigureAzureBlobStorageDataBus.cs" />

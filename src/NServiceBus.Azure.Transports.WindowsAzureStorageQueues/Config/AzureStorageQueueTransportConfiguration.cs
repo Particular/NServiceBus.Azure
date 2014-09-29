@@ -9,7 +9,7 @@
     using Settings;
     using Transports;
 
-    class AzureStorageQueueTransport : ConfigureTransport
+    class AzureStorageQueueTransportConfiguration : ConfigureTransport
     {
 
         protected override void Configure(FeatureConfigurationContext context, string con)
