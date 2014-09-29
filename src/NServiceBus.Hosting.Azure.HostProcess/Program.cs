@@ -13,13 +13,9 @@
 
     class Program
     {
-<<<<<<< HEAD
         static List<Assembly> scannedAssemblies;
 
-        private static void Main(string[] args)
-=======
         static void Main(string[] args)
->>>>>>> release-6.0.0
         {
             var commandLineArguments = Parser.ParseArgs(args);
             var arguments = new HostArguments(commandLineArguments);
@@ -199,7 +195,6 @@
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-<<<<<<< HEAD
             if (scannedAssemblies == null)
             {
                 var assemblyScanner = new AssemblyScanner
@@ -213,30 +208,12 @@
                 scannedAssemblies = assemblyScanner.GetScannableAssemblies().Assemblies;
             }
 
-            foreach (var assembly in scannedAssemblies)
-                foreach (var type in assembly.GetTypes().Where(
-                        t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
-                        && t != typeof(IConfigureThisEndpoint)
-                        && !t.IsAbstract))
-                {
-                    yield return type;
-                }
-=======
-            var assemblyScanner = new AssemblyScanner
-            {
-                ThrowExceptions = false
-            };
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
-
-            return assemblyScanner.GetScannableAssemblies()
-                .Assemblies
+            return scannedAssemblies
                 .SelectMany(assembly => assembly.GetTypes().Where(
                 t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
                      && t != typeof(IConfigureThisEndpoint)
                      && !t.IsAbstract));
->>>>>>> release-6.0.0
+          
         }
 
         static void ValidateEndpoints(IEnumerable<Type> endpointConfigurationTypes)

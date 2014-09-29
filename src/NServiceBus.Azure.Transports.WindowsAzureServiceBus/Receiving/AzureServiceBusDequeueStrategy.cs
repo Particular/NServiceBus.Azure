@@ -233,10 +233,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void TrackNotifier(Type eventType, Address original, INotifyReceivedBrokeredMessages notifier)
         {
-<<<<<<< HEAD:src/NServiceBus.Azure.Transports.WindowsAzureServiceBus/AzureServiceBusDequeueStrategy.cs
-            notifier.Start(address, EnqueueMessage, ErrorDequeueingBatch);
-            notifiers.Add(notifier);
-=======
             var key = CreateKeyFor(eventType, original);
             if (notifiers.ContainsKey(key)) return;
 
@@ -258,12 +254,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var key = CreateKeyFor(eventType, original);
             return !notifiers.ContainsKey(key) ? null : notifiers[key];
->>>>>>> release-6.0.0:src/NServiceBus.Azure.Transports.WindowsAzureServiceBus/Receiving/AzureServiceBusDequeueStrategy.cs
-        }
-
-        void ErrorDequeueingBatch(Exception ex)
-        {
-            Configure.Instance.RaiseCriticalError("Fatal messaging exception occured on the broker while dequeueing batch.", ex);
         }
 
         void EnqueueMessage(BrokeredMessage brokeredMessage)
@@ -295,13 +285,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             return key;
         }
-<<<<<<< HEAD:src/NServiceBus.Azure.Transports.WindowsAzureServiceBus/AzureServiceBusDequeueStrategy.cs
-=======
-
         void ErrorDequeueingBatch(Exception ex)
         {
             criticalError.Raise("Fatal messaging exception occured on the broker while dequeueing batch.", ex);
         }
->>>>>>> release-6.0.0:src/NServiceBus.Azure.Transports.WindowsAzureServiceBus/Receiving/AzureServiceBusDequeueStrategy.cs
     }
 }

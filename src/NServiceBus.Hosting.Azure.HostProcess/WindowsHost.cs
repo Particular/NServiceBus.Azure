@@ -23,13 +23,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
             Program.EndpointId = Program.GetEndpointId(specifier);
 
-<<<<<<< HEAD
-            args = AddProfilesFromConfiguration(args);
-
-            genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) }, Program.EndpointId, scannableAssembliesFullName);
-=======
-            genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) });
->>>>>>> release-6.0.0
+            genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) }, scannableAssembliesFullName);
         }
 
         /// <summary>

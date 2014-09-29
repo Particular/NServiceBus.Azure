@@ -79,14 +79,12 @@
     <Compile Include="Creation\Clients\ICreateSubscriptionClients.cs" />
     <Compile Include="Creation\Clients\ICreateTopicClients.cs" />
     <Compile Include="Creation\ICreateQueues.cs" />
-    <Compile Include="Receiving\RetriableReceiveExceptionHandling.cs" />
     <Compile Include="Topology\AzureServiceBusTopologyCreator.cs" />
     <Compile Include="Creation\Resources\ICreateNamespaceManagers.cs" />
     <Compile Include="Creation\Clients\ICreateQueueClients.cs" />
     <Compile Include="Creation\Resources\AzureServicebusSubscriptionCreator.cs" />
     <Compile Include="Creation\Resources\ICreateSubscriptions.cs" />
     <Compile Include="Creation\Resources\SubscriptionAlreadyInUseException.cs" />
-    <Compile Include="NamingConventions\AzureServiceBusQueueAddressConvention.cs" />
     <Compile Include="Receiving\RetriableReceiveExceptionHandling.cs" />
     <Compile Include="Publishing\AzureServiceBusTopicPublisher.cs" />
     <Compile Include="Publishing\IPublishBrokeredMessages.cs" />
