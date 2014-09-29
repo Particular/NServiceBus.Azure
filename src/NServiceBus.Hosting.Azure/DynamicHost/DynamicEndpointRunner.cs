@@ -30,11 +30,7 @@ namespace NServiceBus.Hosting.Azure
                                                    CreateNoWindow = true,
                                                    RedirectStandardInput = true,
                                                    RedirectStandardOutput = true,
-<<<<<<< HEAD
                                                    RedirectStandardError = true
-=======
-                                                   RedirectStandardError  = true
->>>>>>> release-6.0.0
                                                };
                     
                     var process = new Process {StartInfo = processStartInfo, EnableRaisingEvents = true};
@@ -62,10 +58,6 @@ namespace NServiceBus.Hosting.Azure
 
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
-<<<<<<< HEAD
-=======
-                    
->>>>>>> release-6.0.0
                 }
                 catch (Exception e)
                 {
