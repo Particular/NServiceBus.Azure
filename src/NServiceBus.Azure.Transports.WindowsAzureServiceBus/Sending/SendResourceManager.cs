@@ -4,9 +4,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Transactions;
     using Logging;
 
-    internal class SendResourceManager : IEnlistmentNotification
+    class SendResourceManager : IEnlistmentNotification
     {
-        private readonly Action onCommit;
+        Action onCommit;
 
         public SendResourceManager(Action onCommit )
         {

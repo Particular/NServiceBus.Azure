@@ -1,19 +1,15 @@
-using System.Transactions;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System.Transactions;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Transports;
     using Unicast;
     using Unicast.Queuing;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    internal class AzureServiceBusSender : ISendMessages, IDeferMessages
+    class AzureServiceBusSender : ISendMessages, IDeferMessages
     {
-        readonly ITopology topology;
-        readonly Configure config;
+        ITopology topology;
+        Configure config;
 
         public AzureServiceBusSender(ITopology topology, Configure config)
         {

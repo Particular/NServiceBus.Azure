@@ -5,7 +5,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
 
-    internal class AzureServicebusSubscriptionCreator : ICreateSubscriptions
+    class AzureServicebusSubscriptionCreator : ICreateSubscriptions
     {
         public TimeSpan LockDuration { get; set; }
         public bool RequiresSession { get; set; }
@@ -15,13 +15,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public bool EnableBatchedOperations { get; set; }
         public bool EnableDeadLetteringOnFilterEvaluationExceptions { get; set; }
 
-        readonly ICreateNamespaceManagers createNamespaceManagers;
-        readonly Configure config;
+        ICreateNamespaceManagers createNamespaceManagers;
+        Configure config;
 
-        private static readonly Dictionary<string, bool> rememberTopicExistance = new Dictionary<string, bool>();
-        private static readonly Dictionary<string, bool> rememberSubscriptionExistance = new Dictionary<string, bool>();
-        private static readonly object TopicExistanceLock = new Object();
-        private static readonly object SubscriptionExistanceLock = new Object();
+        static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
+        static Dictionary<string, bool> rememberSubscriptionExistence = new Dictionary<string, bool>();
+        static object TopicExistenceLock = new Object();
+        static object SubscriptionExistenceLock = new Object();
 
         public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
@@ -121,17 +121,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var key = topicpath;
             bool exists;
-            if (!rememberTopicExistance.ContainsKey(key))
+            if (!rememberTopicExistence.ContainsKey(key))
             {
-                lock (TopicExistanceLock)
+                lock (TopicExistenceLock)
                 {
                     exists = namespaceClient.TopicExists(key);
-                    rememberTopicExistance[key] = exists;
+                    rememberTopicExistence[key] = exists;
                 }
             }
             else
             {
-                exists = rememberTopicExistance[key];
+                exists = rememberTopicExistence[key];
             }
 
             return exists;
@@ -141,17 +141,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var key = topicpath + subscriptionname;
             bool exists;
-            if (!rememberSubscriptionExistance.ContainsKey(key))
+            if (!rememberSubscriptionExistence.ContainsKey(key))
             {
-                lock (SubscriptionExistanceLock)
+                lock (SubscriptionExistenceLock)
                 {
                     exists = namespaceClient.SubscriptionExists(topicpath, subscriptionname);
-                    rememberSubscriptionExistance[key] = exists;
+                    rememberSubscriptionExistence[key] = exists;
                 }
             }
             else
             {
-                exists = rememberSubscriptionExistance[key];
+                exists = rememberSubscriptionExistence[key];
             }
 
             return exists;

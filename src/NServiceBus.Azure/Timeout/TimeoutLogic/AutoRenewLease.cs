@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading;
-
-namespace NServiceBus.Azure
+﻿namespace NServiceBus.Azure
 {
+    using System;
+    using System.Threading;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -13,8 +12,8 @@ namespace NServiceBus.Azure
             get { return leaseId != null; }
         }
 
-        readonly CloudBlockBlob blob;
-        readonly string leaseId;
+        CloudBlockBlob blob;
+        string leaseId;
         Thread renewalThread;
         bool disposed;
 

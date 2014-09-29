@@ -3,9 +3,9 @@
     using System;
     using System.Transactions;
     using AcceptanceTesting;
-    using Config;
-    using Config.ConfigurationSource;
     using EndpointTemplates;
+    using NServiceBus.Config;
+    using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
 
     public class When_sending_an_oversized_message_from_a_transaction_scope : NServiceBusAcceptanceTest

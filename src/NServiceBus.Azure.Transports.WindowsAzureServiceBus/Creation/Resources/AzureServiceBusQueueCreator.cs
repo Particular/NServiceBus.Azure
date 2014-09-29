@@ -5,7 +5,7 @@
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
 
-    internal class AzureServiceBusQueueCreator : Transports.ICreateQueues
+    class AzureServiceBusQueueCreator : Transports.ICreateQueues
     {
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }
@@ -18,11 +18,11 @@
         public bool EnableBatchedOperations { get; set; }
         public bool EnablePartitioning { get; set; }
 
-        readonly ICreateNamespaceManagers createNamespaceManagers;
-        readonly Configure config;
+        ICreateNamespaceManagers createNamespaceManagers;
+        Configure config;
 
-        private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
-        private static readonly object ExistanceLock = new Object();
+        static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
+        static object ExistenceLock = new Object();
 
         public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
@@ -80,17 +80,17 @@
         {
             var key = path;
             bool exists;
-            if (!rememberExistance.ContainsKey(key))
+            if (!rememberExistence.ContainsKey(key))
             {
-                lock (ExistanceLock)
+                lock (ExistenceLock)
                 {
                     exists = namespaceClient.QueueExists(key);
-                    rememberExistance[key] = exists;
+                    rememberExistence[key] = exists;
                 }
             }
             else
             {
-                exists = rememberExistance[key];
+                exists = rememberExistence[key];
             }
 
             return exists;

@@ -10,17 +10,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     /// publishes through a topic per endpoint, 
     /// receives on both it's own queue &amp; subscriptions per datatype
     /// </summary>
-
-    internal class QueueAndTopicByEndpointTopology : ITopology
+    class QueueAndTopicByEndpointTopology : ITopology
     {
-        readonly Configure config;
-        readonly ICreateMessagingFactories messagingFactories;
-        readonly ICreateSubscriptions subscriptionCreator;
-        readonly ICreateQueues queueCreator;
-        readonly ICreateTopics topicCreator;
-        readonly ICreateQueueClients queueClients; 
-        readonly ICreateSubscriptionClients subscriptionClients;
-        readonly ICreateTopicClients topicClients;
+        Configure config;
+        ICreateMessagingFactories messagingFactories;
+        ICreateSubscriptions subscriptionCreator;
+        ICreateQueues queueCreator;
+        ICreateTopics topicCreator;
+        ICreateQueueClients queueClients; 
+        ICreateSubscriptionClients subscriptionClients;
+        ICreateTopicClients topicClients;
 
         internal QueueAndTopicByEndpointTopology(
             Configure config, 
@@ -58,7 +57,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             return notifier;
         }
 
-        private SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
+        SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
         {
             var subscriptionname = NamingConventions.SubscriptionNamingConvention(config.Settings, eventType, config.Settings.EndpointName());
             var factory = messagingFactories.Create(address);

@@ -1,14 +1,14 @@
-using NServiceBus.Config;
-using NServiceBus.Hosting.Helpers;
-using NServiceBus.Integration.Azure;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-
 namespace NServiceBus.Hosting.Azure
 {
+    using NServiceBus.Config;
+    using NServiceBus.Hosting.Helpers;
+    using NServiceBus.Integration.Azure;
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.Diagnostics;
+
     public class NServiceBusRoleEntrypoint
     {
         const string ProfileSetting = "AzureProfileConfig.Profiles";
@@ -100,7 +100,7 @@ namespace NServiceBus.Hosting.Azure
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner()
+            var assemblyScanner = new AssemblyScanner
             {
                 ThrowExceptions = false
             };
@@ -120,7 +120,7 @@ namespace NServiceBus.Hosting.Azure
             var count = endpointConfigurationTypes.Count();
             if (count == 0)
             {
-                throw new InvalidOperationException("No endpoint configuration found in scanned assemlies. " +
+                throw new InvalidOperationException("No endpoint configuration found in scanned assemblies. " +
                                                     "This usually happens when NServiceBus fails to load your assembly containing IConfigureThisEndpoint." +
                                                     " Try specifying the type explicitly in the roles config using the appsetting key: EndpointConfigurationType, " +
                                                     "Scanned path: " + AppDomain.CurrentDomain.BaseDirectory);

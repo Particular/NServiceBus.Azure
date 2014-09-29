@@ -17,7 +17,7 @@
     
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
     {
-        readonly Configure config;
+        Configure config;
 
         public TimeoutPersister(Configure config)
         {
@@ -208,7 +208,7 @@
 
         }
 
-        private bool TryGetTimeoutData(ServiceContext context, string partitionKey, string rowKey, out TimeoutDataEntity result)
+        bool TryGetTimeoutData(ServiceContext context, string partitionKey, string rowKey, out TimeoutDataEntity result)
         {
             result = (from c in context.TimeoutData
                         where c.PartitionKey == partitionKey && c.RowKey == rowKey
@@ -387,6 +387,6 @@
         CloudStorageAccount account;
         CloudBlobContainer container;
 
-        static readonly ILog Logger = LogManager.GetLogger(typeof(TimeoutPersister));
+        static ILog Logger = LogManager.GetLogger(typeof(TimeoutPersister));
     }
 }

@@ -131,7 +131,7 @@ namespace NServiceBus.Hosting.Azure
             bus = (UnicastBus) Bus.Create(configuration);
         }
 
-        private string[] AddProfilesFromConfiguration(IEnumerable<string> args)
+        string[] AddProfilesFromConfiguration(IEnumerable<string> args)
         {
             var list = new List<string>(args);
 

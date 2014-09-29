@@ -2,7 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     public class AzureServiceBusTopologyCreator: NServiceBus.Transports.ICreateQueues
     {
-        readonly ITopology topology;
+        ITopology topology;
 
         public AzureServiceBusTopologyCreator(ITopology topology)
         {

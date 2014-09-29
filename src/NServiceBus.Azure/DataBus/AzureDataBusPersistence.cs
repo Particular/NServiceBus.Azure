@@ -10,7 +10,7 @@ namespace NServiceBus
     {
         internal AzureDataBusPersistence()
         {
-            DependsOn<DataBusFeature>();
+            DependsOn<Features.DataBus>();
         }
 
         /// <summary>

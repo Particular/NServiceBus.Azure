@@ -1,21 +1,15 @@
-//namespace NServiceBus
-//{
-//    using System.Collections.Generic;
-//    using Features;
-//    using Persistence;
+namespace NServiceBus
+{
+    using Features;
+    using Persistence;
 
-//    class AzureStoragePersistence : IConfigurePersistence<AzureStorage>
-//    {
-//        public void Enable(Configure config, List<Storage> storagesToEnable)
-//        {
-//            if (storagesToEnable.Contains(Storage.Sagas))
-//                config.Settings.EnableFeatureByDefault<AzureStorageSagaPersistence>();
-
-//            if (storagesToEnable.Contains(Storage.Timeouts))
-//                config.Settings.EnableFeatureByDefault<AzureStorageTimeoutPersistence>();
-
-//            if (storagesToEnable.Contains(Storage.Subscriptions))
-//                config.Settings.EnableFeatureByDefault<AzureStorageSubscriptionPersistence>();
-//        }
-//    }
-//}
+    public class AzureStoragePersistence : PersistenceDefinition
+    {
+        internal AzureStoragePersistence()
+        {
+            Supports(Storage.Timeouts, s => s.EnableFeatureByDefault<AzureStorageTimeoutPersistence>());
+            Supports(Storage.Sagas, s => s.EnableFeatureByDefault<AzureStorageSagaPersistence>());
+            Supports(Storage.Subscriptions, s => s.EnableFeatureByDefault<AzureStorageSubscriptionPersistence>());
+        }
+    }
+}

@@ -11,10 +11,10 @@ namespace NServiceBus.Integration.Azure
 
     public class AzureConfigurationSource : IConfigurationSource
     {
-        static readonly IDictionary<string, object> ConfigurationCache = new ConcurrentDictionary<string, object>();
+        static IDictionary<string, object> ConfigurationCache = new ConcurrentDictionary<string, object>();
 
-        readonly IAzureConfigurationSettings azureConfigurationSettings;
-        readonly bool cache;
+        IAzureConfigurationSettings azureConfigurationSettings;
+        bool cache;
 
         public AzureConfigurationSource(IAzureConfigurationSettings configurationSettings, bool usecache = true)
         {
@@ -58,14 +58,14 @@ namespace NServiceBus.Integration.Azure
             return section;
         }
 
-        private static Configuration GetConfigurationHandler()
+        static Configuration GetConfigurationHandler()
         {
             if (IsWebsite()) return WebConfigurationManager.OpenWebConfiguration(HostingEnvironment.ApplicationVirtualPath);
 
             return ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         }
 
-        private static bool IsWebsite()
+        static bool IsWebsite()
         {
             return HostingEnvironment.IsHosted;
         }

@@ -12,7 +12,7 @@
     /// </summary>
     public class AzureSubscriptionStorage : ISubscriptionStorage
     {
-        readonly CloudTableClient client;
+        CloudTableClient client;
 
         /// <summary>
         /// 

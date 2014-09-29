@@ -4,7 +4,7 @@
     using System.Security.Cryptography;
     using System.Text;
 
-    internal class DeterministicGuidBuilder
+    class DeterministicGuidBuilder
     {
         public Guid Build(string input)
         {

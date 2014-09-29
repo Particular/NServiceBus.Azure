@@ -15,7 +15,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     /// </summary>
     public class PollingDequeueStrategy : IDequeueMessages
     {
-        readonly AzureMessageQueueReceiver messageReceiver;
+        AzureMessageQueueReceiver messageReceiver;
 
         public PollingDequeueStrategy(AzureMessageQueueReceiver messageReceiver, CriticalError criticalError)
         {
@@ -82,7 +82,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        private void Action(object obj)
+        void Action(object obj)
         {
             var cancellationToken = (CancellationToken)obj;
 
@@ -142,7 +142,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             }
         }
 
-        readonly RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
+        RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
         Func<TransportMessage, bool> tryProcessMessage;
         CancellationTokenSource tokenSource;
         Address addressToPoll;

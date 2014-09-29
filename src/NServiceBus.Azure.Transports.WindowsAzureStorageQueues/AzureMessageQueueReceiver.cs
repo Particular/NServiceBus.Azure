@@ -14,8 +14,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
     public class AzureMessageQueueReceiver
     {
-        readonly IMessageSerializer messageSerializer;
-        readonly CloudQueueClient client;
+        IMessageSerializer messageSerializer;
+        CloudQueueClient client;
         public const int DefaultMessageInvisibleTime = 30000;
         public const int DefaultPeekInterval = 50;
         public const int DefaultMaximumWaitTimeWhenIdle = 1000;

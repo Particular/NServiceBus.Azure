@@ -1,6 +1,6 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    internal class ConnectionStringParser
+    class ConnectionStringParser
     {
         public string ParseNamespaceFrom(string inputQueue)
         {

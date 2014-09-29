@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Transactions;
-using NServiceBus.Serialization;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Transactions;
+    using NServiceBus.Serialization;
     using System.Collections.Concurrent;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
@@ -18,13 +17,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     /// </summary>
     public class AzureMessageQueueSender : ISendMessages
     {
-        readonly Configure config;
-        readonly ICreateQueueClients createQueueClients;
+        Configure config;
+        ICreateQueueClients createQueueClients;
 
 
-        private static readonly Dictionary<string, bool> rememberExistance = new Dictionary<string, bool>();
+        static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
         
-        private static readonly object ExistanceLock = new Object();
+        static object ExistenceLock = new Object();
 
         /// <summary>
         /// Gets or sets the message serializer
@@ -65,23 +64,23 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         {
             var key = sendQueue.Uri.ToString();
             bool exists;
-            if (!rememberExistance.ContainsKey(key))
+            if (!rememberExistence.ContainsKey(key))
             {
-                lock (ExistanceLock)
+                lock (ExistenceLock)
                 {
                     exists = sendQueue.Exists();
-                    rememberExistance[key] = exists;
+                    rememberExistence[key] = exists;
                 }
             }
             else
             {
-                 exists = rememberExistance[key];
+                 exists = rememberExistence[key];
             }
 
             return exists;
         }
 
-        private CloudQueueMessage SerializeMessage(TransportMessage message, SendOptions options)
+        CloudQueueMessage SerializeMessage(TransportMessage message, SendOptions options)
         {
             using (var stream = new MemoryStream())
             {
@@ -114,8 +113,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
     public class CreateQueueClients : ICreateQueueClients
     {
-        private readonly ConcurrentDictionary<string, CloudQueueClient> destinationQueueClients = new ConcurrentDictionary<string, CloudQueueClient>();
-        private readonly Configure config;
+        ConcurrentDictionary<string, CloudQueueClient> destinationQueueClients = new ConcurrentDictionary<string, CloudQueueClient>();
+        Configure config;
 
         public CreateQueueClients(Configure config)
         {

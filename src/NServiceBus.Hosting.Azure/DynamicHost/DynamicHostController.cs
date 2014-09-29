@@ -4,20 +4,19 @@ namespace NServiceBus.Hosting.Azure
     using System.Collections.Generic;
     using System.Reflection;
     using Configuration.AdvanceExtensibility;
-    using Persistence;
     using Profiles;
     using Unicast;
 
-    internal class DynamicHostController : IHost
+    class DynamicHostController : IHost
     {
-        private readonly IConfigureThisEndpoint specifier;
-        private readonly ProfileManager profileManager;
+        IConfigureThisEndpoint specifier;
+        ProfileManager profileManager;
 
-        private DynamicEndpointLoader loader;
-        private DynamicEndpointProvisioner provisioner;
-        private DynamicEndpointRunner runner;
-        private DynamicHostMonitor monitor;
-        private List<EndpointToHost> runningServices;
+        DynamicEndpointLoader loader;
+        DynamicEndpointProvisioner provisioner;
+        DynamicEndpointRunner runner;
+        DynamicHostMonitor monitor;
+        List<EndpointToHost> runningServices;
 
         public DynamicHostController(IConfigureThisEndpoint specifier, string[] requestedProfiles, List<Type> defaultProfiles)
         {
@@ -53,7 +52,7 @@ namespace NServiceBus.Hosting.Azure
                 Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
             });
 
-            o.UsePersistence<AzureStorage>();
+            o.UsePersistence<AzureStoragePersistence>();
             o.DiscardFailedMessagesInsteadOfSendingToErrorQueue();
 
             profileManager.ActivateProfileHandlers(o);

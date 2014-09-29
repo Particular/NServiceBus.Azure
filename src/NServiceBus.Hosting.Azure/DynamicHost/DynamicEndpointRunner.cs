@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using NServiceBus.Logging;
-
 namespace NServiceBus.Hosting.Azure
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using NServiceBus.Logging;
     using System.Linq;
     using Config;
 
-    internal class DynamicEndpointRunner
+    class DynamicEndpointRunner
     {
-        private readonly ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
+        ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 
         public bool RecycleRoleOnError { get; set; }
 

@@ -1,18 +1,14 @@
-using System.Transactions;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System.Transactions;
     using NServiceBus.Transports;
     using Unicast;
     using Unicast.Queuing;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    internal class AzureServiceBusPublisher : IPublishMessages
+    class AzureServiceBusPublisher : IPublishMessages
     {
-        readonly Configure config;
-        readonly ITopology topology;
+        Configure config;
+        ITopology topology;
 
         public AzureServiceBusPublisher(Configure config, ITopology topology)
         {
@@ -32,7 +28,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 Transaction.Current.EnlistVolatile(new SendResourceManager(() => Publish(publisher, message, options)), EnlistmentOptions.None);
         }
 
-        private void Publish(IPublishBrokeredMessages publisher, TransportMessage message, PublishOptions options)
+        void Publish(IPublishBrokeredMessages publisher, TransportMessage message, PublishOptions options)
         {
             using (var brokeredMessage = message.ToBrokeredMessage(options, config.Settings, config))
             {

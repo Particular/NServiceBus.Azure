@@ -2,10 +2,10 @@
 {
     using System;
     using Azure.Transports.WindowsAzureServiceBus;
-    using Config;
-    using Config.ConfigurationSource;
     using EndpointTemplates;
     using AcceptanceTesting;
+    using NServiceBus.Config;
+    using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
 
     public class When_sending_an_oversized_message_without_a_transaction_scope : NServiceBusAcceptanceTest

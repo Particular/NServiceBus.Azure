@@ -1,7 +1,7 @@
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using Microsoft.ServiceBus.Messaging;
+
     /// <summary>
     /// 
     /// </summary>

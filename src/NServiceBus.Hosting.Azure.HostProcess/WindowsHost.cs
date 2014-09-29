@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// A windows implementation of the NServiceBus hosting solution
     /// </summary>
     public class WindowsHost : MarshalByRefObject
     {
-        private readonly GenericHost genericHost;
+        GenericHost genericHost;
 
         /// <summary>
         /// Accepts the type which will specify the users custom configuration.
