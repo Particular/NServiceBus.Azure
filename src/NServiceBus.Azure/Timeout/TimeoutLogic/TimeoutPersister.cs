@@ -17,7 +17,14 @@
     
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
     {
-        public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
+        Configure config;
+
+        public TimeoutPersister(Configure config)
+        {
+            this.config = config;
+        }
+
+        public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
         {
             var results = new List<Tuple<string, DateTime>>();
            
@@ -35,13 +42,13 @@
                 result = (from c in context.TimeoutData
                             where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
                             && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
-                                && c.OwningTimeoutManager == Configure.EndpointName
+                                && c.OwningTimeoutManager == config.Settings.EndpointName()
                             select c).ToList().OrderBy(c => c.Time);
             }
             else
             {
                 result = (from c in context.TimeoutData
-                            where c.OwningTimeoutManager == Configure.EndpointName
+                          where c.OwningTimeoutManager == config.Settings.EndpointName()
                             select c).ToList().OrderBy(c => c.Time);
             }
 
@@ -99,7 +106,6 @@
                                           SagaId = timeout.SagaId,
                                           StateAddress = stateAddress,
                                           Time = timeout.Time,
-                                          CorrelationId = timeout.CorrelationId,
                                           OwningTimeoutManager = timeout.OwningTimeoutManager,
                                           Headers = headers
                                       });
@@ -114,7 +120,6 @@
                                           SagaId = timeout.SagaId,
                                           StateAddress = stateAddress,
                                           Time = timeout.Time,
-                                          CorrelationId = timeout.CorrelationId,
                                           OwningTimeoutManager = timeout.OwningTimeoutManager,
                                           Headers = headers
                                       });
@@ -126,7 +131,6 @@
                                     SagaId = timeout.SagaId,
                                     StateAddress = stateAddress,
                                     Time = timeout.Time,
-                                    CorrelationId = timeout.CorrelationId,
                                     OwningTimeoutManager = timeout.OwningTimeoutManager,
                                     Headers = headers
                                 });
@@ -152,7 +156,6 @@
                 SagaId = timeoutDataEntity.SagaId,
                 State = Download(timeoutDataEntity.StateAddress),
                 Time = timeoutDataEntity.Time,
-                CorrelationId = timeoutDataEntity.CorrelationId,
                 Id = timeoutDataEntity.RowKey,
                 OwningTimeoutManager = timeoutDataEntity.OwningTimeoutManager,
                 Headers = Deserialize(timeoutDataEntity.Headers)
@@ -205,7 +208,7 @@
 
         }
 
-        private bool TryGetTimeoutData(ServiceContext context, string partitionKey, string rowKey, out TimeoutDataEntity result)
+        bool TryGetTimeoutData(ServiceContext context, string partitionKey, string rowKey, out TimeoutDataEntity result)
         {
             result = (from c in context.TimeoutData
                         where c.PartitionKey == partitionKey && c.RowKey == rowKey
@@ -248,7 +251,6 @@
         void Init(string connectionString)
         {
             account = CloudStorageAccount.Parse(connectionString);
-            var context = new ServiceContext(account.CreateCloudTableClient());
             var tableClient = account.CreateCloudTableClient();
             var table = tableClient.GetTableReference(ServiceContext.TimeoutManagerDataTableName);
             table.CreateIfNotExists();
@@ -330,7 +332,7 @@
         {
             var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
 
-            return Configure.EndpointName + "_" + identifier;
+            return config.Settings.EndpointName() + "_" + identifier;
         }
 
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)
@@ -385,6 +387,6 @@
         CloudStorageAccount account;
         CloudBlobContainer container;
 
-        static readonly ILog Logger = LogManager.GetLogger(typeof(TimeoutPersister));
+        static ILog Logger = LogManager.GetLogger(typeof(TimeoutPersister));
     }
 }

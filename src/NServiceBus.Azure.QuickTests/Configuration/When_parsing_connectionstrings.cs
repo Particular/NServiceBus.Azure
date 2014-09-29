@@ -1,7 +1,7 @@
-﻿using NUnit.Framework;
-
-namespace NServiceBus.Azure.QuickTests
+﻿namespace NServiceBus.Azure.QuickTests
 {
+    using NUnit.Framework;
+
     [TestFixture]
     [Category("Azure")]
     public class When_parsing_connectionstrings

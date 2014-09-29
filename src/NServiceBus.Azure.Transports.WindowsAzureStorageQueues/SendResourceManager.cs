@@ -6,9 +6,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     
     public class SendResourceManager : IEnlistmentNotification
     {
-        private readonly CloudQueue queue;
-        private readonly CloudQueueMessage message;
-        readonly TimeSpan? timeToBeReceived;
+        CloudQueue queue;
+        CloudQueueMessage message;
+        TimeSpan? timeToBeReceived;
 
         public SendResourceManager(CloudQueue queue, CloudQueueMessage message, TimeSpan? timeToBeReceived)
         {
@@ -25,6 +25,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         public void Commit(Enlistment enlistment)
         {
             queue.AddMessage(message, timeToBeReceived);
+
             enlistment.Done();
         }
 

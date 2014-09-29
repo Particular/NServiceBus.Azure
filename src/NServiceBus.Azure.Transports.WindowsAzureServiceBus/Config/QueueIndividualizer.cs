@@ -1,8 +1,9 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System.Globalization;
-  
-    internal class QueueIndividualizer
+    using Support;
+
+    class QueueIndividualizer
     {
         public static string Individualize(string queueName)
         {
@@ -13,14 +14,26 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 var index = parser.ParseIndexFrom(SafeRoleEnvironment.CurrentRoleInstanceId);
 
                 var currentQueue = parser.ParseQueueNameFrom(queueName);
-                if (!currentQueue.EndsWith("-" + index.ToString(CultureInfo.InvariantCulture))) //individualize can be applied multiple times
+                if (!currentQueue.Contains("-" + index.ToString(CultureInfo.InvariantCulture))) //individualize can be applied multiple times, should exlude subqueues
                 {
                     individualQueueName = currentQueue
-                                              + (index > 0 ? "-" : "")
-                                              + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
+                                          + (index > 0 ? "-" : "")
+                                          + (index > 0 ? index.ToString(CultureInfo.InvariantCulture) : "");
+
+                    if (queueName.Contains("@"))
+                        individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
                 }
-                if (queueName.Contains("@"))
-                    individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
+            }
+            else
+            {
+                var currentQueue = parser.ParseQueueNameFrom(queueName);
+                if (!currentQueue.Contains("-" + RuntimeEnvironment.MachineName)) //individualize can be applied multiple times, should exlude subqueues
+                {
+                    individualQueueName = currentQueue + "-" + RuntimeEnvironment.MachineName;
+
+                    if (queueName.Contains("@"))
+                        individualQueueName += "@" + parser.ParseNamespaceFrom(queueName);
+                }
             }
 
             return individualQueueName;

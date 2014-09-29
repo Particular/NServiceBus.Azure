@@ -10,7 +10,8 @@
         [SetUp]
         public void SetUp()
         {
-            When_doing_flr_with_default_settings.X = () => 4;
+            When_doing_flr_with_dtc_on.X = () => 4;
+            When_doing_flr_with_native_transactions.X = () => 4;
         }
     }
 

@@ -1,7 +1,7 @@
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using Microsoft.ServiceBus.Messaging;
+
     /// <summary>
     /// 
     /// </summary>
@@ -10,8 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="address"></param>
         /// <returns></returns>
-        QueueClient Create(Address address);
+        QueueClient Create(QueueDescription description, MessagingFactory factory);
     }
 }

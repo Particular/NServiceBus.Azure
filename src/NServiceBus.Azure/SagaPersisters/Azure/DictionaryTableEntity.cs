@@ -11,7 +11,7 @@
     /// </summary>
     public class DictionaryTableEntity : TableEntity, IDictionary<string, EntityProperty>
     {
-        private IDictionary<string, EntityProperty> properties;
+        IDictionary<string, EntityProperty> properties;
 
         /// <summary>
         /// 

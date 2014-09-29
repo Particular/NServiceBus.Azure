@@ -2,12 +2,21 @@
 {
     using Config;
     using Config.ConfigurationSource;
+    using Settings;
 
-    public class OverrideMaxRetries : IProvideConfiguration<TransportConfig>
+    class OverrideMaxRetries : IProvideConfiguration<TransportConfig>
     {
+        ReadOnlySettings settings;
+
+        public OverrideMaxRetries(ReadOnlySettings settings)
+        {
+            this.settings = settings;
+        }
+
         public TransportConfig GetConfiguration()
         {
-            var source = Configure.ConfigurationSource;
+            var source = settings.Get<IConfigurationSource>();
+            
             var c = source.GetConfiguration<AzureServiceBusQueueConfig>();
             var t = source.GetConfiguration<TransportConfig>();
 

@@ -10,8 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="address"></param>
         /// <returns></returns>
-        TopicClient Create(Address address);
+        TopicClient Create(TopicDescription topic, MessagingFactory factory);
     }
 }

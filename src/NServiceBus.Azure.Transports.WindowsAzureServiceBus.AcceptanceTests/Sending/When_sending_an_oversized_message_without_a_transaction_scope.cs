@@ -2,10 +2,10 @@
 {
     using System;
     using Azure.Transports.WindowsAzureServiceBus;
-    using Config;
-    using Config.ConfigurationSource;
     using EndpointTemplates;
     using AcceptanceTesting;
+    using NServiceBus.Config;
+    using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
 
     public class When_sending_an_oversized_message_without_a_transaction_scope : NServiceBusAcceptanceTest
@@ -18,7 +18,7 @@
             try
             {
                 Scenario.Define(context)
-                   .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.Send(Address.Local, new OversizedRequest())))
+                   .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.SendLocal(new OversizedRequest())))
                    .Run();
             }
             catch (AggregateException ex)

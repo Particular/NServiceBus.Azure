@@ -1,8 +1,8 @@
-using System;
-using System.Runtime.Serialization;
-
 namespace NServiceBus.Hosting
 {
+    using System;
+    using System.Runtime.Serialization;
+
     [Serializable]
     public class UnableToKillProcessException : Exception
     {

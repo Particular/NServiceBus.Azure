@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 {
     using System;
-    using System.Configuration;
     using System.Security.Cryptography;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -11,32 +10,29 @@
     /// </summary>
     public class AzureMessageQueueUtils
     {
-
         public static string GetQueueName(Address address)
         {
-            // The auto queue name generation uses namespaces which includes dots, 
-            // yet dots are not supported in azure storage names
-            // that's why we replace them here.
-
-            var name = address.Queue.Replace('.', '-').ToLowerInvariant();
-
+            var name = SanitizeQueueName(address.Queue.ToLowerInvariant());
+            var guidinput = address.Queue.Replace('.', '-').ToLowerInvariant(); // this string was used in the past to calculate guid, should stay backward compat
+                
             if (name.Length > 63)
             {
-                var nameGuid = DeterministicGuidBuilder(name).ToString();
+                var nameGuid = DeterministicGuidBuilder(guidinput).ToString();
                 name = name.Substring(0, 63 - nameGuid.Length - 1).Trim('-') + "-" + nameGuid;
             }
-
-            if (! IsValidQueueName(name))
-            {
-                throw new ConfigurationErrorsException(string.Format("Invalid Queuename {0}, rules for naming queues can be found at http://msdn.microsoft.com/en-us/library/windowsazure/dd179349.aspx", name));
-            }
-
+            
             return name;
         }
 
-        public static bool IsValidQueueName(string name)
+        static string SanitizeQueueName(string queueName)
         {
-            return new Regex(@"^(?=.{3,63}$)[a-z0-9](-?[a-z0-9])+$").IsMatch(name);
+            //rules for naming queues can be found at http://msdn.microsoft.com/en-us/library/windowsazure/dd179349.aspx"
+
+            var rgx = new Regex(@"[^a-zA-Z0-9\-]");
+            var n = rgx.Replace(queueName, "-"); // this can lead to multiple - occurences in a row
+            var oc = new Regex(@"\-+");
+            n = oc.Replace(n, "-");
+            return n;
         }
 
         static Guid DeterministicGuidBuilder(string input)
@@ -44,8 +40,8 @@
             //use MD5 hash to get a 16-byte hash of the string
             using (var provider = new MD5CryptoServiceProvider())
             {
-                byte[] inputBytes = Encoding.Default.GetBytes(input);
-                byte[] hashBytes = provider.ComputeHash(inputBytes);
+                var inputBytes = Encoding.Default.GetBytes(input);
+                var hashBytes = provider.ComputeHash(inputBytes);
                 //generate a guid from the hash:
                 return new Guid(hashBytes);
             }

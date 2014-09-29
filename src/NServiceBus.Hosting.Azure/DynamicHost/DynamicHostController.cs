@@ -1,82 +1,68 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using NServiceBus.Hosting.Configuration;
-using NServiceBus.Hosting.Profiles;
-
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
-    using Installation;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using Configuration.AdvanceExtensibility;
+    using Profiles;
+    using Unicast;
 
-    public class DynamicHostController : IHost
+    class DynamicHostController : IHost
     {
-        private readonly IConfigureThisEndpoint specifier;
-        private readonly ConfigManager configManager;
-        private readonly ProfileManager profileManager;
+        IConfigureThisEndpoint specifier;
+        ProfileManager profileManager;
 
-        private DynamicEndpointLoader loader;
-        private DynamicEndpointProvisioner provisioner;
-        private DynamicEndpointRunner runner;
-        private DynamicHostMonitor monitor;
-        private List<EndpointToHost> runningServices;
+        DynamicEndpointLoader loader;
+        DynamicEndpointProvisioner provisioner;
+        DynamicEndpointRunner runner;
+        DynamicHostMonitor monitor;
+        List<EndpointToHost> runningServices;
 
-        public DynamicHostController(IConfigureThisEndpoint specifier, string[] requestedProfiles, List<Type> defaultProfiles, string endpointName)
+        public DynamicHostController(IConfigureThisEndpoint specifier, string[] requestedProfiles, List<Type> defaultProfiles)
         {
             this.specifier = specifier;
-            Configure.GetEndpointNameAction = (Func<string>)(() => endpointName);
-
+            
             var assembliesToScan = new List<Assembly> {GetType().Assembly};
 
-            profileManager = new ProfileManager(assembliesToScan, specifier, requestedProfiles, defaultProfiles);
-            configManager = new ConfigManager(assembliesToScan, specifier);
-
+            profileManager = new ProfileManager(assembliesToScan, requestedProfiles, defaultProfiles);
         }
 
         public void Start()
         {
-            if (specifier is IWantCustomInitialization)
+            DynamicHostControllerConfig configSection = null;
+
+            var o = new BusConfiguration();
+            o.AssembliesToScan(GetType().Assembly);
+            o.AzureConfigurationSource();
+            o.RegisterComponents(Configurer =>
             {
-                try
-                {
-                   (specifier as IWantCustomInitialization).Init();
-                }
-                catch (NullReferenceException ex)
-                {
-                    throw new NullReferenceException("NServiceBus has detected a null reference in your initalization code." +
-                        " This could be due to trying to use NServiceBus.Configure before it was ready." +
-                        " One possible solution is to inherit from IWantCustomInitialization in a different class" +
-                        " than the one that inherits from IConfigureThisEndpoint, and put your code there.", ex);
-                }
-            }
+                Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
+                Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);
+                Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
+                Configurer.ConfigureComponent<DynamicHostMonitor>(DependencyLifecycle.SingleInstance);
 
-            if (!Configure.WithHasBeenCalled())
-                Configure.With(GetType().Assembly);
+                configSection = o.GetSettings().GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
 
-            if (!Configure.BuilderIsConfigured())
-                Configure.Instance.DefaultBuilder();
+                Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.ConnectionString, configSection.ConnectionString);
+                Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.Container, configSection.Container);
+                Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.LocalResource, configSection.LocalResource);
+                Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
+                Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
+                Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.TimeToWaitUntilProcessIsKilled, configSection.TimeToWaitUntilProcessIsKilled);
+                Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
+            });
 
-            Configure.Instance.AzureConfigurationSource();
-            Configure.Instance.Configurer.ConfigureComponent<DynamicEndpointLoader>(DependencyLifecycle.SingleInstance);
-            Configure.Instance.Configurer.ConfigureComponent<DynamicEndpointProvisioner>(DependencyLifecycle.SingleInstance);
-            Configure.Instance.Configurer.ConfigureComponent<DynamicEndpointRunner>(DependencyLifecycle.SingleInstance);
-            Configure.Instance.Configurer.ConfigureComponent<DynamicHostMonitor>(DependencyLifecycle.SingleInstance);
+            o.UsePersistence<AzureStoragePersistence>();
+            o.DiscardFailedMessagesInsteadOfSendingToErrorQueue();
 
-            var configSection = Configure.GetConfigSection<DynamicHostControllerConfig>() ?? new DynamicHostControllerConfig();
+            profileManager.ActivateProfileHandlers(o);
+            specifier.Customize(o);
 
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.ConnectionString, configSection.ConnectionString);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointLoader>(t => t.Container, configSection.Container);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.LocalResource, configSection.LocalResource);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointProvisioner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.RecycleRoleOnError, configSection.RecycleRoleOnError);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicEndpointRunner>(t => t.TimeToWaitUntilProcessIsKilled, configSection.TimeToWaitUntilProcessIsKilled);
-            Configure.Instance.Configurer.ConfigureProperty<DynamicHostMonitor>(t => t.Interval, configSection.UpdateInterval);
+            var bus = (UnicastBus)Bus.Create(o);
 
-            configManager.ConfigureCustomInitAndStartup();
-            profileManager.ActivateProfileHandlers();
-
-            loader = Configure.Instance.Builder.Build<DynamicEndpointLoader>();
-            provisioner = Configure.Instance.Builder.Build<DynamicEndpointProvisioner>();
-            runner = Configure.Instance.Builder.Build<DynamicEndpointRunner>();
+            loader = bus.Builder.Build<DynamicEndpointLoader>();
+            provisioner = bus.Builder.Build<DynamicEndpointProvisioner>();
+            runner = bus.Builder.Build<DynamicEndpointRunner>();
 
             var endpointsToHost = loader.LoadEndpoints();
             if (endpointsToHost == null) return;
@@ -86,11 +72,10 @@ namespace NServiceBus.Hosting
             provisioner.Provision(runningServices);
 
             runner.Start(runningServices);
-            
 
             if (!configSection.AutoUpdate) return;
 
-            monitor = Configure.Instance.Builder.Build<DynamicHostMonitor>();
+            monitor = bus.Builder.Build<DynamicHostMonitor>();
             monitor.UpdatedEndpoints += UpdatedEndpoints;
             monitor.NewEndpoints += NewEndpoints;
             monitor.RemovedEndpoints += RemovedEndpoints;
@@ -107,7 +92,7 @@ namespace NServiceBus.Hosting
                 runner.Stop(runningServices);
         }
 
-        public void Install<TEnvironment>(string username) where TEnvironment : IEnvironment
+        public void Install(string username)
         {
             //todo -yves
         }

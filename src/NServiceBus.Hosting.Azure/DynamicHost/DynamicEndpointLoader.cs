@@ -1,18 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.WindowsAzure;
-
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 
-    internal class DynamicEndpointLoader
+    class DynamicEndpointLoader
     {
-        private CloudBlobClient client;
-        
-
+        CloudBlobClient client;
         public string ConnectionString { get; set; }
         public string Container { get; set; }
 

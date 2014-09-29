@@ -1,7 +1,7 @@
-using System.Configuration;
-
 namespace NServiceBus.Config
 {
+    using System.Configuration;
+
     public class AzureSubscriptionStorageConfig : ConfigurationSection
     {
         [ConfigurationProperty("ConnectionString", IsRequired = false, DefaultValue = "UseDevelopmentStorage=true")]
@@ -43,6 +43,5 @@ namespace NServiceBus.Config
                 this["TableName"] = value;
             }
         }
-
     }
 }

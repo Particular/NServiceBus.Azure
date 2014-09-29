@@ -1,39 +1,26 @@
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using NServiceBus.Transports;
-    using Settings;
+    using Microsoft.ServiceBus.Messaging;
 
-    public class AzureServicebusQueueClientCreator : ICreateQueueClients
+    class AzureServicebusQueueClientCreator : ICreateQueueClients
     {
-        readonly ICreateQueues queueCreator;
-        readonly ICreateMessagingFactories createMessagingFactories;
+        Configure config;
 
-        public int MaxRetries { get; set; }
-
-        public AzureServicebusQueueClientCreator(ICreateQueues queueCreator, ICreateMessagingFactories createMessagingFactories)
+        public AzureServicebusQueueClientCreator(Configure config)
         {
-            this.queueCreator = queueCreator;
-            this.createMessagingFactories = createMessagingFactories;
+            this.config = config;
         }
 
-        public QueueClient Create(Address address)
+        public QueueClient Create(QueueDescription description, MessagingFactory factory)
         {
-            if (QueueAutoCreation.ShouldAutoCreate)
-            {
-                queueCreator.CreateQueueIfNecessary(address, null);
-            }
-
-            var factory = createMessagingFactories.Create(address.Machine);
-            var client = factory.CreateQueueClient(address.Queue, ShouldRetry() ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
+            var client = factory.CreateQueueClient(description.Path, ShouldRetry() ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
             client.PrefetchCount = 100; // todo make configurable
             return client;
         }
 
         bool ShouldRetry()
         {
-            return (bool) SettingsHolder.Get("Transactions.Enabled");
+            return (bool)config.Settings.Get("Transactions.Enabled");
         }
     }
 }

@@ -1,40 +1,45 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using System.Collections.Generic;
+    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Transports;
+    using Transports;
 
-    public class AzureServicebusTopicCreator : ICreateTopics
+    class AzureServicebusTopicCreator : ICreateTopics
     {
-        readonly ICreateNamespaceManagers createNamespaceManagers;
+        ICreateNamespaceManagers createNamespaceManagers;
+        Configure config;
+
+        static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
+        static object TopicExistenceLock = new Object();
 
         public bool EnablePartitioning { get; set; }
 
-        public AzureServicebusTopicCreator() : this(new CreatesNamespaceManagers())
-        {
-        }
-
-        public AzureServicebusTopicCreator(ICreateNamespaceManagers createNamespaceManagers)
+        public AzureServicebusTopicCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
             this.createNamespaceManagers = createNamespaceManagers;
+            this.config = config;
         }
 
-        public void Create(Address address)
+        public TopicDescription Create(Address address)
         {
             var topicName = address.Queue;
             var namespaceclient = createNamespaceManagers.Create(address.Machine);
+            var description = new TopicDescription(topicName)
+            {
+                // todo: add the other settings from a separate config section? Or same as queue section?
+                EnablePartitioning = EnablePartitioning
+            };
+
             try
             {
-                
-                if (!namespaceclient.TopicExists(topicName))
+                if (config.CreateQueues())
                 {
-                    var description = new TopicDescription(topicName)
+                    if (!TopicExists(namespaceclient, topicName))
                     {
-                        // todo: add the other settings from a separate config section? Or same as queue section?
-                        EnablePartitioning = EnablePartitioning
-                    };
-
-                    namespaceclient.CreateTopic(description);
+                        namespaceclient.CreateTopic(description);
+                    }
                 }
             }
             catch (MessagingEntityAlreadyExistsException)
@@ -45,15 +50,32 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 // there is a chance that the timeout occurs, but the queue is created still
                 // check for this
-                if (!namespaceclient.QueueExists(topicName))
+                if (!TopicExists(namespaceclient, topicName))
                     throw;
             }
+
+            return description;
         }
 
-        public void CreateIfNecessary(Address address)
+        bool TopicExists(NamespaceManager namespaceClient, string topicpath)
         {
-            Create(address);
+            var key = topicpath;
+            bool exists;
+            if (!rememberTopicExistence.ContainsKey(key))
+            {
+                lock (TopicExistenceLock)
+                {
+                    exists = namespaceClient.TopicExists(key);
+                    rememberTopicExistence[key] = exists;
+                }
+            }
+            else
+            {
+                exists = rememberTopicExistence[key];
+            }
 
+            return exists;
         }
+
     }
 }

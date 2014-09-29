@@ -1,9 +1,6 @@
-using System;
-using System.Threading;
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+<<<<<<< HEAD
     using Logging;
 
     /// <summary>
@@ -17,22 +14,28 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         private Action<BrokeredMessage> tryProcessMessage;
         private bool cancelRequested;
         Action<Exception> errorProcessingMessage;
+=======
+    using System;
+    using System.Threading;
+    using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Logging;
 
-        /// <summary>
-        /// 
-        /// </summary>
+    class AzureServiceBusSubscriptionNotifier : INotifyReceivedBrokeredMessages
+    {
+        Action<BrokeredMessage> tryProcessMessage;
+        Action<Exception> errorProcessingMessage;
+        bool cancelRequested;
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusSubscriptionNotifier));
+>>>>>>> release-6.0.0
+
         public int ServerWaitTime { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public int BatchSize { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public int BackoffTimeInSeconds { get; set; }
+        public SubscriptionClient SubscriptionClient { get; set; }
+        public Type MessageType { get; set; }
+        public Address Address { get; set; }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -50,30 +53,28 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="tryProcessMessage"></param>
         /// <param name="errorProcessingMessage"></param>
         public void Start(Address address, Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
+=======
+        public void Start(Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
+>>>>>>> release-6.0.0
         {
             cancelRequested = false;
 
             this.tryProcessMessage = tryProcessMessage;
             this.errorProcessingMessage = errorProcessingMessage;
 
-            subscriptionClient = SubscriptionClientCreator.Create(address, EventType);
-
-            if (subscriptionClient != null) subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Stop()
         {
             cancelRequested = true;
         }
 
-        private void OnMessage(IAsyncResult ar)
+        void OnMessage(IAsyncResult ar)
         {
             try
             {
-                var receivedMessages = subscriptionClient.EndReceiveBatch(ar);
+                var receivedMessages = SubscriptionClient.EndReceiveBatch(ar);
 
                 if (cancelRequested) return;
 
@@ -84,12 +85,20 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             catch (TimeoutException ex)
             {
+<<<<<<< HEAD
                 logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", subscriptionClient.Name), ex);
+=======
+                logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", SubscriptionClient.Name), ex);
+>>>>>>> release-6.0.0
                 // time's up, just continue and retry
             }
             catch (UnauthorizedAccessException ex)
             {
+<<<<<<< HEAD
                 logger.Fatal(string.Format("Unauthorized Access Exception occured on subscription {0}", subscriptionClient.Name), ex);
+=======
+                logger.Fatal(string.Format("Unauthorized Access Exception occured on subscription {0}", SubscriptionClient.Name), ex);
+>>>>>>> release-6.0.0
 
                 // errorProcessingMessage(ex);
                 // return
@@ -104,13 +113,21 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 if (!ex.IsTransient && !RetriableReceiveExceptionHandling.IsRetryable(ex))
                 {
+<<<<<<< HEAD
                     logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+=======
+                    logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", SubscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+>>>>>>> release-6.0.0
 
                     errorProcessingMessage(ex);
                 }
                 else
                 {
+<<<<<<< HEAD
                     logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", subscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+=======
+                    logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", SubscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+>>>>>>> release-6.0.0
                 }
 
 
@@ -120,7 +137,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             finally
             {
+<<<<<<< HEAD
                 subscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+=======
+                SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+>>>>>>> release-6.0.0
             }
         }
     }

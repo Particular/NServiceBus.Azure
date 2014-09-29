@@ -1,7 +1,6 @@
-using System;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using MessageInterfaces;
@@ -10,21 +9,19 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using Unicast.Routing;
     using Unicast.Transport;
 
-    public class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
+    class AzureServiceBusTopicSubscriptionManager : IManageSubscriptions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public ICreateSubscriptions SubscriptionCreator { get; set; }
-
+        Configure config;
+        ITopology topology;
         public IMessageMapper MessageMapper { get; set; }
         public StaticMessageRouter MessageRouter { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="eventType"></param>
-        /// <param name="original"></param>
+        public AzureServiceBusTopicSubscriptionManager(Configure config, ITopology topology)
+        {
+            this.config = config;
+            this.topology = topology;
+        }
+
         public void Subscribe(Type eventType, Address original)
         {
             if (original == null)
@@ -43,11 +40,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void SubscribeInternal(Type eventType, Address original)
         {
-            var publisherAddress = AzureServiceBusPublisherAddressConventionForSubscriptions.Apply(original);
-           
             // resolving manually as the bus also gets the subscription manager injected
             // but this is the only way to get to the correct dequeue strategy
-            var bus = Configure.Instance.Builder.Build<UnicastBus>();
+            var bus = config.Builder.Build<UnicastBus>();
             var transport = bus.Transport as TransportReceiver;
             if (transport == null)
             {
@@ -61,16 +56,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     "AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
             }
 
-            var notifier = Configure.Instance.Builder.Build<AzureServiceBusSubscriptionNotifier>();
-            notifier.EventType = eventType;
-            strategy.TrackNotifier(publisherAddress, notifier);
+            var notifier = topology.Subscribe(eventType, original);
+            strategy.TrackNotifier(eventType, original, notifier);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="eventType"></param>
-        /// <param name="original"></param>
         public void Unsubscribe(Type eventType, Address original)
         {
             if (original == null)
@@ -89,14 +78,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void UnSubscribeInternal(Type eventType, Address original)
         {
-            var publisherAddress = AzureServiceBusPublisherAddressConvention.Apply(original);
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(eventType);
-
-            SubscriptionCreator.Delete(publisherAddress, subscriptionname);
-
             // resolving manually as the bus also gets the subscription manager injected
             // but this is the only way to get to the correct dequeue strategy
-            var bus = Configure.Instance.Builder.Build<UnicastBus>();
+            var bus = config.Builder.Build<UnicastBus>();
             var transport = bus.Transport as TransportReceiver;
             if (transport == null)
             {
@@ -110,7 +94,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     "AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
             }
 
-            strategy.RemoveNotifier(publisherAddress);
+            var notifier = strategy.GetNotifier(eventType, original);
+
+            topology.Unsubscribe(notifier);
+
+            strategy.RemoveNotifier(eventType, original);
         }
 
         /// <summary>

@@ -1,10 +1,12 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.Practices.ServiceLocation;
-
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
+<<<<<<< HEAD
     using System.Linq;
+=======
+    using System;
+    using System.Collections.Generic;
+    using Microsoft.Practices.ServiceLocation;
+>>>>>>> release-6.0.0
 
     /// <summary>
     /// Plugs into the generic service locator to return an instance of <see cref="GenericHost"/>.

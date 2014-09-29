@@ -1,19 +1,17 @@
-using NServiceBus.Integration.Azure;
-
 namespace NServiceBus
 {
+    using NServiceBus.Integration.Azure;
+
     public static class ConfigureAzureIntegration
     {
-        public static Configure AzureConfigurationSource(this Configure config)
+        public static void AzureConfigurationSource(this BusConfiguration config, string configurationPrefix = null)
         {
-            return AzureConfigurationSource(config, string.Empty);
-        }
-
-        public static Configure AzureConfigurationSource(this Configure config, string configurationPrefix)
-        {
-            var azureConfigSource = new AzureConfigurationSource(new AzureConfigurationSettings());
-            azureConfigSource.ConfigurationPrefix = configurationPrefix;
-            return config.CustomConfigurationSource(azureConfigSource);
+            var azureConfigSource = new AzureConfigurationSource(new AzureConfigurationSettings())
+            {
+                ConfigurationPrefix = configurationPrefix
+            };
+            
+            config.CustomConfigurationSource(azureConfigSource);
         }
     }
 }

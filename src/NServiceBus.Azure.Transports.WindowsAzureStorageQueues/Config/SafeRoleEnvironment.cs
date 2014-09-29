@@ -5,7 +5,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     using System.IO;
     using System.Reflection;
 
-    [DebuggerNonUserCode] 
+    [DebuggerNonUserCode]
     public static class SafeRoleEnvironment
     {
         static bool isAvailable = true;
@@ -13,44 +13,37 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         static Type roleInstanceType;
         static Type roleType;
         static Type localResourceType;
-       
+
         static SafeRoleEnvironment()
         {
             try
             {
                 TryLoadRoleEnvironment();
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(ex.StackTrace);
-
-                    inner = inner.InnerException;
-                }
-                throw;
+                isAvailable = false;
             }
-            
+
         }
 
-        public static bool IsAvailable {
+        public static bool IsAvailable
+        {
             get
             {
                 return isAvailable;
             }
         }
 
-        public static string CurrentRoleInstanceId {
+        public static string CurrentRoleInstanceId
+        {
             get
             {
                 if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this property!");
 
                 var instance = roleEnvironmentType.GetProperty("CurrentRoleInstance").GetValue(null, null);
-                return (string) roleInstanceType.GetProperty("Id").GetValue(instance, null);
-            } 
+                return (string)roleInstanceType.GetProperty("Id").GetValue(instance, null);
+            }
         }
 
         public static string DeploymentId
@@ -59,7 +52,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             {
                 if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this property!");
 
-                return (string) roleEnvironmentType.GetProperty("DeploymentId").GetValue(null, null);
+                return (string)roleEnvironmentType.GetProperty("DeploymentId").GetValue(null, null);
             }
         }
         public static string CurrentRoleName
@@ -70,7 +63,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
                 var instance = roleEnvironmentType.GetProperty("CurrentRoleInstance").GetValue(null, null);
                 var role = roleInstanceType.GetProperty("Role").GetValue(instance, null);
-                return (string) roleType.GetProperty("Name").GetValue(role, null);
+                return (string)roleType.GetProperty("Name").GetValue(role, null);
             }
         }
 
@@ -78,7 +71,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         {
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
-            return (string) roleEnvironmentType.GetMethod("GetConfigurationSettingValue").Invoke(null, new object[] { name });
+            return (string)roleEnvironmentType.GetMethod("GetConfigurationSettingValue").Invoke(null, new object[] { name });
         }
 
         public static bool TryGetConfigurationSettingValue(string name, out string setting)
@@ -86,25 +79,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
             setting = string.Empty;
-            var result = false;
+            bool result;
             try
             {
                 setting = (string)roleEnvironmentType.GetMethod("GetConfigurationSettingValue").Invoke(null, new object[] { name });
                 result = !string.IsNullOrEmpty(setting);
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    if (inner.GetType().Name.Contains("RoleEnvironmentException"))
-                        return result;
-
-                    inner = inner.InnerException;
-                }
-
-                throw;
+                result = false;
             }
 
             return result;
@@ -123,13 +106,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             var o = roleEnvironmentType.GetMethod("GetLocalResource").Invoke(null, new object[] { name });
             return (string)localResourceType.GetProperty("RootPath").GetValue(o, null);
-            }
+        }
 
         public static bool TryGetRootPath(string name, out string path)
         {
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
-            var result = false;
+            bool result;
             path = string.Empty;
 
             try
@@ -137,19 +120,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 path = GetRootPath(name);
                 result = path != null;
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    if (inner.GetType().Name.Contains("RoleEnvironmentException"))
-                        return result;
-
-                    inner = inner.InnerException;
-                }
-
-                throw;
+                result = false;
             }
 
             return result;
@@ -162,7 +135,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             TryGetRoleEnvironmentTypes(serviceRuntimeAssembly);
             if (!isAvailable) return;
-            
+
             isAvailable = IsAvailableInternal();
 
         }
@@ -188,14 +161,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             {
                 return (bool)roleEnvironmentType.GetProperty("IsAvailable").GetValue(null, null);
             }
-            catch (TypeInitializationException ex)
+            catch
             {
-                var e = ex.InnerException;
-                if (e is FileNotFoundException && e.Message.Contains("msshrtmi"))
-                {
-                    return false;
-                }
-                throw;
+                return false;
             }
         }
 

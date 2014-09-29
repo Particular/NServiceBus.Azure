@@ -4,15 +4,24 @@
     using Config;
     using Settings;
 
-    public class DeterminesBestConnectionStringForAzureServiceBus
+    class DeterminesBestConnectionStringForAzureServiceBus
     {
-        public string Determine()
+        string defaultconnectionString;
+
+        public DeterminesBestConnectionStringForAzureServiceBus(string defaultconnectionString)
         {
-            var configSection = Configure.GetConfigSection<AzureServiceBusQueueConfig>();
+            this.defaultconnectionString = defaultconnectionString;
+        }
+
+        public string Determine(ReadOnlySettings settings)
+        {
+            var configSection = settings.GetConfigSection<AzureServiceBusQueueConfig>();
             var connectionString = configSection != null ? configSection.ConnectionString : string.Empty;
 
             if (string.IsNullOrEmpty(connectionString))
-                connectionString = SettingsHolder.Get<string>("NServiceBus.Transport.ConnectionString");
+            {
+                connectionString = defaultconnectionString;
+            }
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.IssuerKey) && !string.IsNullOrEmpty(configSection.ServiceNamespace))
                 connectionString = string.Format("Endpoint=sb://{0}.servicebus.windows.net/;SharedSecretIssuer=owner;SharedSecretValue={1}", configSection.ServiceNamespace, configSection.IssuerKey);
@@ -30,7 +39,7 @@
             return potentialConnectionString.StartsWith("Endpoint=sb://");
         }
 
-        public string Determine(Address replyToAddress)
+        public string Determine(ReadOnlySettings settings, Address replyToAddress)
         {
             if (IsPotentialServiceBusConnectionString(replyToAddress.Machine))
             {
@@ -39,9 +48,11 @@
             else
             {
                 var replyQueue = replyToAddress.Queue;
-                var @namespace = Determine();
+                var @namespace = Determine(settings); //todo: inject
                 return replyQueue + "@" + @namespace;
             }
         }
+
     }
+
 }

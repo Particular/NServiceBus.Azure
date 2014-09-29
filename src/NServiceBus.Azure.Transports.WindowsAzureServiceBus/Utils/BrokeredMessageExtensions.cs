@@ -1,21 +1,12 @@
-using System;
-using System.Transactions;
-using Microsoft.ServiceBus.Messaging;
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using Logging;
+    using System;
+    using System.Transactions;
+    using Microsoft.ServiceBus.Messaging;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class BrokeredMessageExtensions
+    static class BrokeredMessageExtensions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <returns></returns>
         public static bool SafeComplete(this BrokeredMessage msg)
         {
             try
@@ -53,11 +44,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             return false;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <returns></returns>
         public static bool SafeAbandon(this BrokeredMessage msg)
         {
             try

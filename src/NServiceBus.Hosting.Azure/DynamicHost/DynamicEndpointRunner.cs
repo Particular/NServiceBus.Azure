@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using NServiceBus.Logging;
-
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using NServiceBus.Logging;
     using System.Linq;
     using Config;
 
-    internal class DynamicEndpointRunner
+    class DynamicEndpointRunner
     {
-        private readonly ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
+        ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 
         public bool RecycleRoleOnError { get; set; }
 
@@ -31,7 +30,11 @@ namespace NServiceBus.Hosting
                                                    CreateNoWindow = true,
                                                    RedirectStandardInput = true,
                                                    RedirectStandardOutput = true,
+<<<<<<< HEAD
                                                    RedirectStandardError = true
+=======
+                                                   RedirectStandardError  = true
+>>>>>>> release-6.0.0
                                                };
                     
                     var process = new Process {StartInfo = processStartInfo, EnableRaisingEvents = true};
@@ -59,6 +62,10 @@ namespace NServiceBus.Hosting
 
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
+<<<<<<< HEAD
+=======
+                    
+>>>>>>> release-6.0.0
                 }
                 catch (Exception e)
                 {

@@ -44,7 +44,7 @@
         {
             get
             {
-                return this.CreateQuery<Subscription>(SubscriptionTableName);
+                return CreateQuery<Subscription>(SubscriptionTableName);
             }
         }
 

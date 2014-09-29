@@ -1,15 +1,14 @@
-using System;
-using System.Collections.Generic;
-using NServiceBus.Config;
-
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// A windows implementation of the NServiceBus hosting solution
     /// </summary>
     public class WindowsHost : MarshalByRefObject
     {
-        private readonly GenericHost genericHost;
+        GenericHost genericHost;
 
         /// <summary>
         /// Accepts the type which will specify the users custom configuration.
@@ -24,9 +23,13 @@ namespace NServiceBus.Hosting.Azure.HostProcess
 
             Program.EndpointId = Program.GetEndpointId(specifier);
 
+<<<<<<< HEAD
             args = AddProfilesFromConfiguration(args);
 
             genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) }, Program.EndpointId, scannableAssembliesFullName);
+=======
+            genericHost = new GenericHost(specifier, args, new List<Type> { typeof(Development) });
+>>>>>>> release-6.0.0
         }
 
         /// <summary>
@@ -46,19 +49,6 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         }
 
 
-        private static string[] AddProfilesFromConfiguration(IEnumerable<string> args)
-        {
-            var list = new List<string>(args);
-
-            var configSection = Configure.GetConfigSection<AzureProfileConfig>();
-
-            if (configSection != null)
-            {
-                var configuredProfiles = configSection.Profiles.Split(',');
-                Array.ForEach(configuredProfiles, s => list.Add(s.Trim()));
-            }
-
-            return list.ToArray();
-        }
+        
     }
 }

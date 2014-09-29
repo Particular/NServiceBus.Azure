@@ -1,7 +1,6 @@
-using System.Configuration;
-
 namespace NServiceBus.Config
 {
+    using System.Configuration;
     /// <summary>
     /// 
     /// </summary>
@@ -56,8 +55,5 @@ namespace NServiceBus.Config
             get { return (string)this["PartitionKeyScope"]; }
             set { this["PartitionKeyScope"] = value; }
         }
-
-        
-        
     }
 }

@@ -1,26 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Transactions;
-using Microsoft.ServiceBus.Messaging;
-
-
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
+<<<<<<< HEAD
     using Logging;
     using NServiceBus.Transports;
     using Settings;
+=======
+    using System;
+    using System.Threading;
+    using Microsoft.ServiceBus.Messaging;
+>>>>>>> release-6.0.0
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class AzureServiceBusTopicPublisher : IPublishMessages
+    class AzureServiceBusTopicPublisher : IPublishBrokeredMessages
     {
+<<<<<<< HEAD
         ILog logger = LogManager.GetLogger(typeof(AzureServiceBusTopicPublisher));
+=======
+        public TopicClient TopicClient { get; set; }
+>>>>>>> release-6.0.0
 
         public const int DefaultBackoffTimeInSeconds = 10;
         public int MaxDeliveryCount { get; set; }
 
+<<<<<<< HEAD
         public ICreateTopicClients TopicClientCreator { get; set; }
 
         private static readonly Dictionary<string, TopicClient> senders = new Dictionary<string, TopicClient>();
@@ -42,6 +43,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         // todo, factor out... to bad IMessageSender is internal
         private void Send(TransportMessage message, TopicClient sender)
+=======
+        public void Publish(BrokeredMessage brokeredMessage)
+>>>>>>> release-6.0.0
         {
             var numRetries = 0;
             var sent = false;
@@ -50,7 +54,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    SendTo(message, sender);
+                    TopicClient.Send(brokeredMessage);
+                   
                     sent = true;
                 }
                 // todo, outbox
@@ -118,68 +123,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
                 }
             }
-        }
-
-        // todo, factor out... to bad IMessageSender is internal
-        private void SendTo(TransportMessage message, TopicClient sender)
-        {
-            using (var brokeredMessage = message.Body != null ? new BrokeredMessage(message.Body) : new BrokeredMessage())
-            {
-                brokeredMessage.CorrelationId = message.CorrelationId;
-                if (message.TimeToBeReceived < TimeSpan.MaxValue) brokeredMessage.TimeToLive = message.TimeToBeReceived;
-
-                foreach (var header in message.Headers)
-                {
-                    brokeredMessage.Properties[header.Key] = header.Value;
-                }
-
-                brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
-                brokeredMessage.MessageId = message.Id;
-                
-                if (message.ReplyToAddress != null)
-                {
-                    brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus().Determine(message.ReplyToAddress);
-                }
-
-                if (message.TimeToBeReceived < TimeSpan.MaxValue)
-                {
-                    brokeredMessage.TimeToLive = message.TimeToBeReceived;
-                }
-
-                sender.Send(brokeredMessage);
-                
-            }
-        }
-
-        // todo, factor out...
-        private TopicClient GetTopicClientForDestination(Address destination)
-        {
-            var key = destination.ToString();
-            TopicClient sender;
-            if (!senders.TryGetValue(key, out sender))
-            {
-                lock (SenderLock)
-                {
-                    if (!senders.TryGetValue(key, out sender))
-                    {
-                        try
-                        {
-                            sender = TopicClientCreator.Create(destination);
-                            senders[key] = sender;
-                        }
-                        catch (MessagingEntityNotFoundException)
-                        {
-                            // TopicNotFoundException?
-                            //throw new QueueNotFoundException { Queue = Address.Parse(destination) };
-                        }
-                        catch (MessagingEntityAlreadyExistsException)
-                        {
-                            // is ok.
-                        }
-                    }
-                }
-            }
-            return sender;
         }
     }
 }

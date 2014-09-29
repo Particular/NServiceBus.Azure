@@ -6,22 +6,23 @@ namespace NServiceBus
 
     public static class SetLoggingLibraryForAzure
     {
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.TraceLogger()")]
         public static Configure ConsoleLogger(this Configure config)
         {
-            LogManager.LoggerFactory = new ConsoleLoggerFactory();
-            return config;
+            throw new InvalidOperationException();
         }
 
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.TraceLogger()")]
         public static Configure TraceLogger(this Configure config)
         {
-            LogManager.LoggerFactory = new TraceLoggerFactory();
-            return config;
+            throw new InvalidOperationException();
         }
 
-        [ObsoleteEx(RemoveInVersion = "6.0", TreatAsErrorFromVersion = "5.0", Replacement = "TraceLogger")] 
-        public static Configure AzureDiagnosticsLogger(this Configure config, bool enable = true, bool initialize = true)
+// ReSharper disable UnusedParameter.Global
+        public static void TraceLogger(this BusConfiguration config)
+// ReSharper restore UnusedParameter.Global
         {
-            throw new NotSupportedException("Azure Diagnostics Logger is not supported anymore, setup logging using the .wadcfg file and use TraceLogger instead.");
+            LogManager.UseFactory(new TraceLoggerFactory());
         }
     }
 

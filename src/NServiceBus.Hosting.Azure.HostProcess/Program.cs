@@ -1,21 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using NServiceBus.Hosting.Helpers;
-using Topshelf;
-using Topshelf.Configuration;
-using Topshelf.Internal;
-
-namespace NServiceBus.Hosting.Azure.HostProcess
+﻿namespace NServiceBus.Hosting.Azure.HostProcess
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using NServiceBus.Hosting.Helpers;
+    using Topshelf;
+    using Topshelf.Configuration;
+    using Topshelf.Internal;
+
     class Program
     {
+<<<<<<< HEAD
         static List<Assembly> scannedAssemblies;
 
         private static void Main(string[] args)
+=======
+        static void Main(string[] args)
+>>>>>>> release-6.0.0
         {
             var commandLineArguments = Parser.ParseArgs(args);
             var arguments = new HostArguments(commandLineArguments);
@@ -100,7 +104,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
             Runner.Host(cfg, args);
         }
 
-        private static void DisplayHelpContent()
+        static void DisplayHelpContent()
         {
             try
             {
@@ -124,12 +128,12 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         /// </summary>
         public static string EndpointId { get; set; }
 
-        private static void SetHostServiceLocatorArgs(string[] args)
+        static void SetHostServiceLocatorArgs(string[] args)
         {
             HostServiceLocator.Args = args;
         }
 
-        private static void AssertThatEndpointConfigurationTypeHasDefaultConstructor(Type type)
+        static void AssertThatEndpointConfigurationTypeHasDefaultConstructor(Type type)
         {
             var constructor = type.GetConstructor(Type.EmptyTypes);
 
@@ -137,7 +141,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
                 throw new InvalidOperationException("Endpoint configuration type needs to have a default constructor: " + type.FullName);
         }
 
-        private static string GetEndpointConfigurationFile(Type endpointConfigurationType)
+        static string GetEndpointConfigurationFile(Type endpointConfigurationType)
         {
             return Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
@@ -155,7 +159,7 @@ namespace NServiceBus.Hosting.Azure.HostProcess
             return string.Format("{0}_v{1}", endpointName, endpointConfiguration.GetType().Assembly.GetName().Version);
         }
 
-        private static Type GetEndpointConfigurationType(HostArguments arguments)
+        static Type GetEndpointConfigurationType(HostArguments arguments)
         {
             if (arguments.EndpointConfigurationType != null)
             {
@@ -164,7 +168,10 @@ namespace NServiceBus.Hosting.Azure.HostProcess
                 {
                     var endpointType = Type.GetType(t, false);
                     if (endpointType == null)
-                        throw new ConfigurationErrorsException(string.Format("Command line argument 'endpointConfigurationType' has specified to use the type '{0}' but that type could not be loaded.", t));
+                    {
+                        var message = string.Format("Command line argument 'endpointConfigurationType' has specified to use the type '{0}' but that type could not be loaded.", t);
+                        throw new ConfigurationErrorsException(message);
+                    }
 
                     return endpointType;
                 }
@@ -175,7 +182,10 @@ namespace NServiceBus.Hosting.Azure.HostProcess
             {
                 var endpointType = Type.GetType(endpoint, false);
                 if (endpointType == null)
-                    throw new ConfigurationErrorsException(string.Format("The 'EndpointConfigurationType' entry in the NServiceBus.Host.exe.config has specified to use the type '{0}' but that type could not be loaded.", endpoint));
+                {
+                    var message = string.Format("The 'EndpointConfigurationType' entry in the NServiceBus.Host.exe.config has specified to use the type '{0}' but that type could not be loaded.", endpoint);
+                    throw new ConfigurationErrorsException(message);
+                }
 
                 return endpointType;
             }
@@ -187,8 +197,9 @@ namespace NServiceBus.Hosting.Azure.HostProcess
             return endpoints.First();
         }
 
-        private static IEnumerable<Type> ScanAssembliesForEndpoints()
+        static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
+<<<<<<< HEAD
             if (scannedAssemblies == null)
             {
                 var assemblyScanner = new AssemblyScanner
@@ -210,14 +221,30 @@ namespace NServiceBus.Hosting.Azure.HostProcess
                 {
                     yield return type;
                 }
+=======
+            var assemblyScanner = new AssemblyScanner
+            {
+                ThrowExceptions = false
+            };
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
+            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
+
+            return assemblyScanner.GetScannableAssemblies()
+                .Assemblies
+                .SelectMany(assembly => assembly.GetTypes().Where(
+                t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
+                     && t != typeof(IConfigureThisEndpoint)
+                     && !t.IsAbstract));
+>>>>>>> release-6.0.0
         }
 
-        private static void ValidateEndpoints(IEnumerable<Type> endpointConfigurationTypes)
+        static void ValidateEndpoints(IEnumerable<Type> endpointConfigurationTypes)
         {
             if (endpointConfigurationTypes.Count() == 0)
             {
-                throw new InvalidOperationException("No endpoint configuration found in scanned assemlies. " +
-                                                    "This usually happens when NServiceBus fails to load your assembly contaning IConfigureThisEndpoint." +
+                throw new InvalidOperationException("No endpoint configuration found in scanned assemblies. " +
+                                                    "This usually happens when NServiceBus fails to load your assembly containing IConfigureThisEndpoint." +
                                                     " Try specifying the type explicitly in the NServiceBus.Host.exe.config using the appsetting key: EndpointConfigurationType, " +
                                                     "Scanned path: " + AppDomain.CurrentDomain.BaseDirectory);
             }

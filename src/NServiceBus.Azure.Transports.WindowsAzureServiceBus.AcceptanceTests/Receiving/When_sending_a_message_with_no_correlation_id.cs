@@ -1,10 +1,10 @@
 ﻿namespace NServiceBus.AcceptanceTests.WindowsAzureServiceBus
 {
     using System;
-    using Config;
-    using Config.ConfigurationSource;
     using EndpointTemplates;
     using AcceptanceTesting;
+    using NServiceBus.Config;
+    using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
 
     public class When_a_handler_fails_to_process_a_message : NServiceBusAcceptanceTest
@@ -15,7 +15,8 @@
             var context = new Context();
 
             Scenario.Define(context)
-                    .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.Send(Address.Local, new MyRequest())))
+                    .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.SendLocal(new MyRequest())))
+                    .AllowExceptions()
                     .Done(c => c.ReceivedAgain)
                     .Run();
         }
@@ -30,9 +31,7 @@
         {
             public MyEndpoint()
             {
-                EndpointSetup<DefaultServer>()
-                    .AllowExceptions()
-                    ;
+                EndpointSetup<DefaultServer>();
             }
 
             public class SettingLockDurationLargerThanTestTimeout : IProvideConfiguration<AzureServiceBusQueueConfig>

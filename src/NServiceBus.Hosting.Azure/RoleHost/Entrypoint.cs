@@ -1,14 +1,14 @@
-using NServiceBus.Config;
-using NServiceBus.Hosting.Helpers;
-using NServiceBus.Integration.Azure;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-
 namespace NServiceBus.Hosting.Azure
 {
+    using NServiceBus.Config;
+    using NServiceBus.Hosting.Helpers;
+    using NServiceBus.Integration.Azure;
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.Diagnostics;
+
     public class NServiceBusRoleEntrypoint
     {
         const string ProfileSetting = "AzureProfileConfig.Profiles";
@@ -28,26 +28,21 @@ namespace NServiceBus.Hosting.Azure
 
             var specifier = (IConfigureThisEndpoint)Activator.CreateInstance(endpointConfigurationType);
 
-            var endpointName = SafeRoleEnvironment.IsAvailable
-                ? SafeRoleEnvironment.CurrentRoleName
-                : GetType().Name;
-
             if (specifier is AsA_Host)
             {
-                host = new DynamicHostController(specifier, requestedProfiles, new List<Type> { typeof(Development) },
-                    endpointName);
+                host = new DynamicHostController(specifier, requestedProfiles, new List<Type> { typeof(Development) });
             }
             else
             {
                 host = new GenericHost(specifier, requestedProfiles,
-                    new List<Type> { typeof(Development) }, endpointName);
+                    new List<Type> { typeof(Development) });
             }
 
         }
 
         static void CurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Trace.WriteLine("Unhandled exception occured: " + e.ExceptionObject.ToString());
+            Trace.WriteLine("Unhandled exception occured: " + e.ExceptionObject);
         }
 
         public void Start()
@@ -105,7 +100,10 @@ namespace NServiceBus.Hosting.Azure
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner();
+            var assemblyScanner = new AssemblyScanner
+            {
+                ThrowExceptions = false
+            };
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
             assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(NServiceBusRoleEntrypoint).Assembly);
@@ -122,7 +120,7 @@ namespace NServiceBus.Hosting.Azure
             var count = endpointConfigurationTypes.Count();
             if (count == 0)
             {
-                throw new InvalidOperationException("No endpoint configuration found in scanned assemlies. " +
+                throw new InvalidOperationException("No endpoint configuration found in scanned assemblies. " +
                                                     "This usually happens when NServiceBus fails to load your assembly containing IConfigureThisEndpoint." +
                                                     " Try specifying the type explicitly in the roles config using the appsetting key: EndpointConfigurationType, " +
                                                     "Scanned path: " + AppDomain.CurrentDomain.BaseDirectory);
@@ -146,7 +144,7 @@ namespace NServiceBus.Hosting.Azure
         {
             var list = new List<string>(args);
 
-            var configSection = Configure.GetConfigSection<AzureProfileConfig>();
+            var configSection = ConfigurationManager.GetSection("AzureProfileConfig") as AzureProfileConfig;
 
             if (configSection != null)
             {

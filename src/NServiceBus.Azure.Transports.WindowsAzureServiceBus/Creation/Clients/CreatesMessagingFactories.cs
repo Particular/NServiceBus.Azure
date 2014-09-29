@@ -1,35 +1,37 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using Microsoft.ServiceBus.Messaging;
 
-    public class CreatesMessagingFactories : ICreateMessagingFactories
+    class CreatesMessagingFactories : ICreateMessagingFactories
     {
-        private static readonly Dictionary<string, MessagingFactory> MessagingFactories = new Dictionary<string, MessagingFactory>();
+        ICreateNamespaceManagers createNamespaceManagers;
+        ConcurrentDictionary<string, MessagingFactory> MessagingFactories = new ConcurrentDictionary<string, MessagingFactory>();
 
-        private static readonly object FactoryLock = new Object();
-
-        public MessagingFactory Create(string potentialConnectionString)
+        public CreatesMessagingFactories(ICreateNamespaceManagers createNamespaceManagers)
         {
-            var validation = new DeterminesBestConnectionStringForAzureServiceBus();
-            var connectionstring = validation.IsPotentialServiceBusConnectionString(potentialConnectionString)
-                                     ? potentialConnectionString
-                                     : validation.Determine();
+            this.createNamespaceManagers = createNamespaceManagers;
+        }
 
-            MessagingFactory factory;
-            if (!MessagingFactories.TryGetValue(connectionstring, out factory))
+        public MessagingFactory Create(Address address)
+        {
+            return MessagingFactories.GetOrAdd(address.ToString(), s =>
             {
-                lock (FactoryLock)
+                var potentialConnectionString = address.Machine;
+                var namespaceManager = createNamespaceManagers.Create(potentialConnectionString);
+
+                var settings = new MessagingFactorySettings
                 {
-                    if (!MessagingFactories.TryGetValue(connectionstring, out factory))
+                    TokenProvider = namespaceManager.Settings.TokenProvider,
+                    NetMessagingTransportSettings =
                     {
-                        factory = MessagingFactory.CreateFromConnectionString(connectionstring);
-                        MessagingFactories[connectionstring] = factory;
+                        BatchFlushInterval = TimeSpan.FromSeconds(0.1)
                     }
-                }
-            }
-            return factory;
+                };
+                return MessagingFactory.Create(namespaceManager.Address, settings);
+            });
+       
         }
     }
 }

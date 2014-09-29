@@ -1,5 +1,6 @@
 namespace NServiceBus.DataBus.Azure.BlobStorage
 {
+    using System.Globalization;
     using Logging;
     using System;
     using System.IO;
@@ -40,12 +41,13 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
             var blob = container.GetBlockBlobReference(Path.Combine(BasePath, key));
             if (timeToBeReceived != TimeSpan.MaxValue)
             {
-                blob.Metadata["ValidUntil"] = (DateTime.Now + timeToBeReceived).ToString();
+                blob.Metadata["ValidUntil"] = (DateTime.UtcNow + timeToBeReceived).ToString();
             }
             else
             {
                 blob.Metadata["ValidUntil"] = TimeSpan.MaxValue.ToString();
             }
+            blob.Metadata["ValidUntilKind"] = "Utc";
             UploadBlobInParallel(blob, stream);
             return key;
         }
@@ -78,8 +80,16 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
 
                     blockBlob.FetchAttributes();
                     DateTime validUntil;
-                    DateTime.TryParse(blockBlob.Metadata["ValidUntil"], out validUntil);
-                    if (validUntil == default(DateTime) || validUntil < DateTime.Now)
+                    var style = DateTimeStyles.AssumeUniversal;
+
+                    if (!blockBlob.Metadata.ContainsKey("ValidUntilKind"))
+                    {
+                        style = DateTimeStyles.AdjustToUniversal;
+                    }
+                    
+                    DateTime.TryParse(blockBlob.Metadata["ValidUntil"], null, style, out validUntil);
+
+                    if (validUntil == default(DateTime) || validUntil < DateTime.UtcNow)
                         blockBlob.DeleteIfExists();
                 }
             }

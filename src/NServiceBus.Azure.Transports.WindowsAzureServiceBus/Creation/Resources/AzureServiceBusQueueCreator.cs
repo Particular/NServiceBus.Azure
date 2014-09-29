@@ -1,10 +1,11 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using System.Collections.Generic;
+    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Transports;
 
-    public class AzureServiceBusQueueCreator : ICreateQueues
+    class AzureServiceBusQueueCreator : Transports.ICreateQueues
     {
         public TimeSpan LockDuration { get; set; }
         public long MaxSizeInMegabytes { get; set; }
@@ -17,43 +18,47 @@
         public bool EnableBatchedOperations { get; set; }
         public bool EnablePartitioning { get; set; }
 
-        readonly ICreateNamespaceManagers createNamespaceManagers;
+        ICreateNamespaceManagers createNamespaceManagers;
+        Configure config;
 
-        public AzureServiceBusQueueCreator() : this(new CreatesNamespaceManagers())
-        {
-        }
+        static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
+        static object ExistenceLock = new Object();
 
-        public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers)
+        public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
             this.createNamespaceManagers = createNamespaceManagers;
+            this.config = config;
         }
 
-        public void Create(Address address)
+        public QueueDescription Create(Address address)
         {
             var queueName = address.Queue;
             var path = "";
             var namespaceClient = createNamespaceManagers.Create(address.Machine);
+
+            var description = new QueueDescription(queueName)
+            {
+                LockDuration = LockDuration,
+                MaxSizeInMegabytes = MaxSizeInMegabytes,
+                RequiresDuplicateDetection = RequiresDuplicateDetection,
+                RequiresSession = RequiresSession,
+                DefaultMessageTimeToLive = DefaultMessageTimeToLive,
+                EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
+                DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
+                MaxDeliveryCount = MaxDeliveryCount,
+                EnableBatchedOperations = EnableBatchedOperations,
+                EnablePartitioning = EnablePartitioning
+            };
+
             try
             {
-
-                var description = new QueueDescription(queueName)
+                if (config.CreateQueues())
                 {
-                    LockDuration = LockDuration,
-                    MaxSizeInMegabytes = MaxSizeInMegabytes,
-                    RequiresDuplicateDetection = RequiresDuplicateDetection,
-                    RequiresSession = RequiresSession,
-                    DefaultMessageTimeToLive = DefaultMessageTimeToLive,
-                    EnableDeadLetteringOnMessageExpiration = EnableDeadLetteringOnMessageExpiration,
-                    DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
-                    MaxDeliveryCount = MaxDeliveryCount,
-                    EnableBatchedOperations = EnableBatchedOperations,
-                    EnablePartitioning = EnablePartitioning
-                };
-
-                path = description.Path;
-                if (!namespaceClient.QueueExists(path))
-                {
-                    namespaceClient.CreateQueue(description);
+                    path = description.Path;
+                    if (!Exists(namespaceClient, path))
+                    {
+                        namespaceClient.CreateQueue(description);
+                    }
                 }
             }
             catch (MessagingEntityAlreadyExistsException)
@@ -64,15 +69,32 @@
             {
                 // there is a chance that the timeout occurs, but the queue is created still
                 // check for this
-                if (!namespaceClient.QueueExists(path))
+                if (!Exists(namespaceClient, path))
                     throw;
             }
+
+            return description;
         }
 
-        public void CreateQueueIfNecessary(Address address, string account)
+        bool Exists(NamespaceManager namespaceClient, string path)
         {
-            Create(address);
-        }
-    }
+            var key = path;
+            bool exists;
+            if (!rememberExistence.ContainsKey(key))
+            {
+                lock (ExistenceLock)
+                {
+                    exists = namespaceClient.QueueExists(key);
+                    rememberExistence[key] = exists;
+                }
+            }
+            else
+            {
+                exists = rememberExistence[key];
+            }
 
+            return exists;
+        }
+
+    }
 }

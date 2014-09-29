@@ -1,5 +1,7 @@
-namespace NServiceBus.Transports
+namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.Transports
 {
+    using Microsoft.ServiceBus.Messaging;
+
     /// <summary>
     /// 
     /// </summary>
@@ -10,6 +12,6 @@ namespace NServiceBus.Transports
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        void CreateIfNecessary(Address address);
+        TopicDescription Create(Address address);
     }
 }

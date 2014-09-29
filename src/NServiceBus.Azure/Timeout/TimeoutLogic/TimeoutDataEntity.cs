@@ -1,7 +1,6 @@
-using System;
-
 namespace NServiceBus.Azure
 {
+    using System;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
 
     public class TimeoutDataEntity : TableServiceEntity
@@ -32,11 +31,6 @@ namespace NServiceBus.Azure
         /// The time at which the saga ID expired.
         /// </summary>
         public DateTime Time { get; set; }
-
-        /// <summary>
-        /// The correlation id
-        /// </summary>
-        public string CorrelationId { get; set; }
 
         /// <summary>
         /// The timeout manager that owns this particular timeout

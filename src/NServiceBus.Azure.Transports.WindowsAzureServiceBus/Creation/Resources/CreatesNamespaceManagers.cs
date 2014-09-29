@@ -1,35 +1,32 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using Microsoft.ServiceBus;
     using Support;
 
-    public class CreatesNamespaceManagers : ICreateNamespaceManagers
+    class CreatesNamespaceManagers : ICreateNamespaceManagers
     {
-        private static readonly Dictionary<string, NamespaceManager> NamespaceManagers = new Dictionary<string, NamespaceManager>();
+        Configure config;
 
-        private static readonly object NamespaceLock = new Object();
+        ConcurrentDictionary<string, NamespaceManager> NamespaceManagers = new ConcurrentDictionary<string, NamespaceManager>();
+
+        public CreatesNamespaceManagers(Configure config)
+        {
+            this.config = config;
+        }
 
         public NamespaceManager Create(string potentialConnectionstring)
         {
-            var connectionstring = potentialConnectionstring != RuntimeEnvironment.MachineName
-                                      ? potentialConnectionstring
-                                      : new DeterminesBestConnectionStringForAzureServiceBus().Determine();
-
-            NamespaceManager manager;
-            if (!NamespaceManagers.TryGetValue(connectionstring, out manager))
+            return NamespaceManagers.GetOrAdd(potentialConnectionstring, s =>
             {
-                lock (NamespaceLock)
-                {
-                    if (!NamespaceManagers.TryGetValue(connectionstring, out manager))
-                    {
-                        manager = NamespaceManager.CreateFromConnectionString(connectionstring);
-                        NamespaceManagers[connectionstring] = manager;
-                    }
-                }
-            }
-            return manager;
+                var connectionStringParser = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString());
+                var connectionstring = s != RuntimeEnvironment.MachineName && connectionStringParser.IsPotentialServiceBusConnectionString(s)
+                    ? s
+                    : connectionStringParser.Determine(config.Settings);
+
+               return NamespaceManager.CreateFromConnectionString(connectionstring);
+            });
+       
         }
     }
 }

@@ -1,10 +1,11 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using Microsoft.ServiceBus.Messaging;
 
     public interface ICreateSubscriptions
     {
-        void Create(Address topic, Type eventType, string subscriptionname);
+        SubscriptionDescription Create(Address topic, Type eventType, string subscriptionname);
         void Delete(Address topic, string subscriptionname);
     }
 }

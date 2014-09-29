@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-
 namespace NServiceBus.Hosting
 {
-    public class EndpointsEventArgs : EventArgs
+    using System;
+    using System.Collections.Generic;
+
+    class EndpointsEventArgs : EventArgs
     {
         public IEnumerable<EndpointToHost> Endpoints { get; set; }
     }

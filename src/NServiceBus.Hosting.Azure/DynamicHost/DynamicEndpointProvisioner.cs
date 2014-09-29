@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using NServiceBus.Logging;
-
-namespace NServiceBus.Hosting
+namespace NServiceBus.Hosting.Azure
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using NServiceBus.Logging;
     using Config;
 
-    internal class DynamicEndpointProvisioner
+    class DynamicEndpointProvisioner
     {
         public string LocalResource { get; set; }
 
-        private readonly ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
+        ILog logger = LogManager.GetLogger(typeof(DynamicEndpointRunner));
 
         public bool RecycleRoleOnError { get; set; }
 
@@ -19,7 +18,7 @@ namespace NServiceBus.Hosting
         {
             try
             {
-                string localResource = SafeRoleEnvironment.GetRootPath(LocalResource);
+                var localResource = SafeRoleEnvironment.GetRootPath(LocalResource);
 
                 foreach (var endpoint in endpoints)
                 {

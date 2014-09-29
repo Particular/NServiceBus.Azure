@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.Azure.QuickTests
 {
     using System;
-    using Azure.Transports.WindowsAzureServiceBus;
+    using Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint;
     using NUnit.Framework;
 
     [TestFixture]
@@ -9,9 +9,9 @@
     public class When_determining_subscription_names
     {
         [Test]
-        public void Should_not_exceed_fifthy_characters_and_replace_by_a_deterministic_guid()
+        public void Should_not_exceed_50_characters_and_replace_by_a_deterministic_guid()
         {
-            var subscriptionname = AzureServiceBusSubscriptionNamingConvention.Apply(typeof(SomeEventWithAnInsanelyLongName));
+            var subscriptionname = NamingConventions.SubscriptionNamingConvention(null, typeof(SomeEventWithAnInsanelyLongName), "Should_not_exceed_50_characters_and_replace_by_a_deterministic_guid");
 
             Guid guid;
             Assert.IsTrue(Guid.TryParse(subscriptionname, out guid));

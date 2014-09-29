@@ -20,18 +20,9 @@ namespace NServiceBus.Config
             {
                 TryLoadRoleEnvironment();
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(ex.StackTrace);
-
-                    inner = inner.InnerException;
-                }
-                throw;
+                isAvailable = false;
             }
             
         }
@@ -86,25 +77,15 @@ namespace NServiceBus.Config
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
             setting = string.Empty;
-            var result = false;
+            bool result;
             try
             {
                 setting = (string)roleEnvironmentType.GetMethod("GetConfigurationSettingValue").Invoke(null, new object[] { name });
                 result = !string.IsNullOrEmpty(setting);
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    if (inner.GetType().Name.Contains("RoleEnvironmentException"))
-                        return result;
-
-                    inner = inner.InnerException;
-                }
-
-                throw;
+                result = false;
             }
 
             return result;
@@ -129,7 +110,7 @@ namespace NServiceBus.Config
         {
             if (!IsAvailable) throw new RoleEnvironmentUnavailableException("Role environment is not available, please check IsAvailable before calling this method!");
 
-            var result = false;
+            bool result;
             path = string.Empty;
 
             try
@@ -137,19 +118,9 @@ namespace NServiceBus.Config
                 path = GetRootPath(name);
                 result = path != null;
             }
-            catch (Exception ex)
+            catch
             {
-                var inner = ex;
-
-                while (inner != null)
-                {
-                    if (inner.GetType().Name.Contains("RoleEnvironmentException"))
-                        return result;
-
-                    inner = inner.InnerException;
-                }
-
-                throw;
+                result = false;
             }
 
             return result;
@@ -188,14 +159,9 @@ namespace NServiceBus.Config
             {
                 return (bool)roleEnvironmentType.GetProperty("IsAvailable").GetValue(null, null);
             }
-            catch (TypeInitializationException ex)
+            catch 
             {
-                var e = ex.InnerException;
-                if (e is FileNotFoundException && e.Message.Contains("msshrtmi"))
-                {
-                    return false;
-                }
-                throw;
+                return false;
             }
         }
 

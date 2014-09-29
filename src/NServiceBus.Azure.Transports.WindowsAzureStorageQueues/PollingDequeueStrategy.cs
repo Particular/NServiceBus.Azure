@@ -14,11 +14,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     /// A polling implementation of <see cref="IDequeueMessages"/>.
     /// </summary>
     public class PollingDequeueStrategy : IDequeueMessages
-    {  
-        /// <summary>
-        /// See <see cref="AzureMessageQueueReceiver"/>.
-        /// </summary>
-        public AzureMessageQueueReceiver MessageReceiver { get; set; }
+    {
+        AzureMessageQueueReceiver messageReceiver;
+
+        public PollingDequeueStrategy(AzureMessageQueueReceiver messageReceiver, CriticalError criticalError)
+        {
+            this.messageReceiver = messageReceiver;
+            circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => criticalError.Raise(string.Format("Failed to receive message from Azure Storage Queue."), ex));
+        }
 
         /// <summary>
         /// Initializes the <see cref="IDequeueMessages"/>.
@@ -36,7 +39,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             settings = transactionSettings;
             transactionOptions = new TransactionOptions { IsolationLevel = transactionSettings.IsolationLevel, Timeout = transactionSettings.TransactionTimeout };
 
-            MessageReceiver.Init(addressToPoll, settings.IsTransactional);
+            messageReceiver.Init(addressToPoll, settings.IsTransactional);
         }
 
         /// <summary>
@@ -47,7 +50,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         {
             tokenSource = new CancellationTokenSource();
 
-            for (int i = 0; i < maximumConcurrencyLevel; i++)
+            for (var i = 0; i < maximumConcurrencyLevel; i++)
             {
                 StartThread();
             }
@@ -71,7 +74,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     {
                         t.Exception.Handle(ex =>
                             {
-                                circuitBreaker.Execute(() => Configure.Instance.RaiseCriticalError(string.Format("Failed to receive message from '{0}'.", MessageReceiver), ex));
+                                circuitBreaker.Failure(ex);
                                 return true;
                             });
 
@@ -79,7 +82,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        private void Action(object obj)
+        void Action(object obj)
         {
             var cancellationToken = (CancellationToken)obj;
 
@@ -94,7 +97,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     {
                         using (var scope = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
                         {
-                            message = MessageReceiver.Receive();
+                            message = messageReceiver.Receive();
 
                             if (message != null)
                             {
@@ -107,13 +110,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                     }
                     else
                     {
-                        message = MessageReceiver.Receive();
+                        message = messageReceiver.Receive();
 
                         if (message != null)
                         {
                             tryProcessMessage(message);
                         }
                     }
+
+                    circuitBreaker.Success();
                 }
                 catch (EnvelopeDeserializationFailed ex)
                 {
@@ -129,12 +134,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 }
                 finally
                 {
-                    endProcessMessage(message, exception);
+                    if (!cancellationToken.IsCancellationRequested && (message != null || exception != null))
+                    {
+                        endProcessMessage(message, exception);
+                    }
                 }
             }
         }
 
-        readonly CircuitBreaker circuitBreaker = new CircuitBreaker(100, TimeSpan.FromSeconds(30));
+        RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
         Func<TransportMessage, bool> tryProcessMessage;
         CancellationTokenSource tokenSource;
         Address addressToPoll;
