@@ -1,5 +1,6 @@
 namespace NServiceBus.Hosting.Azure.HostProcess
 {
+    using System.Linq;
     using System;
     using System.Collections.Generic;
     using Microsoft.Practices.ServiceLocation;
@@ -23,7 +24,11 @@ namespace NServiceBus.Hosting.Azure.HostProcess
         protected override object DoGetInstance(Type serviceType, string key)
         {
             var endpoint = Type.GetType(key,true);
-            return new WindowsHost(endpoint, Args);
+
+            var scannableString = Args.First(a => a.StartsWith("/scannedAssemblies="));
+            var scannableAssembliesFullName = scannableString.Replace("/scannedAssemblies=","").Split(';');
+
+            return new WindowsHost(endpoint, Args, scannableAssembliesFullName);
         }
 
         /// <summary>

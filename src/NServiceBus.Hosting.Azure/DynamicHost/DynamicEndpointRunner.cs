@@ -30,7 +30,7 @@ namespace NServiceBus.Hosting.Azure
                                                    CreateNoWindow = true,
                                                    RedirectStandardInput = true,
                                                    RedirectStandardOutput = true,
-                                                   RedirectStandardError  = true
+                                                   RedirectStandardError = true
                                                };
                     
                     var process = new Process {StartInfo = processStartInfo, EnableRaisingEvents = true};
@@ -58,7 +58,6 @@ namespace NServiceBus.Hosting.Azure
 
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
-                    
                 }
                 catch (Exception e)
                 {

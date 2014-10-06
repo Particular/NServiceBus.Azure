@@ -49,6 +49,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             catch (TimeoutException ex)
             {
+
                 logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", SubscriptionClient.Name), ex);
                 // time's up, just continue and retry
             }

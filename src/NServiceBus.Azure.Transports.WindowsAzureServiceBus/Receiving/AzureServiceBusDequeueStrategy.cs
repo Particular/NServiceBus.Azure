@@ -285,12 +285,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             return key;
         }
-
         void ErrorDequeueingBatch(Exception ex)
         {
             criticalError.Raise("Fatal messaging exception occured on the broker while dequeueing batch.", ex);
         }
     }
-
-
 }

@@ -13,6 +13,8 @@
 
     class Program
     {
+        static List<Assembly> scannedAssemblies;
+
         static void Main(string[] args)
         {
             var commandLineArguments = Parser.ParseArgs(args);
@@ -34,6 +36,9 @@
             var endpointConfiguration = Activator.CreateInstance(endpointConfigurationType);
 
             EndpointId = GetEndpointId(endpointConfiguration);
+
+            var assemblylist = string.Join(";", scannedAssemblies.Select((s => s.ToString())));
+            args = args.Concat(new[]{String.Format(@"/scannedAssemblies={0}", assemblylist)}).ToArray();
 
             AppDomain.CurrentDomain.SetupInformation.AppDomainInitializerArguments = args;
 
@@ -190,20 +195,25 @@
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner
+            if (scannedAssemblies == null)
             {
-                ThrowExceptions = false
-            };
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
+                var assemblyScanner = new AssemblyScanner
+                {
+                    ThrowExceptions = false
+                };
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(Program).Assembly);
 
-            return assemblyScanner.GetScannableAssemblies()
-                .Assemblies
+                scannedAssemblies = assemblyScanner.GetScannableAssemblies().Assemblies;
+            }
+
+            return scannedAssemblies
                 .SelectMany(assembly => assembly.GetTypes().Where(
                 t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
                      && t != typeof(IConfigureThisEndpoint)
                      && !t.IsAbstract));
+          
         }
 
         static void ValidateEndpoints(IEnumerable<Type> endpointConfigurationTypes)
