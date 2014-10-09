@@ -39,14 +39,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         {
             var key = Guid.NewGuid().ToString();
             var blob = container.GetBlockBlobReference(Path.Combine(BasePath, key));
-            if (timeToBeReceived != TimeSpan.MaxValue)
-            {
-                blob.Metadata["ValidUntil"] = (DateTime.UtcNow + timeToBeReceived).ToString();
-            }
-            else
-            {
-                blob.Metadata["ValidUntil"] = TimeSpan.MaxValue.ToString();
-            }
+	        blob.Metadata["ValidUntil"] = (timeToBeReceived == TimeSpan.MaxValue ? DateTime.MaxValue : DateTime.UtcNow + timeToBeReceived).ToString();
             blob.Metadata["ValidUntilKind"] = "Utc";
             UploadBlobInParallel(blob, stream);
             return key;
