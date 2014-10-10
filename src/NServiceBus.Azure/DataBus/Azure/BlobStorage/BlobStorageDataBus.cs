@@ -97,6 +97,9 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
 
         internal static DateTime GetValidUntil(ICloudBlob blockBlob)
         {
+
+
+
             string validUntilString;
             if (!blockBlob.Metadata.TryGetValue("ValidUntil", out validUntilString))
             {
@@ -112,13 +115,13 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
             DateTime validUntil;
             if (!DateTime.TryParse(validUntilString, null, style, out validUntil))
             {
-                //If we cant parse the datetime the assume data corruption and store 
+                //If we cant parse the datetime then assume data corruption and store for max time
                 SetValidUntil(blockBlob, TimeSpan.MaxValue);
                 //upload the changed metadata
                 blockBlob.SetMetadata();
                 return DateTime.MaxValue;
             }
-            return validUntil;
+            return validUntil.ToUniversalTime();
         }
 
         void UploadBlobInParallel(CloudBlockBlob blob, Stream stream)

@@ -50,7 +50,7 @@ class BlobStorageDataBusTests
     {
         var cloudBlob = StubACloudBlob();
         BlobStorageDataBus.SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
-        //HACK: ValidUntil to be a non parsable string
+        //HACK: set ValidUntil to be a non parsable string
         cloudBlob.Metadata["ValidUntil"] = "Not a date time";
         var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob);
         Assert.AreEqual(DateTime.MaxValue, resultValidUntil);
@@ -89,12 +89,9 @@ class BlobStorageDataBusTests
     {
         var cloudBlob = StubACloudBlob();
 
-        BlobStorageDataBus.SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
-        //HACK: clear ValidUntilKind since a legacy value will not have this in the metadata
-        cloudBlob.Metadata.Remove("ValidUntilKind");
-        var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob)
-            //HACK: since a legacy datetime would be localtime
-            .ToLocalTime();
+        //HACK: set ValidUntil to the non UTC legacy value
+        cloudBlob.Metadata["ValidUntil"] = (DateTime.Now + TimeSpan.FromHours(1)).ToString();
+        var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob);
         Assert.That(resultValidUntil, Is.EqualTo(DateTime.Now.AddHours(1))
             .Within(TimeSpan.FromSeconds(10)));
     }
@@ -104,9 +101,8 @@ class BlobStorageDataBusTests
     {
         var cloudBlob = StubACloudBlob();
 
-        BlobStorageDataBus.SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
-        //HACK: clear ValidUntilKind since a legacy value will not have this in the metadata
-        cloudBlob.Metadata.Remove("ValidUntilKind");
+        //HACK: set ValidUntil to the non UTC legacy value
+        cloudBlob.Metadata["ValidUntil"] = (DateTime.Now + TimeSpan.FromHours(1)).ToString();
         var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob);
         Assert.AreEqual(DateTimeKind.Utc, resultValidUntil.Kind);
     }
