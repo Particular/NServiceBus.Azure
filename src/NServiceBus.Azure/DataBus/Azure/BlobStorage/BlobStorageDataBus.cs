@@ -12,7 +12,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
 
     public class BlobStorageDataBus : IDataBus, IDisposable
     {
-        ILog logger = LogManager.GetLogger(typeof(IDataBus));
+        static ILog logger = LogManager.GetLogger(typeof(IDataBus));
         CloudBlobContainer container;
         Timer timer;
         
@@ -39,19 +39,10 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         {
             var key = Guid.NewGuid().ToString();
             var blob = container.GetBlockBlobReference(Path.Combine(BasePath, key));
-            if (timeToBeReceived != TimeSpan.MaxValue)
-            {
-                blob.Metadata["ValidUntil"] = (DateTime.UtcNow + timeToBeReceived).ToString();
-            }
-            else
-            {
-                blob.Metadata["ValidUntil"] = TimeSpan.MaxValue.ToString();
-            }
-            blob.Metadata["ValidUntilKind"] = "Utc";
+            SetValidUntil(blob, timeToBeReceived);
             UploadBlobInParallel(blob, stream);
             return key;
         }
-
         public void Start()
         {
             ServicePointManager.DefaultConnectionLimit = NumberOfIOThreads;
@@ -79,24 +70,55 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
                     if (blockBlob == null) continue;
 
                     blockBlob.FetchAttributes();
-                    DateTime validUntil;
-                    var style = DateTimeStyles.AssumeUniversal;
-
-                    if (!blockBlob.Metadata.ContainsKey("ValidUntilKind"))
+                    var validUntil = GetValidUntil(blockBlob);
+                    if (validUntil < DateTime.UtcNow)
                     {
-                        style = DateTimeStyles.AdjustToUniversal;
-                    }
-                    
-                    DateTime.TryParse(blockBlob.Metadata["ValidUntil"], null, style, out validUntil);
-
-                    if (validUntil == default(DateTime) || validUntil < DateTime.UtcNow)
                         blockBlob.DeleteIfExists();
+                    }
                 }
             }
             catch (StorageException ex) // needs to stay as it runs on a background thread
             {
                 logger.Warn(ex.Message);
             }
+        }
+
+
+        internal static void SetValidUntil(ICloudBlob blob, TimeSpan timeToBeReceived)
+        {
+            if (timeToBeReceived != TimeSpan.MaxValue)
+            {
+                blob.Metadata["ValidUntil"] = (DateTime.UtcNow + timeToBeReceived).ToString();
+                blob.Metadata["ValidUntilKind"] = "Utc";
+            }
+            // else no ValidUntil will be considered it to be non-expiring
+        }
+
+
+        internal static DateTime GetValidUntil(ICloudBlob blockBlob)
+        {
+            string validUntilString;
+            if (!blockBlob.Metadata.TryGetValue("ValidUntil", out validUntilString))
+            {
+                // no ValidUntil will be considered non-expiring which for now equates to DateTime.MaxValue
+                return DateTime.MaxValue;
+            }
+            var style = DateTimeStyles.AssumeUniversal;
+            if (!blockBlob.Metadata.ContainsKey("ValidUntilKind"))
+            {
+                style = DateTimeStyles.AdjustToUniversal;
+            }
+
+            DateTime validUntil;
+            if (!DateTime.TryParse(validUntilString, null, style, out validUntil))
+            {
+                //If we cant parse the datetime the assume data corruption and store 
+                SetValidUntil(blockBlob, TimeSpan.MaxValue);
+                //upload the changed metadata
+                blockBlob.SetMetadata();
+                return DateTime.MaxValue;
+            }
+            return validUntil;
         }
 
         void UploadBlobInParallel(CloudBlockBlob blob, Stream stream)
