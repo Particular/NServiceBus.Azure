@@ -88,8 +88,8 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         {
             if (timeToBeReceived != TimeSpan.MaxValue)
             {
-                blob.Metadata["ValidUntil"] = (DateTime.UtcNow + timeToBeReceived).ToString();
-                blob.Metadata["ValidUntilKind"] = "Utc";
+                var validUntil = DateTime.UtcNow + timeToBeReceived;
+                blob.Metadata["ValidUntilUtc"] = DateTimeExtensions.ToWireFormattedString(validUntil);
             }
             // else no ValidUntil will be considered it to be non-expiring
         }
@@ -97,10 +97,16 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
 
         internal static DateTime GetValidUntil(ICloudBlob blockBlob)
         {
+            string validUntilUtcString;
+            if (blockBlob.Metadata.TryGetValue("ValidUntilUtc", out validUntilUtcString))
+            {
+                return DateTimeExtensions.ToUtcDateTime(validUntilUtcString);
+            }
+
             string validUntilString;
             if (!blockBlob.Metadata.TryGetValue("ValidUntil", out validUntilString))
             {
-                // no ValidUntil will be considered non-expiring which for now equates to DateTime.MaxValue
+                // no ValidUntil and no ValidUntilUtc will be considered non-expiring which for now equates to DateTime.MaxValue
                 return DateTime.MaxValue;
             }
             var style = DateTimeStyles.AssumeUniversal;
@@ -110,8 +116,11 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
             }
 
             DateTime validUntil;
+            //since this is the old version that could be written in any culture we cannot be certain it will parse so need to handle failure
             if (!DateTime.TryParse(validUntilString, null, style, out validUntil))
             {
+                var message = string.Format("Could not parse the 'ValidUntil' value `{0}` for blob {1}. Resetting 'ValidUntil' to not expire. You may consider manually removing this entry if non-expiry is incorrect.", validUntilString, blockBlob.Uri);
+                logger.Error(message);
                 //If we cant parse the datetime then assume data corruption and store for max time
                 SetValidUntil(blockBlob, TimeSpan.MaxValue);
                 //upload the changed metadata

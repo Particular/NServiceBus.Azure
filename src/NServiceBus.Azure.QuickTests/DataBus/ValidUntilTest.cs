@@ -14,7 +14,7 @@ abstract class ValidUntilTest
     {
         var cloudBlob = StubACloudBlob();
 
-        BlobStorageDataBus.SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
+        SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
         var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob);
 
         Assert.That(resultValidUntil, Is.EqualTo(DateTime.UtcNow.AddHours(1))
@@ -22,7 +22,7 @@ abstract class ValidUntilTest
     }
 
     [Test]
-    public void ValidUntil_is_not_corrupt_by_change_in_local()
+    public virtual void ValidUntil_is_not_corrupt_by_change_in_local()
     {
         var currentCulture = Thread.CurrentThread.CurrentCulture;
         try
@@ -45,6 +45,7 @@ abstract class ValidUntilTest
     }
 
     [Test]
+    [Explicit("Should not be possible to have a corrupted value")]
     public void ValidUntil_should_default_to_DateTimeMax_for_corrupted_value()
     {
         var cloudBlob = StubACloudBlob();

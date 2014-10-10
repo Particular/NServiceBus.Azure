@@ -18,4 +18,10 @@ class ValidUntilV3BlobStorageDataBusTests : ValidUntilTest
         }
         cloudBlob.Metadata["ValidUntilKind"] = "Utc";
     }
+
+    [Ignore("no way this can work since we cannot be sure what culture the value was writen in")]
+    public override void ValidUntil_is_not_corrupt_by_change_in_local()
+    {
+        base.ValidUntil_is_not_corrupt_by_change_in_local();
+    }
 }
