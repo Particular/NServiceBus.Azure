@@ -97,9 +97,6 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
 
         internal static DateTime GetValidUntil(ICloudBlob blockBlob)
         {
-
-
-
             string validUntilString;
             if (!blockBlob.Metadata.TryGetValue("ValidUntil", out validUntilString))
             {
