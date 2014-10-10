@@ -85,6 +85,21 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataBus\ValidUntilTest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataBus\ValidUntilV1BlobStorageDataBusTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataBus\ValidUntilV2BlobStorageDataBusTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataBus\ValidUntilV3BlobStorageDataBusTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataBus\ValidUntilV4BlobStorageDataBusTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
     <Compile Include="Transports\ServiceBus\When_creating_subscriptions_on_servicebus_topics.cs" />
     <Compile Include="Hosting\When_killing_processes.cs" />
