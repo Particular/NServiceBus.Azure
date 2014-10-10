@@ -19,7 +19,7 @@ class BlobStorageDataBusTests
         BlobStorageDataBus.SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
         var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob);
 
-        Assert.That(resultValidUntil, Is.EqualTo(DateTime.Now.AddHours(1))
+        Assert.That(resultValidUntil, Is.EqualTo(DateTime.UtcNow.AddHours(1))
             .Within(TimeSpan.FromSeconds(10)));
     }
 
@@ -32,7 +32,7 @@ class BlobStorageDataBusTests
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             var cloudBlob = StubACloudBlob();
             var dateTime = new DateTime(2100, 1, 4, 12, 0, 0);
-            var timeSpan = dateTime - DateTime.Now;
+            var timeSpan = dateTime - DateTime.UtcNow;
             BlobStorageDataBus.SetValidUntil(cloudBlob, timeSpan);
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
             var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob);
@@ -92,7 +92,7 @@ class BlobStorageDataBusTests
         //HACK: set ValidUntil to the non UTC legacy value
         cloudBlob.Metadata["ValidUntil"] = (DateTime.Now + TimeSpan.FromHours(1)).ToString();
         var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob);
-        Assert.That(resultValidUntil, Is.EqualTo(DateTime.Now.AddHours(1))
+        Assert.That(resultValidUntil, Is.EqualTo(DateTime.UtcNow.AddHours(1))
             .Within(TimeSpan.FromSeconds(10)));
     }
 
