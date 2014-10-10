@@ -100,7 +100,7 @@ class BlobStorageDataBusTests
     }
 
     [Test]
-    public void Legacy_ValidUntil_Stil_returns_UtcKind()
+    public void Legacy_ValidUntil_Still_returns_UtcKind()
     {
         var cloudBlob = StubACloudBlob();
 
