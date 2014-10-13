@@ -6,8 +6,6 @@
     using System.Data.Services.Client;
     using System.IO;
     using System.Linq;
-    using System.Security.Cryptography;
-    using System.Text;
     using System.Web.Script.Serialization;
     using Logging;
     using Microsoft.WindowsAzure.Storage;
@@ -90,7 +88,7 @@
 
             string identifier;
             timeout.Headers.TryGetValue(Headers.MessageId, out identifier);
-            if (string.IsNullOrEmpty(identifier)) { identifier = Hash(timeout); }
+            if (string.IsNullOrEmpty(identifier)) { identifier = Guid.NewGuid().ToString(); }
 
             TimeoutDataEntity timeoutDataEntity;
             if (TryGetTimeoutData(context, identifier, string.Empty, out timeoutDataEntity)) return;
@@ -312,20 +310,6 @@
         {
             var blob = container.GetBlockBlobReference(stateAddress);
             blob.DeleteIfExists();
-        }
-
-        static string Hash(TimeoutData timeout)
-        {
-            var s = timeout.SagaId + timeout.Destination.ToString() + timeout.Time.Ticks;
-            var sha1 = SHA1.Create();
-            var bytes = sha1.ComputeHash(Encoding.UTF8.GetBytes(s));
-
-            var hash = new StringBuilder();
-            for (var i = 0; i < bytes.Length; i++)
-            {
-                hash.Append(bytes[i].ToString("X2"));
-            }
-            return hash.ToString();
         }
 
         string GetUniqueEndpointName()
