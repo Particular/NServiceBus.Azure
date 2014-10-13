@@ -81,11 +81,15 @@
         public void Add(TimeoutData timeout)
         {
             var context = new ServiceContext(account.CreateCloudTableClient()){ IgnoreResourceNotFoundException = true};
-            var hash = Hash(timeout);
-            TimeoutDataEntity timeoutDataEntity;
-            if (TryGetTimeoutData(context, hash, string.Empty, out timeoutDataEntity)) return;
+            
+            string identifier;
+            timeout.Headers.TryGetValue(Headers.MessageId, out identifier);
+            if (string.IsNullOrEmpty(identifier)) { identifier = Hash(timeout); }
 
-            var stateAddress = Upload(timeout.State, hash);
+            TimeoutDataEntity timeoutDataEntity;
+            if (TryGetTimeoutData(context, identifier, string.Empty, out timeoutDataEntity)) return;
+
+            var stateAddress = Upload(timeout.State, identifier);
             var headers = Serialize(timeout.Headers);
 
             if (!TryGetTimeoutData(context, timeout.Time.ToString(PartitionKeyScope), stateAddress, out timeoutDataEntity))
