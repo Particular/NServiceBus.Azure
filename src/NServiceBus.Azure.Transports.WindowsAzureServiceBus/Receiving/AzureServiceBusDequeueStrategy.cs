@@ -8,6 +8,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Threading;
     using System.Threading.Tasks;
     using CircuitBreakers;
+    using NServiceBus.Logging;
     using NServiceBus.Transports;
     using Unicast.Transport;
 
@@ -27,6 +28,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
         CancellationTokenSource tokenSource;
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
+
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusDequeueStrategy));
         
         const int PeekInterval = 50;
         const int MaximumWaitTimeWhenIdle = 1000;
@@ -262,7 +265,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             try
             {
-                if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow) { return; }
+                if (brokeredMessage.LockedUntilUtc <= DateTime.UtcNow)
+                {
+                    logger.Warn("Brokered message lock expired, this could be due to multiple reasons. One of the most common is a mismatch between the lock duration, batch size and processing speed of your handlers. This condition can also happen when there is clock skew between the client and the azure servicebus service.");
+
+                    return;
+                }
             }
             catch (InvalidOperationException)
             {
