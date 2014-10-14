@@ -153,8 +153,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                         {
                             tryProcessMessage(transportMessage);
                         }
-
-                        brokeredMessage.SafeComplete(); 
                     }
 
                     circuitBreaker.Success();
