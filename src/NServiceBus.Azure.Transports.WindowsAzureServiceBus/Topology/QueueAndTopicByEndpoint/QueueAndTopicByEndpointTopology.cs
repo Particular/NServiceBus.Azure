@@ -2,6 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Logging;
     using Settings;
     using Transports;
 
@@ -20,6 +21,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         ICreateQueueClients queueClients; 
         ICreateSubscriptionClients subscriptionClients;
         ICreateTopicClients topicClients;
+
+        ILog logger = LogManager.GetLogger(typeof(QueueAndTopicByEndpointTopology));
 
         internal QueueAndTopicByEndpointTopology(
             Configure config, 
@@ -121,13 +124,20 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         public void Create(Address original)
         {
+            logger.InfoFormat("Going to create queue for address '{0}' if needed", original.Queue);
+
             var queue = NamingConventions.QueueAddressConvention(config.Settings, original, false);
             queueCreator.Create(queue);
 
+            logger.InfoFormat("Going to create topic for address '{0}' if needed", original.Queue);
             if (original == config.LocalAddress)
             {
                 var topic = NamingConventions.PublisherAddressConvention(config.Settings, original);
                 topicCreator.Create(topic);
+            }
+            else
+            {
+                logger.InfoFormat("Did not create topic for address  '{0}' as it does not correspond to the local address", original.Queue);
             }
         }
     }

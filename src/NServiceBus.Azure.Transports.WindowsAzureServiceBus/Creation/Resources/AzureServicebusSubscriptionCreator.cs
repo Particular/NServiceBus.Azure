@@ -1,9 +1,10 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Logging;
 
     class AzureServicebusSubscriptionCreator : ICreateSubscriptions
     {
@@ -18,10 +19,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         ICreateNamespaceManagers createNamespaceManagers;
         Configure config;
 
-        static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
-        static Dictionary<string, bool> rememberSubscriptionExistence = new Dictionary<string, bool>();
-        static object TopicExistenceLock = new Object();
-        static object SubscriptionExistenceLock = new Object();
+        static ConcurrentDictionary<string, bool> rememberTopicExistence = new ConcurrentDictionary<string, bool>();
+        static ConcurrentDictionary<string, bool> rememberSubscriptionExistence = new ConcurrentDictionary<string, bool>();
+     
+        ILog logger = LogManager.GetLogger(typeof(AzureServicebusSubscriptionCreator));
 
         public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
@@ -60,7 +61,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     {
                         if (!SubscriptionExists(namespaceClient, topicPath, subscriptionname))
                         {
-
                             if (filter != string.Empty)
                             {
                                 namespaceClient.CreateSubscription(description, new SqlFilter(filter));
@@ -69,18 +69,32 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                             {
                                 namespaceClient.CreateSubscription(description);
                             }
+                            logger.InfoFormat("Subscription '{0}' on topic '{1}' created", description.Name, topicPath);
+                        }
+                        else
+                        {
+                            logger.InfoFormat("Subscription '{0}' on topic '{1}' already exists, skipping creation", description.Name, topicPath);
                         }
                     }
                     catch (MessagingEntityAlreadyExistsException)
                     {
                         // the queue already exists or another node beat us to it, which is ok
+                        logger.InfoFormat("Subscription '{0}' on topic '{1}' already exists, another node probably beat us to it", description.Name, topicPath);
                     }
                     catch (TimeoutException)
                     {
+                        logger.InfoFormat("Timeout occured on creation of subscription '{0}' on topic '{1}', going to validate if it doesn't exists", description.Name, topicPath);
+
                         // there is a chance that the timeout occurs, but the subscription is created still
                         // check for this
                         if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                        {
                             throw;
+                        }
+                        else
+                        {
+                            logger.InfoFormat("Looks like subscription '{0}' on topic '{1}' exists anyway", description.Name, topicPath);
+                        }
                     }
 
                     GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
@@ -120,39 +134,25 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         bool TopicExists(NamespaceManager namespaceClient, string topicpath)
         {
             var key = topicpath;
-            bool exists;
-            if (!rememberTopicExistence.ContainsKey(key))
-            {
-                lock (TopicExistenceLock)
-                {
-                    exists = namespaceClient.TopicExists(key);
-                    rememberTopicExistence[key] = exists;
-                }
-            }
-            else
-            {
-                exists = rememberTopicExistence[key];
-            }
-
+            logger.InfoFormat("Checking existence cache for topic '{0}'", topicpath);
+            var exists = rememberTopicExistence.GetOrAdd(key, s => {
+                    logger.InfoFormat("Checking namespace for existance of the topic '{0}'", topicpath);
+                    return namespaceClient.TopicExists(topicpath);
+            });
+            logger.InfoFormat("Determined that the topic '{0}' {1}", topicpath, exists ? "exists" : "does not exist");
             return exists;
         }
 
         bool SubscriptionExists(NamespaceManager namespaceClient, string topicpath, string subscriptionname)
         {
             var key = topicpath + subscriptionname;
-            bool exists;
-            if (!rememberSubscriptionExistence.ContainsKey(key))
-            {
-                lock (SubscriptionExistenceLock)
-                {
-                    exists = namespaceClient.SubscriptionExists(topicpath, subscriptionname);
-                    rememberSubscriptionExistence[key] = exists;
-                }
-            }
-            else
-            {
-                exists = rememberSubscriptionExistence[key];
-            }
+            logger.InfoFormat("Checking existence cache for subscription '{0}' on topic '{1}'", subscriptionname, topicpath);
+            var exists = rememberSubscriptionExistence.GetOrAdd(key, s => {
+                logger.InfoFormat("Checking namespace for subscription '{0}' on  topic '{1}'", subscriptionname, topicpath);
+                return namespaceClient.SubscriptionExists(topicpath, subscriptionname);
+            });
+           
+            logger.InfoFormat("Determined cache that the subscription '{0}' on topic '{1}' {2}", subscriptionname, topicpath, exists ? "exists" : "does not exist");
 
             return exists;
         }
