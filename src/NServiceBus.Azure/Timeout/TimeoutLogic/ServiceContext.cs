@@ -3,7 +3,6 @@ using System.Linq;
 
 namespace NServiceBus.Azure
 {
-    using Microsoft.WindowsAzure.Storage.Auth;
     using Microsoft.WindowsAzure.Storage.Table;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
 
@@ -20,7 +19,7 @@ namespace NServiceBus.Azure
         {
             get
             {
-                return this.CreateQuery<TimeoutManagerDataEntity>(TimeoutManagerDataTableName);
+                return CreateQuery<TimeoutManagerDataEntity>(TimeoutManagerDataTableName);
             }
         }
 
@@ -30,7 +29,7 @@ namespace NServiceBus.Azure
         {
             get
             {
-                return this.CreateQuery<TimeoutDataEntity>(TimeoutDataTableName);
+                return CreateQuery<TimeoutDataEntity>(TimeoutDataTableName);
             }
         }
 

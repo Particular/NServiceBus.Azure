@@ -12,9 +12,10 @@
     using Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
-    using Support;
+    using Microsoft.WindowsAzure.Storage.Table.DataServices;
     using Timeout.Core;
-    
+    using RuntimeEnvironment = Support.RuntimeEnvironment;
+
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
     {
         public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
@@ -30,20 +31,25 @@
 
             IOrderedEnumerable<TimeoutDataEntity> result;
 
+            IQueryable<TimeoutDataEntity> query;
             if (lastSuccessfulRead.HasValue)
             {
-                result = (from c in context.TimeoutData
-                            where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
-                            && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
-                                && c.OwningTimeoutManager == Configure.EndpointName
-                            select c).ToList().OrderBy(c => c.Time);
+                query = (from c in context.TimeoutData
+                    where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
+                          && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
+                          && c.OwningTimeoutManager == Configure.EndpointName
+                    select c);
             }
             else
             {
-                result = (from c in context.TimeoutData
+                query = (from c in context.TimeoutData
                             where c.OwningTimeoutManager == Configure.EndpointName
-                            select c).ToList().OrderBy(c => c.Time);
+                            select c);
             }
+
+            result = query
+                        .AsTableServiceQuery(context) // fixes issue #191
+                        .ToList().OrderBy(c => c.Time);
 
             var allTimeouts = result.ToList();
             if (allTimeouts.Count == 0)
@@ -182,10 +188,14 @@
         public void RemoveTimeoutBy(Guid sagaId)
         {
             var context = new ServiceContext(account.CreateCloudTableClient());
-            
-            var results = (from c in context.TimeoutData
-                            where c.PartitionKey == sagaId.ToString()
-                            select c).ToList();
+
+            var query = (from c in context.TimeoutData
+                where c.PartitionKey == sagaId.ToString()
+                select c);
+
+            var results = query
+                .AsTableServiceQuery(context) // fixes issue #191
+                .ToList();
 
             foreach (var timeoutDataEntityBySaga in results)
             {
@@ -208,8 +218,9 @@
         private bool TryGetTimeoutData(ServiceContext context, string partitionKey, string rowKey, out TimeoutDataEntity result)
         {
             result = (from c in context.TimeoutData
-                        where c.PartitionKey == partitionKey && c.RowKey == rowKey
+                        where c.PartitionKey == partitionKey && c.RowKey == rowKey // issue #191 cannot occur when both partitionkey and rowkey are specified
                       select c).SafeFirstOrDefault();
+
 
             return result != null;
 
@@ -248,7 +259,6 @@
         void Init(string connectionString)
         {
             account = CloudStorageAccount.Parse(connectionString);
-            var context = new ServiceContext(account.CreateCloudTableClient());
             var tableClient = account.CreateCloudTableClient();
             var table = tableClient.GetTableReference(ServiceContext.TimeoutManagerDataTableName);
             table.CreateIfNotExists();
@@ -335,9 +345,15 @@
 
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)
         {
-            lastSuccessfulReadEntity = (from m in context.TimeoutManagerData
+            var query = (from m in context.TimeoutManagerData
                                             where m.PartitionKey == GetUniqueEndpointName()
-                                        select m).SafeFirstOrDefault();
+                                        select m);
+                                        
+            // fixes issue #191
+            lastSuccessfulReadEntity = query
+                .AsTableServiceQuery(context)
+                .AsEnumerable() //TSQ does only follows continuation tokens for listings, not for single entity results, yet continuation tokes can still happen in this case
+                .SafeFirstOrDefault();
             
             return lastSuccessfulReadEntity != null;
         }
