@@ -108,7 +108,6 @@
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
     <Compile Include="ConfigureAzureIntegration.cs" />
     <Compile Include="DataBus\Azure\BlobStorage\BlobStorageDataBus.cs" />
-    <Compile Include="DataBus\Azure\BlobStorage\Block.cs" />
     <Compile Include="ConfigurationSource\Azure\AzureConfigurationSettings.cs" />
     <Compile Include="ConfigurationSource\Azure\AzureConfigurationSource.cs" />
     <Compile Include="ConfigurationSource\Azure\IAzureConfigurationSettings.cs" />
