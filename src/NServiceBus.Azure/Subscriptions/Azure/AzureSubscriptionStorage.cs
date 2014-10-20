@@ -5,6 +5,7 @@
     using MessageDrivenSubscriptions;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
+    using Microsoft.WindowsAzure.Storage.Table.DataServices;
 
     /// <summary>
     /// 
@@ -60,7 +61,9 @@
                                 where s.PartitionKey == type.ToString() && s.RowKey == encodedAddress
                                 select s;
 
-                    var subscription = query.FirstOrDefault();
+                    var subscription = query.AsTableServiceQuery(context) // Fixes #191
+                                        .AsEnumerable() // Fixes #191, continuation not applied on single resultsets eventhough continuation can happen
+                                        .FirstOrDefault();
                     if(subscription != null) context.DeleteObject(subscription);
                     context.SaveChangesWithRetries();
                 }
@@ -82,7 +85,11 @@
                                 where s.PartitionKey == type.ToString() 
                                 select s;
 
-                    subscribers.AddRange(query.ToList().Select(s => Address.Parse(DecodeFrom64(s.RowKey))));
+                    var result = query
+                        .AsTableServiceQuery(context)
+                        .ToList();
+
+                    subscribers.AddRange(result.Select(s => Address.Parse(DecodeFrom64(s.RowKey))));
                 }
             }
           
