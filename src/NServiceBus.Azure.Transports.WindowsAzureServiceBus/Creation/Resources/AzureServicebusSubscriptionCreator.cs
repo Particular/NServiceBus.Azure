@@ -96,6 +96,18 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                             logger.InfoFormat("Looks like subscription '{0}' on topic '{1}' exists anyway", description.Name, topicPath);
                         }
                     }
+                    catch (MessagingException ex)
+                    {
+                        if (!ex.IsTransient && !CreationExceptionHandling.IsCommon(ex))
+                        {
+                            logger.Fatal(string.Format("{2} {3} occured on subscription creation {0} on topic '{1}'", description.Name, topicPath, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                            throw;
+                        }
+                        else
+                        {
+                            logger.Info(string.Format("{2} {3} occured on subscription creation {0} on topic '{1}'", description.Name, topicPath, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                        }
+                    }
 
                     GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
                 }

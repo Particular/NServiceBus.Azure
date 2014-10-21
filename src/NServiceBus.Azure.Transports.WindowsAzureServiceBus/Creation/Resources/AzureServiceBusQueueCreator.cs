@@ -92,6 +92,18 @@
                     logger.InfoFormat("Looks like queue '{0}' exists anyway", description.Path);
                 }
             }
+            catch (MessagingException ex)
+            {
+                if (!ex.IsTransient && !CreationExceptionHandling.IsCommon(ex))
+                {
+                    logger.Fatal(string.Format("{1} {2} occured on queue creation {0}", description.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                    throw;
+                }
+                else
+                {
+                    logger.Info(string.Format("{1} {2} occured on queue creation {0}", description.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                }
+            }
 
             return description;
         }
