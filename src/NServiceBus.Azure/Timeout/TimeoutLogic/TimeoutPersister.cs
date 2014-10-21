@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Azure
 {
+    using System.Text.RegularExpressions;
     using Config;
     using System;
     using System.Collections.Generic;
@@ -326,7 +327,14 @@
         {
             var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
 
-            return config.Settings.EndpointName() + "_" + identifier;
+            return Sanitize(config.Settings.EndpointName() + "_" + identifier);
+        }
+
+        string Sanitize(string s)
+        {
+            var rgx = new Regex(@"[^a-zA-Z0-9\-_]");
+            var n = rgx.Replace(s, "");
+            return n;
         }
 
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)
