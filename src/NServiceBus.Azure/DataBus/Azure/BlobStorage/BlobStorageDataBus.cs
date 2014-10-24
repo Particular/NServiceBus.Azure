@@ -9,6 +9,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
     using System.Threading;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
     public class BlobStorageDataBus : IDataBus, IDisposable
     {
@@ -17,6 +18,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         Timer timer;
         
         public int MaxRetries { get; set; }
+        public int BackOffInterval { get; set; }
         public int NumberOfIOThreads { get; set; }
         public string BasePath { get; set; }
         public int BlockSize { get; set; }
@@ -133,6 +135,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         void UploadBlobInParallel(CloudBlockBlob blob, Stream stream)
         {
             blob.ServiceClient.ParallelOperationThreadCount = NumberOfIOThreads;
+            container.ServiceClient.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(BackOffInterval), MaxRetries);
             blob.UploadFromStream(stream);
         }
 
@@ -140,6 +143,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         {
             blob.FetchAttributes();
             blob.ServiceClient.ParallelOperationThreadCount = NumberOfIOThreads;
+            container.ServiceClient.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(BackOffInterval), MaxRetries);
             blob.DownloadToStream(stream);
             stream.Seek(0, SeekOrigin.Begin);
         }

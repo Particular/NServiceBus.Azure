@@ -17,6 +17,19 @@ namespace NServiceBus.Config
             }
         }
 
+        [ConfigurationProperty("BackOffInterval", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultBackOffInterval)]
+        public int BackOffInterval
+        {
+            get
+            {
+                return (int)this["BackOffInterval"];
+            }
+            set
+            {
+                this["BackOffInterval"] = value;
+            }
+        }
+
         [ConfigurationProperty("BlockSize", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultBlockSize)]
         public int BlockSize
         {

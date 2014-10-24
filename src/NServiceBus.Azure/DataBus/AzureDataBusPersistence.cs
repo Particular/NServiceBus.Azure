@@ -32,6 +32,7 @@ namespace NServiceBus
             {
                 BasePath = configSection.BasePath,
                 MaxRetries = configSection.MaxRetries,
+                BackOffInterval = configSection.BackOffInterval,
                 NumberOfIOThreads = configSection.NumberOfIOThreads,
                 BlockSize = configSection.BlockSize
             };
