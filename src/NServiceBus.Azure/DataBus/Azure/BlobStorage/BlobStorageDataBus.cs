@@ -22,6 +22,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         public int NumberOfIOThreads { get; set; }
         public string BasePath { get; set; }
         public int BlockSize { get; set; }
+        public long DefaultTTL { get; set; }
 
         public BlobStorageDataBus(CloudBlobContainer container)
         {
@@ -72,7 +73,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
                     if (blockBlob == null) continue;
 
                     blockBlob.FetchAttributes();
-                    var validUntil = GetValidUntil(blockBlob);
+                    var validUntil = GetValidUntil(blockBlob, DefaultTTL);
                     if (validUntil < DateTime.UtcNow)
                     {
                         blockBlob.DeleteIfExists();
@@ -93,23 +94,24 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
                 var validUntil = DateTime.UtcNow + timeToBeReceived;
                 blob.Metadata["ValidUntilUtc"] = DateTimeExtensions.ToWireFormattedString(validUntil);
             }
-            // else no ValidUntil will be considered it to be non-expiring
+            // else no ValidUntil will be considered it to be non-expiring or subject to maximum ttl
         }
 
 
-        internal static DateTime GetValidUntil(ICloudBlob blockBlob)
+        internal static DateTime GetValidUntil(ICloudBlob blockBlob, long defaultTtl = Int64.MaxValue)
         {
             string validUntilUtcString;
             if (blockBlob.Metadata.TryGetValue("ValidUntilUtc", out validUntilUtcString))
             {
                 return DateTimeExtensions.ToUtcDateTime(validUntilUtcString);
+                    
             }
 
             string validUntilString;
             if (!blockBlob.Metadata.TryGetValue("ValidUntil", out validUntilString))
             {
-                // no ValidUntil and no ValidUntilUtc will be considered non-expiring which for now equates to DateTime.MaxValue
-                return DateTime.MaxValue;
+                // no ValidUntil and no ValidUntilUtc will be considered non-expiring or whatever default ttl is set
+                return ToDefault(defaultTtl, blockBlob);
             }
             var style = DateTimeStyles.AssumeUniversal;
             if (!blockBlob.Metadata.ContainsKey("ValidUntilKind"))
@@ -127,9 +129,28 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
                 SetValidUntil(blockBlob, TimeSpan.MaxValue);
                 //upload the changed metadata
                 blockBlob.SetMetadata();
-                return DateTime.MaxValue;
+
+                return ToDefault(defaultTtl, blockBlob);
             }
+
             return validUntil.ToUniversalTime();
+        }
+
+        static DateTime ToDefault(long defaultTtl, ICloudBlob blockBlob)
+        {
+            if (defaultTtl != Int64.MaxValue && blockBlob.Properties.LastModified.HasValue)
+            {
+                try
+                {
+                    return blockBlob.Properties.LastModified.Value.Add(TimeSpan.FromSeconds(defaultTtl)).UtcDateTime;
+                }
+                catch (ArgumentOutOfRangeException) 
+                {
+                    // fallback to datetime.maxvalue
+                }
+            }
+
+            return DateTime.MaxValue;
         }
 
         void UploadBlobInParallel(CloudBlockBlob blob, Stream stream)

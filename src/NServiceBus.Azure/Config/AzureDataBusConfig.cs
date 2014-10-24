@@ -94,5 +94,18 @@ namespace NServiceBus.Config
                 this["BasePath"] = value;
             }
         }
+
+        [ConfigurationProperty("DefaultTTL", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultDefaultTTL)]
+        public long DefaultTTL
+        {
+            get
+            {
+                return (long)this["DefaultTTL"];
+            }
+            set
+            {
+                this["DefaultTTL"] = value;
+            }
+        }
     }
 }

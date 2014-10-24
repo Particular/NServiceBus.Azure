@@ -23,4 +23,17 @@ class ValidUntilV1BlobStorageDataBusTests : ValidUntilTest
     {
         base.ValidUntil_is_not_corrupt_by_change_in_local();
     }
+
+    [Ignore("this never worked since TimeSpan.MaxValue would overflow the datetime math")]
+    public override void ValidUntil_defaults_to_DefaultTtl_IfDefaultTtlSet()
+    {
+        base.ValidUntil_defaults_to_DefaultTtl_IfDefaultTtlSet();
+    }
+
+    [Ignore("this never worked since TimeSpan.MaxValue would overflow the datetime math")]
+    public override void ValidUntil_defaults_to_DateTimeMax_IfDefaultTtlSet_ButNoLastModifiedDateSet()
+    {
+        base.ValidUntil_defaults_to_DateTimeMax_IfDefaultTtlSet_ButNoLastModifiedDateSet();
+    }
+    
 }

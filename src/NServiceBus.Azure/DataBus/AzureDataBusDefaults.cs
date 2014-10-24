@@ -1,5 +1,7 @@
 namespace NServiceBus
 {
+    using System;
+
     public class AzureDataBusDefaults
     {
         public const string Defaultcontainer = "databus";
@@ -9,5 +11,6 @@ namespace NServiceBus
         public const string DefaultConnectionString = "UseDevelopmentStorage=true";
         public const int DefaultBlockSize = 4 * 1024 * 1024; // 4MB
         public const int DefaultBackOffInterval = 30; //seconds
+        public const long DefaultDefaultTTL = Int64.MaxValue;
     }
 }

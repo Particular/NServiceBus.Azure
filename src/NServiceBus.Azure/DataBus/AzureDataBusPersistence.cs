@@ -34,7 +34,8 @@ namespace NServiceBus
                 MaxRetries = configSection.MaxRetries,
                 BackOffInterval = configSection.BackOffInterval,
                 NumberOfIOThreads = configSection.NumberOfIOThreads,
-                BlockSize = configSection.BlockSize
+                BlockSize = configSection.BlockSize,
+                DefaultTTL = configSection.DefaultTTL
             };
 
             context.Container.RegisterSingleton<IDataBus>(dataBus);
