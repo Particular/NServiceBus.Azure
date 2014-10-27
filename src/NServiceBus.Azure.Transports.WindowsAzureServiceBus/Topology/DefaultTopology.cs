@@ -21,7 +21,7 @@
             context.Container.ConfigureComponent(b =>
             {
                 var config = b.Build<Configure>();
-                var messagingFactories = b.Build<ICreateMessagingFactories>();
+                var messagingFactories = b.Build<IManageMessagingFactoriesLifecycle>();
                 var subscriptionCreator = b.Build<ICreateSubscriptions>();
                 var queueCreator = b.Build<ICreateQueues>();
                 var topicCreator = b.Build<ICreateTopics>();

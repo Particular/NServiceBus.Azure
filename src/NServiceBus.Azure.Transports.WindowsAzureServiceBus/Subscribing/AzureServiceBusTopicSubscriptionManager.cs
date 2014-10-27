@@ -56,7 +56,17 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     "AzureServiceBusTopicSubscriptionManager can only be used in conjunction with windows azure servicebus, please configure the windows azure servicebus transport");
             }
 
+            CreateAndTrackNotifier(eventType, original, strategy);
+        }
+
+        void CreateAndTrackNotifier(Type eventType, Address original, AzureServiceBusDequeueStrategy strategy)
+        {
             var notifier = topology.Subscribe(eventType, original);
+            notifier.Faulted += (sender, args) =>
+            {
+                strategy.RemoveNotifier(eventType, original);
+                CreateAndTrackNotifier(eventType, original, strategy);
+            };
             strategy.TrackNotifier(eventType, original, notifier);
         }
 

@@ -14,7 +14,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     class QueueAndTopicByEndpointTopology : ITopology
     {
         Configure config;
-        ICreateMessagingFactories messagingFactories;
+        IManageMessagingFactoriesLifecycle messagingFactories;
         ICreateSubscriptions subscriptionCreator;
         ICreateQueues queueCreator;
         ICreateTopics topicCreator;
@@ -26,7 +26,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         internal QueueAndTopicByEndpointTopology(
             Configure config, 
-            ICreateMessagingFactories messagingFactories,
+            IManageMessagingFactoriesLifecycle messagingFactories,
             ICreateSubscriptions subscriptionCreator, 
             ICreateQueues queueCreator,
             ICreateTopics topicCreator, 
@@ -63,7 +63,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
         {
             var subscriptionname = NamingConventions.SubscriptionNamingConvention(config.Settings, eventType, config.Settings.EndpointName());
-            var factory = messagingFactories.Create(address);
+            var factory = messagingFactories.Get(address);
 
             try
             {
@@ -93,7 +93,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         public INotifyReceivedBrokeredMessages GetReceiver(Address original)
         {
             var address = NamingConventions.QueueAddressConvention(config.Settings, original, false);
-            var factory = messagingFactories.Create(address);
+            var factory = messagingFactories.Get(address);
             var description = queueCreator.Create(address);
             var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
             notifier.QueueClient = queueClients.Create(description, factory);
@@ -105,7 +105,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         public ISendBrokeredMessages GetSender(Address original)
         {
             var address = NamingConventions.QueueAddressConvention(config.Settings, original, true);
-            var factory = messagingFactories.Create(address);
+            var factory = messagingFactories.Get(address);
             var description = queueCreator.Create(address);
             var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));
             sender.QueueClient = queueClients.Create(description, factory);
@@ -116,7 +116,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         {
             var address = NamingConventions.PublisherAddressConvention(config.Settings, original);
             var description = topicCreator.Create(address);
-            var factory = messagingFactories.Create(address);
+            var factory = messagingFactories.Get(address);
             var publisher = (AzureServiceBusTopicPublisher)config.Builder.Build(typeof(AzureServiceBusTopicPublisher));
             publisher.TopicClient = topicClients.Create(description, factory);
             return publisher;

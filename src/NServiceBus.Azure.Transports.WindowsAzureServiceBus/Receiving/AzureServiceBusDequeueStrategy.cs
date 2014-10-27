@@ -68,7 +68,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             this.maximumConcurrencyLevel = maximumConcurrencyLevel;
 
-            CreateAndStartNotifier();
+            CreateAndTrackNotifier();
             
             tokenSource = new CancellationTokenSource();
 
@@ -225,9 +225,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             tokenSource.Cancel();
         }
 
-        void CreateAndStartNotifier()
+        void CreateAndTrackNotifier()
         {
             var notifier = topology.GetReceiver(address);
+
+            notifier.Faulted += (sender, args) =>
+            {
+                RemoveNotifier(null, address);
+                CreateAndTrackNotifier();
+            };
 
             TrackNotifier(null, address, notifier);
         }
