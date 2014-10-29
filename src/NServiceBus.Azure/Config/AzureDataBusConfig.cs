@@ -19,8 +19,8 @@ namespace NServiceBus.Config
             base.Properties.Add(new ConfigurationProperty("NumberOfIOThreads", typeof(int), AzureDataBusDefaults.DefaultNumberOfIOThreads,
                 null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckNumberOfIOThreads), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(int), AzureDataBusDefaults.DefaultConnectionString,
-                null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
+            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureDataBusDefaults.DefaultConnectionString,
+                null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
             
             base.Properties.Add(new ConfigurationProperty("Container", typeof(string), AzureDataBusDefaults.DefaultContainer,
                 null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckContainerName), ConfigurationPropertyOptions.None));

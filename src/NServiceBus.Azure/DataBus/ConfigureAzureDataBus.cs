@@ -60,11 +60,11 @@
             return config;
         }
 
-        public static DataBusExtentions<AzureDataBus> DefaultTTL(this DataBusExtentions<AzureDataBus> config, string defaultTTL)
+        public static DataBusExtentions<AzureDataBus> DefaultTTL(this DataBusExtentions<AzureDataBus> config, long defaultTTLInSeconds)
         {
-            AzureDataBusGuard.CheckDefaultTTL(defaultTTL);
+            AzureDataBusGuard.CheckDefaultTTL(defaultTTLInSeconds);
 
-            config.GetSettings().Set("AzureDataBus.DefaultTTL", defaultTTL);
+            config.GetSettings().Set("AzureDataBus.DefaultTTL", defaultTTLInSeconds);
             return config;
         }
     }
