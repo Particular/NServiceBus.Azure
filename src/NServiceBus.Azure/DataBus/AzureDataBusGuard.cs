@@ -59,7 +59,7 @@ namespace NServiceBus.DataBus
 
             if (spacesOnly)
             {
-                throw new ArgumentException("BasePath name should not be null or empty string.", "basePath");
+                throw new ArgumentException("BasePath name should not be null or spaces only.", "basePath");
             }            
         }
 
