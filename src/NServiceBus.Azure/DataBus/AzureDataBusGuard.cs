@@ -8,7 +8,7 @@ namespace NServiceBus.DataBus
         {
             if ((int)maxRetries < 0)
             {
-                throw new Exception("MaxRetries should not be negative.");
+                throw new ArgumentOutOfRangeException("maxRetries", maxRetries, "MaxRetries should not be negative.");
             }
         }
 
@@ -16,7 +16,7 @@ namespace NServiceBus.DataBus
         {
             if ((int)backOffInterval < 0)
             {
-                throw new Exception("BackOffInterval should not be negative.");
+                throw new ArgumentOutOfRangeException("backOffInterval", backOffInterval, "BackOffInterval should not be negative.");
             }
         }
 
@@ -24,7 +24,7 @@ namespace NServiceBus.DataBus
         {
             if ((int)blockSize <= 0 || (int)blockSize > AzureDataBusDefaults.DefaultBlockSize)
             {
-                throw new Exception("BlockSize should not be negative.");
+                throw new ArgumentOutOfRangeException("blockSize", blockSize, "BlockSize should not be negative.");
             }            
         }
 
@@ -32,7 +32,7 @@ namespace NServiceBus.DataBus
         {
             if ((int)numberOfIOThreads <= 0)
             {
-                throw new Exception("NumberOfIOThreads should less than one.");
+                throw new ArgumentOutOfRangeException("numberOfIOThreads", numberOfIOThreads, "NumberOfIOThreads should not be less than one.");
             }                        
         }
 
@@ -40,7 +40,7 @@ namespace NServiceBus.DataBus
         {
             if (string.IsNullOrWhiteSpace((string)connectionString))
             {
-                throw new Exception("ConnectionString should not be an empty string.");
+                throw new ArgumentException("ConnectionString should not be an empty string.", "connectionString");
             }
         }
 
@@ -48,23 +48,30 @@ namespace NServiceBus.DataBus
         {
             if (string.IsNullOrWhiteSpace((string)containerName))
             {
-                throw new Exception("Container name should not be an empty string.");
+                throw new ArgumentException("Container name should not be an empty string.", "containerName");
             }
         }
 
         public static void CheckBasePath(object basePath)
         {
-            if ((string)basePath == null)
+            var value = basePath != null ? (string)basePath : " ";
+            var spacesOnly = value.Trim().Length == 0 && value.Length != 0;
+
+            if (spacesOnly)
             {
-                throw new Exception("BasePath name should not be an empty string.");
+                throw new ArgumentException("BasePath name should not be null or empty string.", "basePath");
             }            
         }
 
         public static void CheckDefaultTTL(object defaultTTL)
         {
+            if (defaultTTL.GetType() != typeof(long))
+            {
+                throw new ArgumentException("defaultTTL should be of type long", "defaultTTL");
+            }
             if ((long)defaultTTL < 0)
             {
-                throw new Exception("DefaultTTL should not be negative.");
+                throw new ArgumentOutOfRangeException("defaultTTL", defaultTTL, "DefaultTTL should not be negative.");
             }            
         }
     }
