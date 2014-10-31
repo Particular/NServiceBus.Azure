@@ -1,10 +1,37 @@
 namespace NServiceBus.Config
 {
     using System.Configuration;
+    using NServiceBus.DataBus;
 
     public class AzureDataBusConfig : ConfigurationSection
     {
-        [ConfigurationProperty("MaxRetries", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultMaxRetries)]
+        public AzureDataBusConfig()
+        {
+            base.Properties.Add(new ConfigurationProperty("MaxRetries", typeof(int), AzureDataBusDefaults.DefaultMaxRetries,
+                null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckMaxRetries), ConfigurationPropertyOptions.None));
+
+            base.Properties.Add(new ConfigurationProperty("BackOffInterval", typeof(int), AzureDataBusDefaults.DefaultBackOffInterval,
+                null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckBackOffInterval), ConfigurationPropertyOptions.None));
+
+            base.Properties.Add(new ConfigurationProperty("BlockSize", typeof(int), AzureDataBusDefaults.DefaultBlockSize,
+                null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckBlockSize), ConfigurationPropertyOptions.None));
+
+            base.Properties.Add(new ConfigurationProperty("NumberOfIOThreads", typeof(int), AzureDataBusDefaults.DefaultNumberOfIOThreads,
+                null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckNumberOfIOThreads), ConfigurationPropertyOptions.None));
+
+            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureDataBusDefaults.DefaultConnectionString,
+                null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
+            
+            base.Properties.Add(new ConfigurationProperty("Container", typeof(string), AzureDataBusDefaults.DefaultContainer,
+                null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckContainerName), ConfigurationPropertyOptions.None));
+
+            base.Properties.Add(new ConfigurationProperty("BasePath", typeof(string), AzureDataBusDefaults.DefaultBasePath,
+                null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckBasePath), ConfigurationPropertyOptions.None));
+
+            base.Properties.Add(new ConfigurationProperty("DefaultTTL", typeof(long), AzureDataBusDefaults.DefaultTTL,
+                null, new CallbackValidator(typeof(long), AzureDataBusGuard.CheckDefaultTTL), ConfigurationPropertyOptions.None));
+        }
+
         public int MaxRetries
         {
             get
@@ -17,7 +44,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("BackOffInterval", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultBackOffInterval)]
         public int BackOffInterval
         {
             get
@@ -30,7 +56,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("BlockSize", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultBlockSize)]
         public int BlockSize
         {
             get
@@ -43,7 +68,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("NumberOfIOThreads", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultNumberOfIOThreads)]
         public int NumberOfIOThreads
         {
             get
@@ -56,7 +80,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("ConnectionString", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultConnectionString)]
         public string ConnectionString
         {
             get
@@ -69,7 +92,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("Container", IsRequired = false, DefaultValue = AzureDataBusDefaults.Defaultcontainer)]
         public string Container
         {
             get
@@ -82,7 +104,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("BasePath", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultBasePath)]
         public string BasePath
         {
             get
@@ -95,7 +116,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("DefaultTTL", IsRequired = false, DefaultValue = AzureDataBusDefaults.DefaultDefaultTTL)]
         public long DefaultTTL
         {
             get
