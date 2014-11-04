@@ -3,7 +3,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Transactions;
+    using NServiceBus.Logging;
     using NServiceBus.Serialization;
     using System.Collections.Concurrent;
     using Microsoft.WindowsAzure.Storage;
@@ -19,10 +21,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     {
         Configure config;
         ICreateQueueClients createQueueClients;
-
+        ILog logger = LogManager.GetLogger(typeof(AzureMessageQueueSender));
 
         static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
-        
+
         static object ExistenceLock = new Object();
 
         /// <summary>
@@ -48,13 +50,34 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                 throw new QueueNotFoundException { Queue = address };
 
             var timeToBeReceived = options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue ? options.TimeToBeReceived : null;
+            timeToBeReceived = timeToBeReceived ?? message.TimeToBeReceived;
+
+            if (timeToBeReceived.Value == TimeSpan.Zero)
+            {
+                var messageType = message.Headers[Headers.EnclosedMessageTypes].Split(',').First();
+                logger.WarnFormat("TimeToBeReceived is set to zero for message of type '{0}'. Cannot send message.", messageType);
+                return;
+            }
+
+            // user explicitly specified TimeToBeReceived that is not TimeSpan.MaxValue - fail
+            if (timeToBeReceived.Value > CloudQueueMessage.MaxTimeToLive && timeToBeReceived != TimeSpan.MaxValue)
+            {
+                var messageType = message.Headers[Headers.EnclosedMessageTypes].Split(',').First();
+                throw new InvalidOperationException(string.Format("TimeToBeReceived is set to more than 7 days (maximum for Azure Storage queue) for message type '{0}'.",
+                    messageType));
+            }
+
+            // TimeToBeReceived was not specified on message - go for maximum set by SDK
+            if (timeToBeReceived == TimeSpan.MaxValue)
+            {
+                timeToBeReceived = null;
+            }
 
             var rawMessage = SerializeMessage(message, options);
 
             if (!config.Settings.Get<bool>("Transactions.Enabled") || Transaction.Current == null)
             {
                 sendQueue.AddMessage(rawMessage, timeToBeReceived);
-                
             }
             else
                 Transaction.Current.EnlistVolatile(new SendResourceManager(sendQueue, rawMessage, timeToBeReceived), EnlistmentOptions.None);
@@ -74,7 +97,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
             }
             else
             {
-                 exists = rememberExistence[key];
+                exists = rememberExistence[key];
             }
 
             return exists;
