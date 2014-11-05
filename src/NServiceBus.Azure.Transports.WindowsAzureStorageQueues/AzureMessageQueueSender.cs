@@ -117,7 +117,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
                         CorrelationId = message.CorrelationId ?? options.CorrelationId,
                         Recoverable = message.Recoverable,
                         ReplyToAddress = replyToAddress,
-                        TimeToBeReceived = options.TimeToBeReceived.HasValue ? options.TimeToBeReceived.Value : default(TimeSpan),
+                        TimeToBeReceived = options.TimeToBeReceived.HasValue ? options.TimeToBeReceived.Value : message.TimeToBeReceived,
                         Headers = message.Headers,
                         MessageIntent = message.MessageIntent
                     };
