@@ -81,6 +81,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             return false;
         }
 
+        public static BrokeredMessage CloneWithMessageId(this BrokeredMessage toSend)
+        {
+            var clone = toSend.Clone();
+            clone.MessageId = toSend.MessageId;
+            toSend = clone;
+            return toSend;
+        }
+
         static ILog Log = LogManager.GetLogger(typeof(BrokeredMessageExtensions));
     }
 }

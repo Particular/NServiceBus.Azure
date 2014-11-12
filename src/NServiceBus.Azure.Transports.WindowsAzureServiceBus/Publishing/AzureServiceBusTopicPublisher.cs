@@ -41,7 +41,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
 
-                    toSend = CloneBrokeredMessage(toSend);
+                    toSend = toSend.CloneWithMessageId();
                 }
                 // back off when we're being throttled
                 catch (ServerBusyException ex)
@@ -56,7 +56,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
 
-                    toSend = CloneBrokeredMessage(toSend);
+                    toSend = toSend.CloneWithMessageId();
                 }
                 // took to long, maybe we lost connection
                 catch (TimeoutException ex)
@@ -71,7 +71,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
 
-                    toSend = CloneBrokeredMessage(toSend);
+                    toSend = toSend.CloneWithMessageId();
                 }
                 // connection lost
                 catch (MessagingCommunicationException ex)
@@ -86,7 +86,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
 
-                    toSend = CloneBrokeredMessage(toSend);
+                    toSend = toSend.CloneWithMessageId();
                 }
                 catch (MessagingException ex)
                 {
@@ -100,17 +100,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
 
-                    toSend = CloneBrokeredMessage(toSend);
+                    toSend = toSend.CloneWithMessageId();
                 }
             }
         }
 
-        BrokeredMessage CloneBrokeredMessage(BrokeredMessage toSend)
-        {
-            var clone = toSend.Clone();
-            clone.MessageId = toSend.MessageId;
-            toSend = clone;
-            return toSend;
-        }
+        
     }
 }
