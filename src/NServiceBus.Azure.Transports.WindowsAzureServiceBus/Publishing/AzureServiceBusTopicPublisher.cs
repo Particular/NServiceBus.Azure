@@ -16,6 +16,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void Publish(BrokeredMessage brokeredMessage)
         {
+            var toSend = brokeredMessage;
             var numRetries = 0;
             var sent = false;
 
@@ -23,7 +24,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                    TopicClient.Send(brokeredMessage);
+                    TopicClient.Send(toSend);
                    
                     sent = true;
                 }
@@ -39,6 +40,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+
+                    toSend = CloneBrokeredMessage(toSend);
                 }
                 // back off when we're being throttled
                 catch (ServerBusyException ex)
@@ -52,6 +55,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+
+                    toSend = CloneBrokeredMessage(toSend);
                 }
                 // took to long, maybe we lost connection
                 catch (TimeoutException ex)
@@ -65,6 +70,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+
+                    toSend = CloneBrokeredMessage(toSend);
                 }
                 // connection lost
                 catch (MessagingCommunicationException ex)
@@ -78,6 +85,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+
+                    toSend = CloneBrokeredMessage(toSend);
                 }
                 catch (MessagingException ex)
                 {
@@ -90,8 +99,18 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     logger.Warn("Will retry after backoff period");
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+
+                    toSend = CloneBrokeredMessage(toSend);
                 }
             }
+        }
+
+        BrokeredMessage CloneBrokeredMessage(BrokeredMessage toSend)
+        {
+            var clone = toSend.Clone();
+            clone.MessageId = toSend.MessageId;
+            toSend = clone;
+            return toSend;
         }
     }
 }
