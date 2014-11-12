@@ -44,30 +44,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var brokeredMessage = message.Body != null ? new BrokeredMessage(message.Body) : new BrokeredMessage();
 
-            brokeredMessage.CorrelationId = message.CorrelationId;
-            if (message.TimeToBeReceived < TimeSpan.MaxValue) brokeredMessage.TimeToLive = message.TimeToBeReceived;
-
-            foreach (var header in message.Headers)
-            {
-                brokeredMessage.Properties[header.Key] = header.Value;
-            }
-
-            brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
-            brokeredMessage.MessageId = message.Id;
-            
-            if (message.ReplyToAddress != null)
-            {
-                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).Determine(settings, message.ReplyToAddress);
-            }
-            else if (options.ReplyToAddress != null)
-            {
-                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).Determine(settings, options.ReplyToAddress);
-            }
+            SetHeaders(message, options, settings, config, brokeredMessage);
 
             if (message.TimeToBeReceived < TimeSpan.MaxValue)
             {
                 brokeredMessage.TimeToLive = message.TimeToBeReceived;
             }
+
+            GuardMessageSize(brokeredMessage);
 
             return brokeredMessage;
         }
@@ -76,13 +60,37 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var brokeredMessage = message.Body != null ? new BrokeredMessage(message.Body) : new BrokeredMessage();
 
-            var timeToSend = DelayIfNeeded(options, expectDelay);
+            SetHeaders(message, options, settings, config, brokeredMessage);
 
-            brokeredMessage.CorrelationId = message.CorrelationId;
+            var timeToSend = DelayIfNeeded(options, expectDelay);
                         
             if (timeToSend.HasValue)
                 brokeredMessage.ScheduledEnqueueTimeUtc = timeToSend.Value;
 
+            if (message.TimeToBeReceived < TimeSpan.MaxValue)
+            {
+                brokeredMessage.TimeToLive = message.TimeToBeReceived;
+            }
+            else if (options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue)
+            {
+                brokeredMessage.TimeToLive = options.TimeToBeReceived.Value;
+            }
+
+            GuardMessageSize(brokeredMessage);
+
+            return brokeredMessage;
+        }
+
+        static void GuardMessageSize(BrokeredMessage brokeredMessage)
+        {
+            if (brokeredMessage.Size > 256*1024)
+            {
+                throw new MessageTooLargeException(string.Format("The message with id {0} is larger that the maximum message size allowed by Azure ServiceBus, consider using the databus instead", brokeredMessage.MessageId));
+            }
+        }
+
+        static void SetHeaders(TransportMessage message, DeliveryOptions options, ReadOnlySettings settings, Configure config, BrokeredMessage brokeredMessage)
+        {
             foreach (var header in message.Headers)
             {
                 brokeredMessage.Properties[header.Key] = header.Value;
@@ -90,26 +98,18 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             brokeredMessage.Properties[Headers.MessageIntent] = message.MessageIntent.ToString();
             brokeredMessage.MessageId = message.Id;
+            brokeredMessage.CorrelationId = message.CorrelationId;
 
-            if (options.ReplyToAddress != null)
+            if (message.ReplyToAddress != null)
             {
-                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).
-                    Determine(settings, options.ReplyToAddress);
+                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).Determine(settings, message.ReplyToAddress);
             }
-
-            if (options.TimeToBeReceived.HasValue && options.TimeToBeReceived < TimeSpan.MaxValue)
+            else if (options.ReplyToAddress != null)
             {
-                brokeredMessage.TimeToLive = options.TimeToBeReceived.Value;
+                brokeredMessage.ReplyTo = new DeterminesBestConnectionStringForAzureServiceBus(config.TransportConnectionString()).Determine(settings, options.ReplyToAddress);
             }
-
-            if (brokeredMessage.Size > 256 * 1024)
-            {
-                throw new MessageTooLargeException(string.Format("The message with id {0} is larger that the maximum message size allowed by Azure ServiceBus, consider using the databus instead", message.Id));
-            }
-
-            return brokeredMessage;
         }
-        
+
         static DateTime? DelayIfNeeded(SendOptions options, bool expectDelay)
         {
             DateTime? deliverAt = null;
