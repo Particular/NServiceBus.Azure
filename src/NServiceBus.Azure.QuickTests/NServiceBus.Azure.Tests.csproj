@@ -52,7 +52,7 @@
     </Reference>
     <Reference Include="NServiceBus.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NServiceBus.5.1.0-beta0001\lib\net45\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.5.1.0\lib\net45\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -79,6 +79,7 @@
     <Compile Include="DataBus\ValidUntilV2BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\ValidUntilV3BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\ValidUntilV4BlobStorageDataBusTests.cs" />
+    <Compile Include="DataBus\When_using_azure_databus_guard.cs" />
     <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
     <Compile Include="Transports\AzureStorage\When_naming_queues_on_azure_storage.cs" />
     <Compile Include="Transports\ServiceBus\When_creating_subscriptions_on_servicebus_topics.cs" />
