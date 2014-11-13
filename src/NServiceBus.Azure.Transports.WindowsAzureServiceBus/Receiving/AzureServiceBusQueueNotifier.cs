@@ -23,14 +23,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         Action<Exception> errorProcessingMessage;
 
+        public event EventHandler Faulted;
+
+        void OnFaulted()
+        {
+            if (Faulted != null)
+                Faulted(this, EventArgs.Empty);
+        }
+
         public void Start(Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
         {
             cancelRequested = false;
 
             this.tryProcessMessage = tryProcessMessage;
             this.errorProcessingMessage = errorProcessingMessage;
-            
-            QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+
+            SafeBeginReceive();
         }
 
         public void Stop()
@@ -42,6 +50,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             try
             {
+                if (QueueClient.IsClosed)
+                {
+                    Stop();
+                    OnFaulted();
+                    return;
+                }
+
                 var receivedMessages = QueueClient.EndReceiveBatch(ar);
 
                 if (cancelRequested) return;
@@ -85,9 +100,32 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
+            catch (OperationCanceledException ex)
+            {
+                logger.Fatal(string.Format("Operation cancelled exception occured on receive for queue {0}, faulting this notifier", QueueClient.Path), ex);
+                Stop();
+                OnFaulted();
+            }
             finally
             {
-                QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+                SafeBeginReceive();
+            }
+        }
+
+        void SafeBeginReceive()
+        {
+            if (!cancelRequested)
+            {
+                try
+                {
+                    QueueClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    logger.Fatal(string.Format("Operation cancelled exception occured on receive for queue {0}, faulting this notifier", QueueClient.Path), ex);
+                    Stop();
+                    OnFaulted();
+                }
             }
         }
     }

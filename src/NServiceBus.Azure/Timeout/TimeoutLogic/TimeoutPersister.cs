@@ -1,13 +1,12 @@
 ﻿namespace NServiceBus.Azure
 {
+    using System.Text.RegularExpressions;
     using Config;
     using System;
     using System.Collections.Generic;
     using System.Data.Services.Client;
     using System.IO;
     using System.Linq;
-    using System.Security.Cryptography;
-    using System.Text;
     using System.Web.Script.Serialization;
     using Logging;
     using Microsoft.WindowsAzure.Storage;
@@ -96,7 +95,7 @@
 
             string identifier;
             timeout.Headers.TryGetValue(Headers.MessageId, out identifier);
-            if (string.IsNullOrEmpty(identifier)) { identifier = Hash(timeout); }
+            if (string.IsNullOrEmpty(identifier)) { identifier = Guid.NewGuid().ToString(); }
 
             TimeoutDataEntity timeoutDataEntity;
             if (TryGetTimeoutData(context, identifier, string.Empty, out timeoutDataEntity)) return;
@@ -324,25 +323,18 @@
             blob.DeleteIfExists();
         }
 
-        static string Hash(TimeoutData timeout)
-        {
-            var s = timeout.SagaId + timeout.Destination.ToString() + timeout.Time.Ticks;
-            var sha1 = SHA1.Create();
-            var bytes = sha1.ComputeHash(Encoding.UTF8.GetBytes(s));
-
-            var hash = new StringBuilder();
-            for (var i = 0; i < bytes.Length; i++)
-            {
-                hash.Append(bytes[i].ToString("X2"));
-            }
-            return hash.ToString();
-        }
-
         string GetUniqueEndpointName()
         {
             var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
 
-            return config.Settings.EndpointName() + "_" + identifier;
+            return Sanitize(config.Settings.EndpointName() + "_" + identifier);
+        }
+
+        string Sanitize(string s)
+        {
+            var rgx = new Regex(@"[^a-zA-Z0-9\-_]");
+            var n = rgx.Replace(s, "");
+            return n;
         }
 
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)

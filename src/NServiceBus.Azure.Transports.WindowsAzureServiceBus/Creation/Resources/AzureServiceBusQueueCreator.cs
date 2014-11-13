@@ -1,9 +1,10 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Logging;
 
     class AzureServiceBusQueueCreator : Transports.ICreateQueues
     {
@@ -21,8 +22,9 @@
         ICreateNamespaceManagers createNamespaceManagers;
         Configure config;
 
-        static Dictionary<string, bool> rememberExistence = new Dictionary<string, bool>();
-        static object ExistenceLock = new Object();
+        static ConcurrentDictionary<string, bool> rememberExistence = new ConcurrentDictionary<string, bool>();
+
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusQueueCreator));
 
         public AzureServiceBusQueueCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
@@ -58,19 +60,49 @@
                     if (!Exists(namespaceClient, path))
                     {
                         namespaceClient.CreateQueue(description);
+                        logger.InfoFormat("Queue '{0}' created", description.Path);
                     }
+                    else
+                    {
+                        logger.InfoFormat("Queue '{0}' already exists, skipping creation", description.Path);
+                    }
+                }
+                else
+                {
+                    logger.InfoFormat("Create queues is set to false, skipping the creation of '{0}'", description.Path);
                 }
             }
             catch (MessagingEntityAlreadyExistsException)
             {
                 // the queue already exists or another node beat us to it, which is ok
+                logger.InfoFormat("Queue '{0}' already exists, another node probably beat us to it", description.Path);
             }
             catch (TimeoutException)
             {
+                logger.InfoFormat("Timeout occured on queue creation for '{0}' going to validate if it doesn't exist", description.Path);
+
                 // there is a chance that the timeout occurs, but the queue is created still
                 // check for this
                 if (!Exists(namespaceClient, path))
+                {
                     throw;
+                }
+                else
+                {
+                    logger.InfoFormat("Looks like queue '{0}' exists anyway", description.Path);
+                }
+            }
+            catch (MessagingException ex)
+            {
+                if (!ex.IsTransient && !CreationExceptionHandling.IsCommon(ex))
+                {
+                    logger.Fatal(string.Format("{1} {2} occured on queue creation {0}", description.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                    throw;
+                }
+                else
+                {
+                    logger.Info(string.Format("{1} {2} occured on queue creation {0}", description.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                }
             }
 
             return description;
@@ -79,19 +111,14 @@
         bool Exists(NamespaceManager namespaceClient, string path)
         {
             var key = path;
-            bool exists;
-            if (!rememberExistence.ContainsKey(key))
+            logger.InfoFormat("Checking existence cache for '{0}'", path);
+            var exists = rememberExistence.GetOrAdd(key, s =>
             {
-                lock (ExistenceLock)
-                {
-                    exists = namespaceClient.QueueExists(key);
-                    rememberExistence[key] = exists;
-                }
-            }
-            else
-            {
-                exists = rememberExistence[key];
-            }
+                logger.InfoFormat("Checking namespace for existance of the queue '{0}'", path);
+                return namespaceClient.QueueExists(key);
+            });
+            
+            logger.InfoFormat("Determined that the queue '{0}' {1}", path, exists ? "exists" : "does not exist");
 
             return exists;
         }

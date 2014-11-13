@@ -9,6 +9,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void Stop();
 
+        event EventHandler Faulted;
+
         Type MessageType { get; set; }
         Address Address { get; set; }
     }

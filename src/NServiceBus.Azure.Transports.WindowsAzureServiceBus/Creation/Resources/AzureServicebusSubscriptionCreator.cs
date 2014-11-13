@@ -1,9 +1,11 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Azure.Transports.WindowsAzureServiceBus.Transports;
+    using NServiceBus.Logging;
 
     class AzureServicebusSubscriptionCreator : ICreateSubscriptions
     {
@@ -17,16 +19,18 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         ICreateNamespaceManagers createNamespaceManagers;
         Configure config;
+        readonly ICreateTopics topicCreator;
 
-        static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
-        static Dictionary<string, bool> rememberSubscriptionExistence = new Dictionary<string, bool>();
-        static object TopicExistenceLock = new Object();
-        static object SubscriptionExistenceLock = new Object();
+        static ConcurrentDictionary<string, bool> rememberTopicExistence = new ConcurrentDictionary<string, bool>();
+        static ConcurrentDictionary<string, bool> rememberSubscriptionExistence = new ConcurrentDictionary<string, bool>();
+     
+        ILog logger = LogManager.GetLogger(typeof(AzureServicebusSubscriptionCreator));
 
-        public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
+        public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config, ICreateTopics topicCreator)
         {
             this.createNamespaceManagers = createNamespaceManagers;
             this.config = config;
+            this.topicCreator = topicCreator;
         }
 
         public SubscriptionDescription Create(Address topic, Type eventType, string subscriptionname)
@@ -54,41 +58,66 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             if (config.CreateQueues())
             {
-                if (TopicExists(namespaceClient, topicPath))
+                if (!TopicExists(namespaceClient, topicPath))
                 {
-                    try
+                    logger.Info(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist yet, going to create it...", topicPath));
+                    topicCreator.Create(topic);
+                }
+                
+                try
+                {
+                    if (!SubscriptionExists(namespaceClient, topicPath, subscriptionname))
                     {
-                        if (!SubscriptionExists(namespaceClient, topicPath, subscriptionname))
+                        if (filter != string.Empty)
                         {
-
-                            if (filter != string.Empty)
-                            {
-                                namespaceClient.CreateSubscription(description, new SqlFilter(filter));
-                            }
-                            else
-                            {
-                                namespaceClient.CreateSubscription(description);
-                            }
+                            namespaceClient.CreateSubscription(description, new SqlFilter(filter));
                         }
+                        else
+                        {
+                            namespaceClient.CreateSubscription(description);
+                        }
+                        logger.InfoFormat("Subscription '{0}' on topic '{1}' created", description.Name, topicPath);
                     }
-                    catch (MessagingEntityAlreadyExistsException)
+                    else
                     {
-                        // the queue already exists or another node beat us to it, which is ok
+                        logger.InfoFormat("Subscription '{0}' on topic '{1}' already exists, skipping creation", description.Name, topicPath);
                     }
-                    catch (TimeoutException)
-                    {
-                        // there is a chance that the timeout occurs, but the subscription is created still
-                        // check for this
-                        if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
-                            throw;
-                    }
-
-                    GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
                 }
-                else
+                catch (MessagingEntityAlreadyExistsException)
                 {
-                    throw new InvalidOperationException(string.Format("The topic that you're trying to subscribe to, {0}, doesn't exist", topicPath));
+                    // the queue already exists or another node beat us to it, which is ok
+                    logger.InfoFormat("Subscription '{0}' on topic '{1}' already exists, another node probably beat us to it", description.Name, topicPath);
                 }
+                catch (TimeoutException)
+                {
+                    logger.InfoFormat("Timeout occured on creation of subscription '{0}' on topic '{1}', going to validate if it doesn't exists", description.Name, topicPath);
+
+                    // there is a chance that the timeout occurs, but the subscription is created still
+                    // check for this
+                    if (!namespaceClient.SubscriptionExists(topicPath, subscriptionname))
+                    {
+                        throw;
+                    }
+                    else
+                    {
+                        logger.InfoFormat("Looks like subscription '{0}' on topic '{1}' exists anyway", description.Name, topicPath);
+                    }
+                }
+                catch (MessagingException ex)
+                {
+                    if (!ex.IsTransient && !CreationExceptionHandling.IsCommon(ex))
+                    {
+                        logger.Fatal(string.Format("{2} {3} occured on subscription creation {0} on topic '{1}'", description.Name, topicPath, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                        throw;
+                    }
+                    else
+                    {
+                        logger.Info(string.Format("{2} {3} occured on subscription creation {0} on topic '{1}'", description.Name, topicPath, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                    }
+                }
+
+                GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
+                
             }
             return description;
         }
@@ -120,39 +149,25 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         bool TopicExists(NamespaceManager namespaceClient, string topicpath)
         {
             var key = topicpath;
-            bool exists;
-            if (!rememberTopicExistence.ContainsKey(key))
-            {
-                lock (TopicExistenceLock)
-                {
-                    exists = namespaceClient.TopicExists(key);
-                    rememberTopicExistence[key] = exists;
-                }
-            }
-            else
-            {
-                exists = rememberTopicExistence[key];
-            }
-
+            logger.InfoFormat("Checking existence cache for topic '{0}'", topicpath);
+            var exists = rememberTopicExistence.GetOrAdd(key, s => {
+                    logger.InfoFormat("Checking namespace for existance of the topic '{0}'", topicpath);
+                    return namespaceClient.TopicExists(topicpath);
+            });
+            logger.InfoFormat("Determined that the topic '{0}' {1}", topicpath, exists ? "exists" : "does not exist");
             return exists;
         }
 
         bool SubscriptionExists(NamespaceManager namespaceClient, string topicpath, string subscriptionname)
         {
             var key = topicpath + subscriptionname;
-            bool exists;
-            if (!rememberSubscriptionExistence.ContainsKey(key))
-            {
-                lock (SubscriptionExistenceLock)
-                {
-                    exists = namespaceClient.SubscriptionExists(topicpath, subscriptionname);
-                    rememberSubscriptionExistence[key] = exists;
-                }
-            }
-            else
-            {
-                exists = rememberSubscriptionExistence[key];
-            }
+            logger.InfoFormat("Checking existence cache for subscription '{0}' on topic '{1}'", subscriptionname, topicpath);
+            var exists = rememberSubscriptionExistence.GetOrAdd(key, s => {
+                logger.InfoFormat("Checking namespace for subscription '{0}' on  topic '{1}'", subscriptionname, topicpath);
+                return namespaceClient.SubscriptionExists(topicpath, subscriptionname);
+            });
+           
+            logger.InfoFormat("Determined cache that the subscription '{0}' on topic '{1}' {2}", subscriptionname, topicpath, exists ? "exists" : "does not exist");
 
             return exists;
         }

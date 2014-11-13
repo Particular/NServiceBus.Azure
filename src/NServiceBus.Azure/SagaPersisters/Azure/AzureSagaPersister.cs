@@ -351,47 +351,5 @@
         }
     }
     
-    //todo: refactor to feature, similar to this
-    //public class AzureTablesSagaStorage : Feature
-    //{
-    //    public AzureTablesSagaStorage()
-    //    {
-    //        //Default(s => s.SetDefault('mywhatever', "something"));
-    //        DependsOn<Sagas>();
-    //    }
-
-    //    protected override void Setup(FeatureConfigurationContext context)
-    //    {
-    //        var mywhatever = context.Settings.Get<string>("whatever");
-    //    }
-    //}
-
-    //public class AzureTableStorage : PersistenceDefinition
-    //{
-    //}
-
-    //class AzureTableStorageConfigurer: IConfigurePersistence<AzureTableStorage>
-    //{
-    //    public void Enable(Configure config)
-    //    {
-    //        config.Settings.EnableFeatureByDefault<AzureTablesSagaStorage>();
-    //    }
-    //}
-
-    //public static class SagaSpecificSettings
-    //{
-    //    public static void SomeCoolSetting(this PersistenceConfiguration config, string mywhatever )
-    //    {
-    //        config.Config.Settings.Set("whatever", mywhatever);
-    //    }
-    //}
-
-    //public class Program
-    //{
-    //    public static void Main()
-    //    {
-    //        Configure.With()
-    //            .UsePersistence<AzureTableStorage>(t => t.SomeCoolSetting("true"));
-    //    }
-    //}
+  
 }

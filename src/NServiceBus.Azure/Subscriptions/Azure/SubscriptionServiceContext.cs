@@ -24,7 +24,7 @@
         public static void Init(CloudTableClient client)
         {
             var table = client.GetTableReference(SubscriptionTableName);
-            table.CreateIfNotExists();
+            if(CreateIfNotExist) table.CreateIfNotExists();
         }
 
         /// <summary>

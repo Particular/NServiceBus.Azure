@@ -1,9 +1,10 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Logging;
     using Transports;
 
     class AzureServicebusTopicCreator : ICreateTopics
@@ -11,10 +12,11 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         ICreateNamespaceManagers createNamespaceManagers;
         Configure config;
 
-        static Dictionary<string, bool> rememberTopicExistence = new Dictionary<string, bool>();
-        static object TopicExistenceLock = new Object();
+        static ConcurrentDictionary<string, bool> rememberTopicExistence = new ConcurrentDictionary<string, bool>();
 
         public bool EnablePartitioning { get; set; }
+
+        ILog logger = LogManager.GetLogger(typeof(AzureServicebusTopicCreator));
 
         public AzureServicebusTopicCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
@@ -39,19 +41,49 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     if (!TopicExists(namespaceclient, topicName))
                     {
                         namespaceclient.CreateTopic(description);
+                        logger.InfoFormat("Topic '{0}' created", description.Path);
                     }
+                    else
+                    {
+                        logger.InfoFormat("Topic '{0}' already exists, skipping creation", description.Path);
+                    }
+                }
+                else
+                {
+                    logger.InfoFormat("Create queues is set to false, skipping the creation of '{0}'", description.Path);
                 }
             }
             catch (MessagingEntityAlreadyExistsException)
             {
                 // the topic already exists or another node beat us to it, which is ok
+                logger.InfoFormat("Topic '{0}' already exists, another node probably beat us to it", description.Path);
             }
             catch (TimeoutException)
             {
+                logger.InfoFormat("Timeout occured on topic creation for '{0}' going to validate if it doesn't exist", description.Path);
+
                 // there is a chance that the timeout occurs, but the queue is created still
                 // check for this
                 if (!TopicExists(namespaceclient, topicName))
+                {
                     throw;
+                }
+                else
+                {
+                    logger.InfoFormat("Looks like topic '{0}' exists anyway", description.Path);
+                }
+            }
+            catch (MessagingException ex)
+            {
+                if (!ex.IsTransient && !CreationExceptionHandling.IsCommon(ex))
+                {
+                    logger.Fatal(string.Format("{1} {2} occured on topic creation {0}", description.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                    throw;
+                }
+                else
+                {
+                    logger.Info(string.Format("{1} {2} occured on topic creation {0}", description.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
+                }
             }
 
             return description;
@@ -60,19 +92,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         bool TopicExists(NamespaceManager namespaceClient, string topicpath)
         {
             var key = topicpath;
-            bool exists;
-            if (!rememberTopicExistence.ContainsKey(key))
+            logger.InfoFormat("Checking existence cache for existance of the topic '{0}'", topicpath);
+            var exists = rememberTopicExistence.GetOrAdd(key, s =>
             {
-                lock (TopicExistenceLock)
-                {
-                    exists = namespaceClient.TopicExists(key);
-                    rememberTopicExistence[key] = exists;
-                }
-            }
-            else
-            {
-                exists = rememberTopicExistence[key];
-            }
+                logger.InfoFormat("Checking namespace for existance of the topic '{0}'", topicpath);
+                return namespaceClient.TopicExists(key);
+            });
+
+            logger.InfoFormat("Determined that the topic '{0}' {1}", topicpath, exists ? "exists" : "does not exist");
 
             return exists;
         }

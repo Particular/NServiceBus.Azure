@@ -26,7 +26,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.tryProcessMessage = tryProcessMessage;
             this.errorProcessingMessage = errorProcessingMessage;
 
-            SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+            SafeBeginReceive();
         }
 
         public void Stop()
@@ -34,10 +34,25 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             cancelRequested = true;
         }
 
+        public event EventHandler Faulted;
+
+        void OnFaulted()
+        {
+            if (Faulted != null)
+                Faulted(this, EventArgs.Empty);
+        }
+
         void OnMessage(IAsyncResult ar)
         {
             try
             {
+                if (SubscriptionClient.IsClosed)
+                {
+                    Stop();
+                    OnFaulted();
+                    return;
+                }
+
                 var receivedMessages = SubscriptionClient.EndReceiveBatch(ar);
 
                 if (cancelRequested) return;
@@ -84,9 +99,32 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 Thread.Sleep(TimeSpan.FromSeconds(BackoffTimeInSeconds));
             }
+            catch (OperationCanceledException ex)
+            {
+                logger.Fatal(string.Format("Operation cancelled exception occured on receive for subscription {0}, most likely due to a closed channel, faulting this notifier", SubscriptionClient.Name), ex);
+                Stop();
+                OnFaulted();
+            }
             finally
             {
-                SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+                SafeBeginReceive();
+            }
+        }
+
+        void SafeBeginReceive()
+        {
+            if (!cancelRequested)
+            {
+                try
+                {
+                    SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    logger.Fatal(string.Format("Operation cancelled exception occured on receive for subscription {0}, faulting this notifier", SubscriptionClient.Name), ex);
+                    Stop();
+                    OnFaulted();
+                }
             }
         }
     }

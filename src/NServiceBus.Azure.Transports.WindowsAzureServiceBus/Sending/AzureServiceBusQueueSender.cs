@@ -14,6 +14,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public void Send(BrokeredMessage brokeredMessage)
         {
+            var toSend = brokeredMessage;
             var numRetries = 0;
             var sent = false;
 
@@ -33,6 +34,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     if (numRetries >= MaxDeliveryCount) throw;
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+
+                    toSend = toSend.CloneWithMessageId();
                 }
                     // back off when we're being throttled
                 catch (ServerBusyException)
@@ -42,6 +45,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     if (numRetries >= MaxDeliveryCount) throw;
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+
+                    toSend = toSend.CloneWithMessageId();
                 }
                     // connection lost
                 catch (MessagingCommunicationException)
@@ -51,6 +56,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     if (numRetries >= MaxDeliveryCount) throw;
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+
+                    toSend = toSend.CloneWithMessageId();
                 }
                     // took to long, maybe we lost connection
                 catch (TimeoutException)
@@ -60,6 +67,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     if (numRetries >= MaxDeliveryCount) throw;
 
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+
+                    toSend = toSend.CloneWithMessageId();
                 }
             }
         }

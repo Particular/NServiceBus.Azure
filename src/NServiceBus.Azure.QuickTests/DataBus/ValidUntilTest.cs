@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Threading;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NServiceBus.DataBus.Azure.BlobStorage;
@@ -75,12 +76,67 @@ abstract class ValidUntilTest
         Assert.AreEqual(DateTime.MaxValue, resultValidUntil);
     }
 
-    protected static ICloudBlob StubACloudBlob()
+    [Test]
+    public virtual void ValidUntil_defaults_to_DefaultTtl_IfDefaultTtlSet()
     {
+        var validUntil = DateTime.UtcNow;
+        var cloudBlob = StubACloudBlob(validUntil);
+
+        const int defaultTtl = 1;
+        SetValidUntil(cloudBlob, TimeSpan.MaxValue);
+        var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob, defaultTtl);
+        Assert.AreEqual(validUntil.AddSeconds(defaultTtl), resultValidUntil);
+    }
+
+    [Test]
+    public virtual void ValidUntil_defaults_to_DateTimeMax_IfDefaultTtlSet_ButNoLastModifiedDateSet()
+    {
+        var cloudBlob = StubACloudBlob();
+
+        const int defaultTtl = 1;
+        SetValidUntil(cloudBlob, TimeSpan.MaxValue);
+        var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob, defaultTtl);
+        Assert.AreEqual(DateTime.MaxValue, resultValidUntil);
+    }
+
+    [Test]
+    public virtual void ValidUntil_is_respected_IfDefaultTtlSet()
+    {
+        var lastModified = DateTime.UtcNow;
+        var cloudBlob = StubACloudBlob(lastModified);
+
+        const int defaultTtl = 1;
+        SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
+        var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob, defaultTtl);
+        
+        Assert.That(resultValidUntil, Is.EqualTo(DateTime.UtcNow.AddHours(1))
+            .Within(TimeSpan.FromSeconds(10)));
+    }
+
+    [Test]
+    public virtual void ValidUntil_is_respected_IfDefaultTtlSet_EvenWhenNoLastModifiedDateFound()
+    {
+        var cloudBlob = StubACloudBlob();
+
+        const int defaultTtl = 1;
+        SetValidUntil(cloudBlob, TimeSpan.FromHours(1));
+        var resultValidUntil = BlobStorageDataBus.GetValidUntil(cloudBlob, defaultTtl);
+
+        Assert.That(resultValidUntil, Is.EqualTo(DateTime.UtcNow.AddHours(1))
+            .Within(TimeSpan.FromSeconds(10)));
+    }
+
+    protected ICloudBlob StubACloudBlob(DateTimeOffset? lastModified = default(DateTimeOffset?))
+    {
+        var cloudBlobProperties = new BlobProperties();
+        var property = typeof(BlobProperties).GetProperty("LastModified");
+        property.SetValue(cloudBlobProperties, lastModified, BindingFlags.NonPublic, null, null, null);
+
+
         var cloudBlob = MockRepository.GenerateStub<ICloudBlob>();
-        cloudBlob.Stub(x => x.Metadata)
-            .Return(new Dictionary<string, string>());
+        cloudBlob.Stub(x => x.Metadata).Return(new Dictionary<string, string>());
         cloudBlob.Stub(x => x.SetMetadata());
+        cloudBlob.Stub(x => x.Properties).Return(cloudBlobProperties);
         return cloudBlob;
     }
 
