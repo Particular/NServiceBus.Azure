@@ -3,6 +3,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System;
     using System.Threading;
     using Microsoft.ServiceBus.Messaging;
+    using NServiceBus.Logging;
 
     class AzureServiceBusQueueSender : ISendBrokeredMessages
     {
@@ -11,6 +12,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public int MaxDeliveryCount { get; set; }
 
         public QueueClient QueueClient { get; set; }
+
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusQueueSender));
 
         public void Send(BrokeredMessage brokeredMessage)
         {
@@ -26,49 +29,46 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     
                    sent = true;
                 }
-                    // todo: outbox
-                catch (MessagingEntityDisabledException)
+                // took to long, maybe we lost connection
+                catch (TimeoutException ex)
                 {
+                    logger.Warn(string.Format("{1} occured when sending to queue {0}", QueueClient.Path, ex.GetType().Name), ex);
+
                     numRetries++;
 
                     if (numRetries >= MaxDeliveryCount) throw;
 
+                    logger.Warn("Will retry after backoff period");
+
                     Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
 
                     toSend = toSend.CloneWithMessageId();
+
                 }
-                    // back off when we're being throttled
-                catch (ServerBusyException)
+                // connection lost
+                catch (MessagingException ex)
                 {
-                    numRetries++;
+                    if (!ex.IsTransient && !RetriableSendExceptionHandling.IsRetryable(ex))
+                    {
+                        logger.Fatal(string.Format("{1} {2} occured when sending to queue {0}", QueueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
 
-                    if (numRetries >= MaxDeliveryCount) throw;
+                        throw;
+                    }
+                    else
+                    {
+                        logger.Warn(string.Format("{1} {2} occured when sending to queue {0}", QueueClient.Path, (ex.IsTransient ? "Transient" : "Non transient"), ex.GetType().Name), ex);
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+                        numRetries++;
 
-                    toSend = toSend.CloneWithMessageId();
-                }
-                    // connection lost
-                catch (MessagingCommunicationException)
-                {
-                    numRetries++;
+                        if (numRetries >= MaxDeliveryCount) throw;
 
-                    if (numRetries >= MaxDeliveryCount) throw;
+                        logger.Warn("Will retry after backoff period");
 
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
+                        Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
 
-                    toSend = toSend.CloneWithMessageId();
-                }
-                    // took to long, maybe we lost connection
-                catch (TimeoutException)
-                {
-                    numRetries++;
-
-                    if (numRetries >= MaxDeliveryCount) throw;
-
-                    Thread.Sleep(TimeSpan.FromSeconds(numRetries*DefaultBackoffTimeInSeconds));
-
-                    toSend = toSend.CloneWithMessageId();
+                        toSend = toSend.CloneWithMessageId();
+                    }
+                   
                 }
             }
         }
