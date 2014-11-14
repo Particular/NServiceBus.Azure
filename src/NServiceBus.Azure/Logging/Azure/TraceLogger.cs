@@ -4,6 +4,7 @@ namespace NServiceBus.Logging.Loggers
     using System.Diagnostics;
 
     /// <summary/>
+    [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Message = "Trace logging is now built into the core of NSB.")]
     public class TraceLogger : ILog
     {
         /// <summary/>
