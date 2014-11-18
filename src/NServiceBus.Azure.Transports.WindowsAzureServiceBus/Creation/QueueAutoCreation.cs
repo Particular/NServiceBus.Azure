@@ -6,6 +6,7 @@
     using Config;
     using Features;
     using NServiceBus.Transports;
+    using Settings;
     using Unicast.Queuing;
 
     /// <summary>
@@ -39,7 +40,7 @@
         {
             get
             {
-                return IsEnabled<QueueAutoCreation>() && !ConfigureQueueCreation.DontCreateQueues;
+                return IsEnabled<QueueAutoCreation>() && !ConfigureQueueCreation.DontCreateQueues && !SettingsHolder.Get<bool>("Endpoint.SendOnly");
             }
         }
 
