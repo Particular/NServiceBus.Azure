@@ -3,15 +3,15 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>NServiceBus.Hosting.Azure</id>
     <title>NServiceBus Hosting Azure</title>
-    <version>$version$</version>
+    <version>5.1.0</version>
     <authors>NServiceBus Ltd</authors>
-    <owners>NServiceBus Ltd</owners>
+    <owners>Udi Dahan, Andreas Ohlund, John Simons</owners>
     <licenseUrl>http://particular.net/LicenseAgreement</licenseUrl>
     <projectUrl>http://particular.net/</projectUrl>
     <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>The Azure Cloudservices Host for NServicebus</description>
-    <copyright>Copyright 2010-2014 NServiceBus. All rights reserved</copyright>
+    <copyright>Copyright 2010-2013 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
      <dependencies>		 
 		 <dependency id="WindowsAzure.Storage" version="2.1.0.0" />
