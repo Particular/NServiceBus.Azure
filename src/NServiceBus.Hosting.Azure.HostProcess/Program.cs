@@ -37,6 +37,7 @@
 
             EndpointId = GetEndpointId(endpointConfiguration);
 
+            scannedAssemblies = scannedAssemblies ?? new List<Assembly>();
             var assemblylist = string.Join(";", scannedAssemblies.Select((s => s.ToString())));
             args = args.Concat(new[]{String.Format(@"/scannedAssemblies={0}", assemblylist)}).ToArray();
 
