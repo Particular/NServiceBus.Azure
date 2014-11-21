@@ -26,6 +26,5 @@
   </metadata>
   <files>
     <file src="..\..\src\binaries\NServiceBus.Hosting.Azure.HostProcess.???" target="lib\net45" />
-    <file src="..\..\src\lib\Topshelf\Topshelf.dll" target="lib\net45" />
   </files>
 </package>
