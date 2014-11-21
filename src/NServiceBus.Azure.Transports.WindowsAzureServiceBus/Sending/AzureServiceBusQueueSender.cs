@@ -45,6 +45,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                     toSend = toSend.CloneWithMessageId();
 
                 }
+                //The operation cannot be performed because the brokered message '...' has already been consumed. Please use a new BrokeredMessage instance for the operation.
+                catch (InvalidOperationException ex)
+                {
+                    logger.Warn(string.Format("{1} occured when sending to queue {0}", QueueClient.Path, ex.GetType().Name), ex);
+
+                    numRetries++;
+
+                    if (numRetries >= MaxDeliveryCount) throw;
+
+                    logger.Warn("Will retry after backoff period");
+
+                    Thread.Sleep(TimeSpan.FromSeconds(numRetries * DefaultBackoffTimeInSeconds));
+
+                    toSend = toSend.CloneWithMessageId();
+
+                }
                 // connection lost
                 catch (MessagingException ex)
                 {

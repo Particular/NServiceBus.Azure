@@ -4,6 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Collections.Generic;
     using System.Linq;
     using MessageInterfaces;
+    using NServiceBus.Logging;
     using NServiceBus.Transports;
     using Unicast;
     using Unicast.Routing;
@@ -15,6 +16,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         ITopology topology;
         public IMessageMapper MessageMapper { get; set; }
         public StaticMessageRouter MessageRouter { get; set; }
+
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusTopicSubscriptionManager));
 
         public AzureServiceBusTopicSubscriptionManager(Configure config, ITopology topology)
         {
@@ -61,6 +64,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void CreateAndTrackNotifier(Type eventType, Address original, AzureServiceBusDequeueStrategy strategy)
         {
+            logger.InfoFormat("Creating a new notifier for event type {0}, address {1}", eventType.Name, original.ToString());
+
             var notifier = topology.Subscribe(eventType, original);
             notifier.Faulted += (sender, args) =>
             {

@@ -1,7 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Transactions;
     using Microsoft.ServiceBus.Messaging;
     using System.Collections;
@@ -25,7 +25,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         Action<TransportMessage, Exception> endProcessMessage;
         TransactionOptions transactionOptions;
         Queue pendingMessages = Queue.Synchronized(new Queue());
-        IDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new Dictionary<string, INotifyReceivedBrokeredMessages>();
+        ConcurrentDictionary<string, INotifyReceivedBrokeredMessages> notifiers = new ConcurrentDictionary<string, INotifyReceivedBrokeredMessages>();
         CancellationTokenSource tokenSource;
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
 
@@ -227,6 +227,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void CreateAndTrackNotifier()
         {
+            logger.InfoFormat("Creating a new notifier for address {0}", address.ToString());
+
             var notifier = topology.GetReceiver(address);
 
             notifier.Faulted += (sender, args) =>
@@ -241,26 +243,39 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public void TrackNotifier(Type eventType, Address original, INotifyReceivedBrokeredMessages notifier)
         {
             var key = CreateKeyFor(eventType, original);
-            if (notifiers.ContainsKey(key)) return;
 
             notifier.Start(EnqueueMessage, ErrorDequeueingBatch);
-            notifiers.Add(key, notifier);
+            notifiers.AddOrUpdate(key, notifier, (s, n) => notifier);
+
+            if (eventType != null)
+            {
+                logger.InfoFormat("Started tracking new notifier for event type {0}, address {1}",  eventType.Name, original.ToString());
+            }
+            else
+            {
+                logger.InfoFormat("Started tracking new notifier for address {0}", original.ToString());
+            }
         }
 
         public void RemoveNotifier(Type eventType, Address original)
         {
             var key = CreateKeyFor(eventType, original);
             if (!notifiers.ContainsKey(key)) return;
-
-            var toRemove = notifiers[key];
-            toRemove.Stop();
-            notifiers.Remove(key);
+            
+            INotifyReceivedBrokeredMessages toRemove;
+            if (notifiers.TryRemove(key, out toRemove))
+            {
+                toRemove.Stop();
+                logger.InfoFormat("Stopped tracking new notifier for event type {0}, address {1}", eventType.Name, original.ToString());
+            }
         }
 
         public INotifyReceivedBrokeredMessages GetNotifier(Type eventType, Address original)
         {
             var key = CreateKeyFor(eventType, original);
-            return !notifiers.ContainsKey(key) ? null : notifiers[key];
+            INotifyReceivedBrokeredMessages notifier;
+            notifiers.TryGetValue(key, out notifier);
+            return notifier;
         }
 
         void EnqueueMessage(BrokeredMessage brokeredMessage)
