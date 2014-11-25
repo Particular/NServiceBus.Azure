@@ -6,6 +6,9 @@ namespace NServiceBus
     using Features;
     using Microsoft.WindowsAzure.Storage;
 
+    /// <summary>
+    /// Used to configure Azure databus
+    /// </summary>
     [ObsoleteEx(
         Replacement = "UseDataBusExtensions.UseDataBus<AzureDataBus>(this BusConfiguration config)",
         Message = "Use `configuration.UseDataBus<AzureDataBus>()`, where `configuration` is an instance of `BusConfiguration`. If self-hosting the instance can be obtained from `new BusConfiguration()`. if using the NServiceBus Host the instance of `BusConfiguration` will be passed in via the `INeedInitialization` or `IConfigureThisEndpoint` interfaces.",

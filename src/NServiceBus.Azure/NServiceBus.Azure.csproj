@@ -98,6 +98,7 @@
     <Compile Include="DataBus\AzureDataBusPersistence.cs" />
     <Compile Include="AzureStoragePersistence.cs" />
     <Compile Include="SagaPersisters\Azure\AzureStorageSagaPersistence.cs" />
+    <Compile Include="Subscriptions\AzureSubscriptionStorageGuard.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
     <Compile Include="Obsoletes\ConfigureAzureBlobStorageDataBus.cs" />
     <Compile Include="Config\IsHostedIn.cs" />
@@ -120,6 +121,8 @@
     <Compile Include="SagaPersisters\Azure\AzureSagaPersister.cs" />
     <Compile Include="SagaPersisters\Azure\DictionaryTableEntity.cs" />
     <Compile Include="SafeLinqExtensions.cs" />
+    <Compile Include="Subscriptions\ConfigureAzureSubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\AzureSubscriptionStorageDefaults.cs" />
     <Compile Include="Timeout\Config\AzureStorageTimeoutPersistence.cs" />
     <Compile Include="Obsoletes\ConfigureTimeoutManager.cs" />
     <Compile Include="Timeout\TimeoutLogic\AutoRenewLease.cs" />

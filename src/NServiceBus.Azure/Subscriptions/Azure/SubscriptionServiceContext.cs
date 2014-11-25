@@ -28,12 +28,12 @@
         }
 
         /// <summary>
-        /// 
+        /// Subscriptions table name.
         /// </summary>
         public static string SubscriptionTableName = "Subscription";
 
         /// <summary>
-        /// 
+        /// Should subscription table be created or not.
         /// </summary>
         public static bool CreateIfNotExist = true;
 
