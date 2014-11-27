@@ -25,7 +25,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 try
                 {
-                   QueueClient.Send(brokeredMessage);
+                   QueueClient.Send(toSend);
                     
                    sent = true;
                 }
@@ -84,7 +84,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                         toSend = toSend.CloneWithMessageId();
                     }
-                   
                 }
             }
         }
