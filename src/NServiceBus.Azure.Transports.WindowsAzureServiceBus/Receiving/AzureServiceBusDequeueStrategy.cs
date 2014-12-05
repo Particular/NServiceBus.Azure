@@ -266,7 +266,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             if (notifiers.TryRemove(key, out toRemove))
             {
                 toRemove.Stop();
-                logger.InfoFormat("Stopped tracking new notifier for event type {0}, address {1}", eventType.Name, original.ToString());
+                if (eventType != null)
+                {
+                    logger.InfoFormat("Stopped tracking new notifier for event type {0}, address {1}", eventType.Name, original.ToString());
+                }
+                else
+                {
+                    logger.InfoFormat("Stopped tracking new notifier address {1}", original.ToString());
+                }
             }
         }
 
