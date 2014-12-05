@@ -7,9 +7,9 @@ namespace NServiceBus
     {
         internal AzureStoragePersistence()
         {
-            Supports(Storage.Timeouts, s => s.EnableFeatureByDefault<AzureStorageTimeoutPersistence>());
-            Supports(Storage.Sagas, s => s.EnableFeatureByDefault<AzureStorageSagaPersistence>());
-            Supports(Storage.Subscriptions, s => s.EnableFeatureByDefault<AzureStorageSubscriptionPersistence>());
+            Supports<StorageType.Timeouts>(s => s.EnableFeatureByDefault<AzureStorageTimeoutPersistence>());
+            Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<AzureStorageSagaPersistence>());
+            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<AzureStorageSubscriptionPersistence>());
         }
     }
 }

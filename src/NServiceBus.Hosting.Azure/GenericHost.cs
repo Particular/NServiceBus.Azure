@@ -34,7 +34,6 @@ namespace NServiceBus.Hosting.Azure
             this.specifier = specifier;
 
             endpointNameToUse = specifier.GetType().Namespace ?? specifier.GetType().Assembly.GetName().Name;
-            endpointVersionToUse = FileVersionRetriever.GetFileVersion(specifier.GetType());
 
             if (scannableAssembliesFullName == null || !scannableAssembliesFullName.Any())
             {
@@ -112,7 +111,6 @@ namespace NServiceBus.Hosting.Azure
             var configuration = new BusConfiguration();
 
             configuration.EndpointName(endpointNameToUse);
-            configuration.EndpointVersion(endpointVersionToUse);
             configuration.AssembliesToScan(assembliesToScan);
            
             if (SafeRoleEnvironment.IsAvailable)
@@ -175,6 +173,5 @@ namespace NServiceBus.Hosting.Azure
         UnicastBus bus;
 
         string endpointNameToUse;
-        string endpointVersionToUse;
     }
 }
