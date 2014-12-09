@@ -75,9 +75,17 @@
     <Compile Include="Config\QueueIndividualizer.cs" />
     <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
     <Compile Include="Config\SafeRoleEnvironment.cs" />
+    <Compile Include="Creation\Clients\CircularBuffer.cs" />
     <Compile Include="Creation\Clients\ICreateMessagingFactories.cs" />
     <Compile Include="Creation\Clients\ICreateSubscriptionClients.cs" />
     <Compile Include="Creation\Clients\ICreateTopicClients.cs" />
+    <Compile Include="Creation\Clients\IManageMessagingFactoriesLifecycle.cs" />
+    <Compile Include="Creation\Clients\IManageQueueClientsLifecycle.cs" />
+    <Compile Include="Creation\Clients\IManageSubscriptionClientsLifecycle.cs" />
+    <Compile Include="Creation\Clients\IManageTopicClientsLifecycle.cs" />
+    <Compile Include="Creation\Clients\ManageMessagingFactoriesLifeCycle.cs" />
+    <Compile Include="Creation\Clients\ManageQueueClientsLifeCycle.cs" />
+    <Compile Include="Creation\Clients\ManageTopicClientsLifeCycle.cs" />
     <Compile Include="Creation\ICreateQueues.cs" />
     <Compile Include="Topology\AzureServiceBusTopologyCreator.cs" />
     <Compile Include="Creation\Resources\ICreateNamespaceManagers.cs" />

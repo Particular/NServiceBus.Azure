@@ -25,15 +25,16 @@
                 var subscriptionCreator = b.Build<ICreateSubscriptions>();
                 var queueCreator = b.Build<ICreateQueues>();
                 var topicCreator = b.Build<ICreateTopics>();
-                var queueClients = b.Build<ICreateQueueClients>();
+                var queueClients = b.Build<IManageQueueClientsLifecycle>();
                 var subscriptionClients = b.Build<ICreateSubscriptionClients>();
-                var topicClients = b.Build<ICreateTopicClients>();
+                var topicClients = b.Build<IManageTopicClientsLifecycle>();
+                var queueClientCreator = b.Build<ICreateQueueClients>();
 
                 // isn't there a better way to call initialize on object creation?
                 var topology = new QueueAndTopicByEndpointTopology(config, 
                     messagingFactories, 
-                    subscriptionCreator,queueCreator, topicCreator, 
-                    queueClients, subscriptionClients, topicClients);
+                    subscriptionCreator,queueCreator, topicCreator,
+                    queueClients, subscriptionClients, topicClients, queueClientCreator);
                 
                 topology.Initialize(context.Settings);
                 

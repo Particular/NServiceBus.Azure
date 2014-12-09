@@ -61,6 +61,7 @@
             context.Container.ConfigureComponent<CreatesMessagingFactories>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<CreatesNamespaceManagers>(DependencyLifecycle.SingleInstance);
 
+            context.Container.ConfigureComponent<ManageQueueClientsLifeCycle>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<AzureServicebusQueueClientCreator>(DependencyLifecycle.InstancePerCall);
 
             context.Container.ConfigureComponent<AzureServiceBusTopologyCreator>(DependencyLifecycle.InstancePerCall);
@@ -77,6 +78,7 @@
             context.Container.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.EnableBatchedOperations, configSection.EnableBatchedOperations);
             context.Container.ConfigureProperty<AzureServiceBusQueueCreator>(t => t.EnablePartitioning, configSection.EnablePartitioning);
 
+            context.Container.ConfigureComponent<ManageTopicClientsLifeCycle>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<AzureServicebusTopicClientCreator>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureComponent<AzureServicebusTopicCreator>(DependencyLifecycle.InstancePerCall);
             context.Container.ConfigureProperty<AzureServicebusTopicCreator>(t => t.EnablePartitioning, configSection.EnablePartitioning);

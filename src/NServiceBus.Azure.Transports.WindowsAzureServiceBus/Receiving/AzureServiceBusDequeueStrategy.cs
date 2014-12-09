@@ -228,7 +228,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         void CreateAndStartNotifier()
         {
             var notifier = topology.GetReceiver(address);
-
             TrackNotifier(null, address, notifier);
         }
 
@@ -245,7 +244,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         {
             var key = CreateKeyFor(eventType, original);
             if (!notifiers.ContainsKey(key)) return;
-
             var toRemove = notifiers[key];
             toRemove.Stop();
             notifiers.Remove(key);
@@ -259,7 +257,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void EnqueueMessage(BrokeredMessage brokeredMessage)
         {
-            while (pendingMessages.Count > 2 * maximumConcurrencyLevel){Thread.Sleep(10);}
+           // while (pendingMessages.Count > 2 * maximumConcurrencyLevel){Thread.Sleep(10);}
 
             try
             {
