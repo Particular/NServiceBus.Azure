@@ -231,13 +231,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             var notifier = topology.GetReceiver(address);
 
-            notifier.Faulted += (sender, args) =>
-            {
-                RemoveNotifier(null, address);
-                CreateAndTrackNotifier();
-            };
+            notifier.Faulted += NotifierFaulted;
 
             TrackNotifier(null, address, notifier);
+        }
+
+        void NotifierFaulted(object sender, EventArgs e)
+        {
+           RemoveNotifier(null, address);
+           CreateAndTrackNotifier();
         }
 
         public void TrackNotifier(Type eventType, Address original, INotifyReceivedBrokeredMessages notifier)
@@ -265,6 +267,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             INotifyReceivedBrokeredMessages toRemove;
             if (notifiers.TryRemove(key, out toRemove))
             {
+                toRemove.Faulted -= NotifierFaulted;
                 toRemove.Stop();
                 if (eventType != null)
                 {
@@ -287,7 +290,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void EnqueueMessage(BrokeredMessage brokeredMessage)
         {
-            while (pendingMessages.Count > 2 * maximumConcurrencyLevel){Thread.Sleep(10);}
+           // while (pendingMessages.Count > 2 * maximumConcurrencyLevel){Thread.Sleep(10);}
 
             try
             {

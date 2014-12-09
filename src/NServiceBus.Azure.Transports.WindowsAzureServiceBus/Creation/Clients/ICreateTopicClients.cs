@@ -12,5 +12,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         /// <returns></returns>
         TopicClient Create(TopicDescription topic, MessagingFactory factory);
+
+        TopicClient Create(string topic, MessagingFactory factory);
     }
 }
