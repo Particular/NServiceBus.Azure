@@ -79,15 +79,16 @@
     <Compile Include="DataBus\ValidUntilV2BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\ValidUntilV3BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\ValidUntilV4BlobStorageDataBusTests.cs" />
-    <Compile Include="DataBus\When_using_azure_databus_guard.cs" />
+    <Compile Include="DataBus\When_using_AzureDataBusGuard.cs" />
     <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
+    <Compile Include="Persisters\When_using_AzureStorageSagaGuard.cs" />
     <Compile Include="Transports\AzureStorage\When_naming_queues_on_azure_storage.cs" />
     <Compile Include="Transports\ServiceBus\When_creating_subscriptions_on_servicebus_topics.cs" />
     <Compile Include="Hosting\When_killing_processes.cs" />
     <Compile Include="Configuration\When_parsing_connectionstrings.cs" />
     <Compile Include="Configuration\When_using_the_azure_configuration_source.cs" />
     <Compile Include="Transports\ServiceBus\When_determining_subscription_names.cs" />
-    <Compile Include="Transports\ServiceBus\When_using_azure_subscription_storage_guard.cs" />
+    <Compile Include="Persisters\When_using_AzureSubscriptionStorageGuard.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj">

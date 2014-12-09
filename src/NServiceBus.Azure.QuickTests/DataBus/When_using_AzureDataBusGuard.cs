@@ -7,7 +7,7 @@
 
     [TestFixture]
     [Category("Azure")]
-    public class When_using_azure_databus_guard
+    public class When_using_AzureDataBusGuard
     {
         [Test]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]

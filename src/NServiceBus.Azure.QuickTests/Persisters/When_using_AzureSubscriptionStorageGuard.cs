@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Azure.Tests.DataBus
+﻿namespace NServiceBus.Azure.Tests.Persisters
 {
     using System;
     using NServiceBus.Config;
@@ -7,7 +7,7 @@
 
     [TestFixture]
     [Category("Azure")]
-    public class When_using_azure_subscription_storage_guard
+    public class When_using_AzureSubscriptionStorageGuard
     {
         [TestCase("")]
         [TestCase(null)]
