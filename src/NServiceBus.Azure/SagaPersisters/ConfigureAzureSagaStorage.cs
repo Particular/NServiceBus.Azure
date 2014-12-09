@@ -4,12 +4,12 @@
     using NServiceBus.Persistence;
 
     /// <summary>
-    /// Configuration extensions for the saga storage
+    /// Configuration extensions for the sagas storage
     /// </summary>
     public static class ConfigureAzureSagaStorage
     {
         /// <summary>
-        /// Connection string to use for subscriptions storage.
+        /// Connection string to use for sagas storage.
         /// </summary>
         public static PersistenceExtentions<AzureStoragePersistence, StorageType.Sagas> ConnectionString(this PersistenceExtentions<AzureStoragePersistence, StorageType.Sagas> config, string connectionString)
         {
@@ -20,7 +20,7 @@
         }
 
         /// <summary>
-        /// Should an attempt at startup be made to verify if subscriptions storage table exists or not and if not create it.
+        /// Should an attempt be made to create saga storage table or not.
         /// <remarks>Operation will fail if connection string does not allow access to create storage tables</remarks>
         /// </summary>
         public static PersistenceExtentions<AzureStoragePersistence, StorageType.Sagas> CreateSchema(this PersistenceExtentions<AzureStoragePersistence, StorageType.Sagas> config, bool createSchema)
