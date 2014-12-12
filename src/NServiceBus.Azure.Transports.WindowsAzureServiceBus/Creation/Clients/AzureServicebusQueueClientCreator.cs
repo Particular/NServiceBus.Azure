@@ -13,7 +13,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         public QueueClient Create(QueueDescription description, MessagingFactory factory)
         {
-            var client = factory.CreateQueueClient(description.Path, ShouldRetry() ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
+            return Create(description.Path, factory);
+        }
+
+        public QueueClient Create(string description, MessagingFactory factory)
+        {
+            var client = factory.CreateQueueClient(description, ShouldRetry() ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
             client.PrefetchCount = 100; // todo make configurable
             return client;
         }

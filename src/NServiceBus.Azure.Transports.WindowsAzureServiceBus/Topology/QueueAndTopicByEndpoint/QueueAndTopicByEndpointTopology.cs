@@ -14,25 +14,27 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
     class QueueAndTopicByEndpointTopology : ITopology
     {
         Configure config;
-        ICreateMessagingFactories messagingFactories;
+        IManageMessagingFactoriesLifecycle messagingFactories;
         ICreateSubscriptions subscriptionCreator;
         ICreateQueues queueCreator;
         ICreateTopics topicCreator;
-        ICreateQueueClients queueClients; 
+        IManageQueueClientsLifecycle queueClients; 
         ICreateSubscriptionClients subscriptionClients;
-        ICreateTopicClients topicClients;
+        IManageTopicClientsLifecycle topicClients;
+        ICreateQueueClients queueClientCreator;
 
         ILog logger = LogManager.GetLogger(typeof(QueueAndTopicByEndpointTopology));
 
         internal QueueAndTopicByEndpointTopology(
             Configure config, 
-            ICreateMessagingFactories messagingFactories,
+            IManageMessagingFactoriesLifecycle messagingFactories,
             ICreateSubscriptions subscriptionCreator, 
             ICreateQueues queueCreator,
-            ICreateTopics topicCreator, 
-            ICreateQueueClients queueClients, 
+            ICreateTopics topicCreator,
+            IManageQueueClientsLifecycle queueClients, 
             ICreateSubscriptionClients subscriptionClients,
-            ICreateTopicClients topicClients)
+            IManageTopicClientsLifecycle topicClients, 
+            ICreateQueueClients queueClientCreator)
         {
             this.config = config;
             this.messagingFactories = messagingFactories;
@@ -42,6 +44,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             this.queueClients = queueClients;
             this.subscriptionClients = subscriptionClients;
             this.topicClients = topicClients;
+            this.queueClientCreator = queueClientCreator;
         }
 
         public void Initialize(ReadOnlySettings settings)
@@ -63,7 +66,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
         {
             var subscriptionname = NamingConventions.SubscriptionNamingConvention(config.Settings, eventType, config.Settings.EndpointName());
-            var factory = messagingFactories.Create(address);
+            var factory = messagingFactories.Get(address);
 
             try
             {
@@ -93,10 +96,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         public INotifyReceivedBrokeredMessages GetReceiver(Address original)
         {
             var address = NamingConventions.QueueAddressConvention(config.Settings, original, false);
-            var factory = messagingFactories.Create(address);
-            var description = queueCreator.Create(address);
+            var desc = queueCreator.Create(address); //we shouldn't do this over and over
+            var factory = messagingFactories.Get(address);
             var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
-            notifier.QueueClient = queueClients.Create(description, factory);
+            notifier.QueueClient = queueClientCreator.Create(desc, factory);
 
             //todo: notifier.BatchSize = maximumConcurrencyLevel;
             return notifier;
@@ -105,20 +108,18 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         public ISendBrokeredMessages GetSender(Address original)
         {
             var address = NamingConventions.QueueAddressConvention(config.Settings, original, true);
-            var factory = messagingFactories.Create(address);
-            var description = queueCreator.Create(address);
+            queueCreator.Create(address); //we shouldn't do this over and over
             var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));
-            sender.QueueClient = queueClients.Create(description, factory);
+            sender.QueueClient = queueClients.Get(address);
             return sender;
         }
 
         public IPublishBrokeredMessages GetPublisher(Address original)
         {
             var address = NamingConventions.PublisherAddressConvention(config.Settings, original);
-            var description = topicCreator.Create(address);
-            var factory = messagingFactories.Create(address);
+            topicCreator.Create(address); //we shouldn't do this over and over
             var publisher = (AzureServiceBusTopicPublisher)config.Builder.Build(typeof(AzureServiceBusTopicPublisher));
-            publisher.TopicClient = topicClients.Create(description, factory);
+            publisher.TopicClient = topicClients.Get(address);
             return publisher;
         }
 
