@@ -12,5 +12,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// </summary>
         /// <returns></returns>
         QueueClient Create(QueueDescription description, MessagingFactory factory);
+
+        QueueClient Create(string description, MessagingFactory factory);
     }
 }
