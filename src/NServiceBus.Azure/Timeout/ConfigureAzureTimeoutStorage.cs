@@ -56,6 +56,7 @@
         ///  Set the catchup interval in seconds for missed timeouts.
         /// </summary>
         /// <param name="catchUpInterval">Catch up interval in seconds</param>
+        /// <param name="config"></param>
         public static PersistenceExtentions<AzureStoragePersistence, StorageType.Timeouts> CatchUpInterval(this PersistenceExtentions<AzureStoragePersistence, StorageType.Timeouts> config, int catchUpInterval)
         {
             AzureTimeoutStorageGuard.CheckCatchUpInterval(catchUpInterval);
@@ -68,6 +69,7 @@
         ///  Time range used as partition key value for all timeouts.
         /// </summary>
         /// <param name="partitionKeyScope">Partition key DateTime format string.</param>
+        /// <param name="config"></param>
         /// <remarks>For optimal performance, this should be in line with the CatchUpInterval.</remarks>
         public static PersistenceExtentions<AzureStoragePersistence, StorageType.Timeouts> PartitionKeyScope(this PersistenceExtentions<AzureStoragePersistence, StorageType.Timeouts> config, string partitionKeyScope)
         {
