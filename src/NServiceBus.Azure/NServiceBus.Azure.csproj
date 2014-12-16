@@ -127,6 +127,9 @@
     <Compile Include="SafeLinqExtensions.cs" />
     <Compile Include="Subscriptions\ConfigureAzureSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\AzureSubscriptionStorageDefaults.cs" />
+    <Compile Include="Timeout\AzureTimeoutStorageGuard.cs" />
+    <Compile Include="Timeout\AzureTimeoutStorageDefaults.cs" />
+    <Compile Include="Timeout\ConfigureAzureTimeoutStorage.cs" />
     <Compile Include="Timeout\Config\AzureStorageTimeoutPersistence.cs" />
     <Compile Include="Obsoletes\ConfigureTimeoutManager.cs" />
     <Compile Include="Timeout\TimeoutLogic\AutoRenewLease.cs" />

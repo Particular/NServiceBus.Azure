@@ -31,7 +31,7 @@
         }
 
         [Test]
-        public void Should_validate_all_default_settings_for_azure_databus_config()
+        public void Should_validate_all_default_settings_for_a_new_config()
         {
             var config = new AzureSubscriptionStorageConfig();
             Assert.AreEqual(AzureSubscriptionStorageDefaults.ConnectionString, config.ConnectionString);

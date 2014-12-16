@@ -31,5 +31,6 @@ namespace NServiceBus.Azure
             }
         }
 
+        public static bool CreateSchema { get; set; }
     }
 }
