@@ -54,6 +54,7 @@
             }
 
             result = query
+                        .Take(1000) // fixes isue #208. 
                         .AsTableServiceQuery(context) // fixes issue #191
                         .ToList().OrderBy(c => c.Time);
 
@@ -196,6 +197,7 @@
                 select c);
 
             var results = query
+                .Take(1000) // fixes isue #208.
                 .AsTableServiceQuery(context) // fixes issue #191
                .ToList();
 
