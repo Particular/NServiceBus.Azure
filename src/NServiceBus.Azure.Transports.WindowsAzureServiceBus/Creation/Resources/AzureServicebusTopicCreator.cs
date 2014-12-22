@@ -7,18 +7,27 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using NServiceBus.Logging;
     using Transports;
 
-    class AzureServicebusTopicCreator : ICreateTopics
+    class AzureServiceBusTopicCreator : ICreateTopics
     {
         ICreateNamespaceManagers createNamespaceManagers;
         Configure config;
 
         static ConcurrentDictionary<string, bool> rememberTopicExistence = new ConcurrentDictionary<string, bool>();
 
+        public TimeSpan LockDuration { get; set; }
+        public long MaxSizeInMegabytes { get; set; }
+        public bool RequiresDuplicateDetection { get; set; }
+        public bool RequiresSession { get; set; }
+        public TimeSpan DefaultMessageTimeToLive { get; set; }
+        public bool EnableDeadLetteringOnMessageExpiration { get; set; }
+        public TimeSpan DuplicateDetectionHistoryTimeWindow { get; set; }
+        public int MaxDeliveryCount { get; set; }
+        public bool EnableBatchedOperations { get; set; }
         public bool EnablePartitioning { get; set; }
 
-        ILog logger = LogManager.GetLogger(typeof(AzureServicebusTopicCreator));
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusTopicCreator));
 
-        public AzureServicebusTopicCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
+        public AzureServiceBusTopicCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config)
         {
             this.createNamespaceManagers = createNamespaceManagers;
             this.config = config;
@@ -27,10 +36,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public TopicDescription Create(Address address)
         {
             var topicName = address.Queue;
-            var namespaceclient = createNamespaceManagers.Create(address.Machine);
+            var namespaceClient = createNamespaceManagers.Create(address.Machine);
             var description = new TopicDescription(topicName)
             {
-                // todo: add the other settings from a separate config section? Or same as queue section?
+                // same as queue section from AzureServiceBusQueueConfig
+                MaxSizeInMegabytes = MaxSizeInMegabytes,
+                RequiresDuplicateDetection = RequiresDuplicateDetection,
+                DefaultMessageTimeToLive = DefaultMessageTimeToLive,
+                DuplicateDetectionHistoryTimeWindow = DuplicateDetectionHistoryTimeWindow,
+                EnableBatchedOperations = EnableBatchedOperations,
                 EnablePartitioning = EnablePartitioning
             };
 
@@ -38,9 +52,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             {
                 if (config.CreateQueues())
                 {
-                    if (!TopicExists(namespaceclient, topicName))
+                    if (!TopicExists(namespaceClient, topicName))
                     {
-                        namespaceclient.CreateTopic(description);
+                        namespaceClient.CreateTopic(description);
                         logger.InfoFormat("Topic '{0}' created", description.Path);
                     }
                     else
@@ -64,7 +78,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 // there is a chance that the timeout occurs, but the queue is created still
                 // check for this
-                if (!TopicExists(namespaceclient, topicName))
+                if (!TopicExists(namespaceClient, topicName))
                 {
                     throw;
                 }
@@ -92,10 +106,10 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         bool TopicExists(NamespaceManager namespaceClient, string topicpath)
         {
             var key = topicpath;
-            logger.InfoFormat("Checking existence cache for existance of the topic '{0}'", topicpath);
+            logger.InfoFormat("Checking cache for existence of the topic '{0}'", topicpath);
             var exists = rememberTopicExistence.GetOrAdd(key, s =>
             {
-                logger.InfoFormat("Checking namespace for existance of the topic '{0}'", topicpath);
+                logger.InfoFormat("Checking namespace for existence of the topic '{0}'", topicpath);
                 return namespaceClient.TopicExists(key);
             });
 
