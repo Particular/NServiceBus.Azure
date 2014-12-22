@@ -204,6 +204,10 @@
             var query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, saga.Id.ToString()));
 
             var entity = table.ExecuteQuery(query).SafeFirstOrDefault();
+            if (entity == null)
+            {
+                return; // should not try to delete saga data that does not exist, this situation can occur on retry or parallel execution
+            }
 
             table.Execute(TableOperation.Delete(entity));
         }
