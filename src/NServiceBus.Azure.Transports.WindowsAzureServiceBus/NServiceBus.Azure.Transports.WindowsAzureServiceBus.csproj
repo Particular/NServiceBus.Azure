@@ -90,6 +90,7 @@
     <Compile Include="Creation\Clients\ManageTopicClientsLifeCycle.cs" />
     <Compile Include="Creation\ICreateQueues.cs" />
     <Compile Include="Receiving\CreationExceptionHandling.cs" />
+    <Compile Include="Receiving\EmptyNotifier.cs" />
     <Compile Include="Receiving\RetriableSendExceptionHandling.cs" />
     <Compile Include="Topology\AzureServiceBusTopologyCreator.cs" />
     <Compile Include="Creation\Resources\ICreateNamespaceManagers.cs" />
@@ -103,6 +104,8 @@
     <Compile Include="Sending\AzureServiceBusQueueSender.cs" />
     <Compile Include="Sending\ISendBrokeredMessages.cs" />
     <Compile Include="Sending\MessageTooLargeException.cs" />
+    <Compile Include="Topology\Bundle\BundleTopology.cs" />
+    <Compile Include="Topology\Bundle\NamingConventions.cs" />
     <Compile Include="Topology\DefaultTopology.cs" />
     <Compile Include="Topology\ITopology.cs" />
     <Compile Include="Topology\QueueAndTopicByEndpoint\NamingConventions.cs" />

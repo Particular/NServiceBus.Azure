@@ -1,6 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.ServiceBus.Messaging;
 
     public interface INotifyReceivedBrokeredMessages
@@ -9,9 +10,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
         void Stop();
 
-        event EventHandler Faulted;
-
         Type MessageType { get; set; }
-        Address Address { get; set; }
+        string EntityName { get; set; }
+        IEnumerable<string> Namespaces { get; set; }
     }
 }
