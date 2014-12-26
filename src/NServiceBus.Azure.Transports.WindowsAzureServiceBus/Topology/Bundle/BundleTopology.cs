@@ -56,7 +56,7 @@
 
         public INotifyReceivedBrokeredMessages Subscribe(Type eventType, Address address)
         {
-            var queueName = NamingConventions.QueueNamingConvention(config.Settings, address.Queue, false);
+            var queueName = NamingConventions.SubscriptionNamingConvention(config.Settings, address.Queue);
             var namespaces = new[]
             {
                 primaryConnectionString,
@@ -175,7 +175,7 @@
             if (eventType != null)
             {
                 filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
-                n = eventType.FullName;
+                n = NamingConventions.SqlFilterNamingConvention(config.Settings, eventType.FullName);
             }
 
             subscriptionClient.RemoveRule(n);

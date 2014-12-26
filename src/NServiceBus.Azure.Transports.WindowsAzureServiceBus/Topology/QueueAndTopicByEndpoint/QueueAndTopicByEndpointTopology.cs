@@ -167,7 +167,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             if (eventType != null)
             {
                 filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
-                n = eventType.FullName;
             }
 
             GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);

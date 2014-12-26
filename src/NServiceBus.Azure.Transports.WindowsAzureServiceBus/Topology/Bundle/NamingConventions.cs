@@ -70,6 +70,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.Bundle
             }
         }
 
+        internal static Func<ReadOnlySettings, string, string> SqlFilterNamingConvention
+        {
+            get
+            {
+                return (settings, filtername) =>
+                {
+                    filtername = SanitizeEntityName(filtername);
+
+                    if (filtername.Length >= 50)
+                        filtername = new DeterministicGuidBuilder().Build(filtername).ToString();
+
+                    return filtername;
+                };
+            }
+        }
+
         internal static Func<ReadOnlySettings, string, int, string> TopicNamingConvention
         {
             get
