@@ -181,7 +181,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             foreach (var rule in rules)
             {
                 var sqlFilter = rule.Filter as SqlFilter;
-                if (sqlFilter != null && sqlFilter.SqlExpression != filter)
+                if (sqlFilter != null && sqlFilter.SqlExpression != "1=1" && sqlFilter.SqlExpression != filter)
                 {
                     throw new SubscriptionAlreadyInUseException(
                         "Looks like this subscriptionname is already taken by another logical endpoint as the sql filter does not match the subscribed eventtype, please choose a different subscription name!");
