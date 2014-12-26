@@ -24,10 +24,14 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.config = config;
         }
 
-        public TopicDescription Create(Address address)
+        public TopicDescription Create(string topicName, string @namespace)
         {
-            var topicName = address.Queue;
-            var namespaceclient = createNamespaceManagers.Create(address.Machine);
+            var namespaceclient = createNamespaceManagers.Create(@namespace);
+            return Create(topicName, namespaceclient);
+        }
+
+        public TopicDescription Create(string topicName, NamespaceManager namespaceclient)
+        {
             var description = new TopicDescription(topicName)
             {
                 // todo: add the other settings from a separate config section? Or same as queue section?
@@ -88,6 +92,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
             return description;
         }
+
+
 
         bool TopicExists(NamespaceManager namespaceClient, string topicpath)
         {

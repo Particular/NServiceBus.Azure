@@ -5,7 +5,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
     public interface ICreateSubscriptions
     {
-        SubscriptionDescription Create(Address topic, Type eventType, string subscriptionname);
-        void Delete(Address topic, string subscriptionname);
+        SubscriptionDescription Create(string topicName, string @namespace, Type eventType, string subscriptionname, string forwardTo = null);
+        void Delete(string topicName, string @namespace, string subscriptionname);
     }
 }

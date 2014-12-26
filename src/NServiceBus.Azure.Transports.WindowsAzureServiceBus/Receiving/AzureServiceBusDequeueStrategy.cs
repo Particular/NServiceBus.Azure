@@ -227,16 +227,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             logger.InfoFormat("Creating a new notifier for address {0}", address.ToString());
 
             var notifier = topology.GetReceiver(address);
-
-            notifier.Faulted += NotifierFaulted;
-
             TrackNotifier(null, address, notifier);
-        }
-
-        void NotifierFaulted(object sender, EventArgs e)
-        {
-           RemoveNotifier(null, address);
-           CreateAndTrackNotifier();
         }
 
         public void TrackNotifier(Type eventType, Address original, INotifyReceivedBrokeredMessages notifier)
@@ -244,15 +235,16 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var key = CreateKeyFor(eventType, original);
 
             notifier.Start(EnqueueMessage, ErrorDequeueingBatch);
+
             notifiers.AddOrUpdate(key, notifier, (s, n) => notifier);
 
             if (eventType != null)
             {
-                logger.InfoFormat("Started tracking new notifier for event type {0}, address {1}",  eventType.Name, original.ToString());
+                logger.InfoFormat("Started tracking new notifiers for event type {0}, address {1}",  eventType.Name, original.ToString());
             }
             else
             {
-                logger.InfoFormat("Started tracking new notifier for address {0}", original.ToString());
+                logger.InfoFormat("Started tracking new notifiers for address {0}", original.ToString());
             }
         }
 
@@ -264,8 +256,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             INotifyReceivedBrokeredMessages toRemove;
             if (notifiers.TryRemove(key, out toRemove))
             {
-                toRemove.Faulted -= NotifierFaulted;
                 toRemove.Stop();
+                
                 if (eventType != null)
                 {
                     logger.InfoFormat("Stopped tracking new notifier for event type {0}, address {1}", eventType.Name, original.ToString());

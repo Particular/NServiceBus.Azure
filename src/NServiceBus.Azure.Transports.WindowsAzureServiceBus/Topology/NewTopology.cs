@@ -1,16 +1,12 @@
-﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
+namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using Config;
-    using Features;
-    using QueueAndTopicByEndpoint;
-    using Transports;
+    using NServiceBus.Azure.Transports.WindowsAzureServiceBus.Bundle;
+    using NServiceBus.Azure.Transports.WindowsAzureServiceBus.Transports;
+    using NServiceBus.Config;
+    using NServiceBus.Features;
 
-    public class DefaultTopology : Feature
+    public class NewTopology : Feature
     {
-        public DefaultTopology()
-        {
-            EnableByDefault();
-        }
 
         protected override void Setup(FeatureConfigurationContext context)
         {
@@ -29,16 +25,15 @@
                 var subscriptionClients = b.Build<ICreateSubscriptionClients>();
                 var topicClients = b.Build<IManageTopicClientsLifecycle>();
                 var queueClientCreator = b.Build<ICreateQueueClients>();
-                var namespaceManager = b.Build<ICreateNamespaceManagers>();
 
                 // isn't there a better way to call initialize on object creation?
-                var topology = new QueueAndTopicByEndpointTopology(config, 
-                    messagingFactories, 
-                    subscriptionCreator,queueCreator, topicCreator,
-                    queueClients, subscriptionClients, topicClients, queueClientCreator, namespaceManager);
-                
+                var topology = new BundleTopology(config,
+                    messagingFactories,
+                    subscriptionCreator, queueCreator, topicCreator,
+                    queueClients, subscriptionClients, topicClients, queueClientCreator);
+
                 topology.Initialize(context.Settings);
-                
+
                 return topology;
 
             }, DependencyLifecycle.SingleInstance);

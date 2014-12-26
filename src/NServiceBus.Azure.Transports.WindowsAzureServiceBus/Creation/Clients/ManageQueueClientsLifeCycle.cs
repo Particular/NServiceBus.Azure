@@ -19,18 +19,18 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.messagingFactories = messagingFactories;
         }
 
-        public QueueClient Get(Address address)
+        public QueueClient Get(string queueName, string @namespace)
         {
-            var key = address.ToString();
+            var key = queueName + "@" + @namespace;
             var buffer = queueClients.GetOrAdd(key, s =>
             {
                 var b = new CircularBuffer<QueueClientEntry>(numberOfQueueClientsPerAddress);
                 for (var i = 0; i < numberOfQueueClientsPerAddress; i++)
                 {
-                    var factory = messagingFactories.Get(address);
+                    var factory = messagingFactories.Get(queueName, @namespace);
                     b.Put(new QueueClientEntry
                     {
-                        Client = queueClientCreator.Create(address.Queue, factory)
+                        Client = queueClientCreator.Create(queueName, factory)
                     });
                 }
                 return b;
@@ -44,8 +44,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     if (entry.Client.IsClosed)
                     {
-                        var factory = messagingFactories.Get(address);
-                        entry.Client = queueClientCreator.Create(address.Queue, factory);
+                        var factory = messagingFactories.Get(queueName, @namespace);
+                        entry.Client = queueClientCreator.Create(queueName, factory);
                     }
                 }
             }

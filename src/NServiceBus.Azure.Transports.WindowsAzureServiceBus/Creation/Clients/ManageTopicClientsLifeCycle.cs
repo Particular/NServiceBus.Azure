@@ -19,18 +19,18 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.messagingFactories = messagingFactories;
         }
 
-        public TopicClient Get(Address address)
+        public TopicClient Get(string topicName, string @namespace)
         {
-            var key = address.ToString();
+            var key = topicName + "@" + @namespace;
             var buffer = topicClients.GetOrAdd(key, s =>
             {
                 var b = new CircularBuffer<TopicClientEntry>(numberOfTopicClientsPerAddress);
                 for (var i = 0; i < numberOfTopicClientsPerAddress; i++)
                 {
-                    var factory = messagingFactories.Get(address);
+                    var factory = messagingFactories.Get(topicName, @namespace);
                     b.Put(new TopicClientEntry
                     {
-                        Client = topicClientCreator.Create(address.Queue, factory)
+                        Client = topicClientCreator.Create(topicName, factory)
                     });
                 }
                 return b;
@@ -44,8 +44,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     if (entry.Client.IsClosed)
                     {
-                        var factory = messagingFactories.Get(address);
-                        entry.Client = topicClientCreator.Create(address.Queue, factory);
+                        var factory = messagingFactories.Get(topicName, @namespace);
+                        entry.Client = topicClientCreator.Create(topicName, factory);
                     }
                 }
             }

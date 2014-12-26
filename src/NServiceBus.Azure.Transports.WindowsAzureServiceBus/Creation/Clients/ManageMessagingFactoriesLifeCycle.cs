@@ -16,13 +16,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.createMessagingFactories = createMessagingFactories;
         }
 
-        public MessagingFactory Get(Address address)
+        public MessagingFactory Get(string entityName, string @namespace)
         {
-            var key = address.ToString();
+            var key = entityName + "@" + @namespace;
             var buffer = MessagingFactories.GetOrAdd(key, s => {
                 var b = new CircularBuffer<FactoryEntry>(numberOfFactoriesPerAddress);
-                for(var i = 0; i < numberOfFactoriesPerAddress; i++) 
-                    b.Put(new FactoryEntry { Factory = createMessagingFactories.Create(address) });
+                for(var i = 0; i < numberOfFactoriesPerAddress; i++)
+                    b.Put(new FactoryEntry { Factory = createMessagingFactories.Create(@namespace) });
                 return b;
             });
 
@@ -34,7 +34,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 {
                     if (entry.Factory.IsClosed)
                     {
-                        entry.Factory = createMessagingFactories.Create(address);
+                        entry.Factory = createMessagingFactories.Create(@namespace);
                     }
                 }
             }

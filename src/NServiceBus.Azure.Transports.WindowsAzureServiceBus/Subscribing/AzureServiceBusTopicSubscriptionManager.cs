@@ -67,11 +67,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             logger.InfoFormat("Creating a new notifier for event type {0}, address {1}", eventType.Name, original.ToString());
 
             var notifier = topology.Subscribe(eventType, original);
-            notifier.Faulted += (sender, args) =>
-            {
-                strategy.RemoveNotifier(eventType, original);
-                CreateAndTrackNotifier(eventType, original, strategy);
-            };
             strategy.TrackNotifier(eventType, original, notifier);
         }
 

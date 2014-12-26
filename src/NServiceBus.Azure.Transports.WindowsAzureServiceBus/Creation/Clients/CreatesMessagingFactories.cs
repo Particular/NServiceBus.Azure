@@ -12,10 +12,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.createNamespaceManagers = createNamespaceManagers;
         }
 
-        public MessagingFactory Create(Address address)
+        public MessagingFactory Create(string @namespace)
         {
-            var potentialConnectionString = address.Machine;
-            var namespaceManager = createNamespaceManagers.Create(potentialConnectionString);
+            var namespaceManager = createNamespaceManagers.Create(@namespace);
 
             var settings = new MessagingFactorySettings
             {

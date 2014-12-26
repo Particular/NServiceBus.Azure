@@ -32,11 +32,10 @@
             this.config = config;
         }
 
-        public QueueDescription Create(Address address)
+        public QueueDescription Create(string queueName, string @namespace)
         {
-            var queueName = address.Queue;
             var path = "";
-            var namespaceClient = createNamespaceManagers.Create(address.Machine);
+            var namespaceClient = createNamespaceManagers.Create(@namespace);
 
             var description = new QueueDescription(queueName)
             {

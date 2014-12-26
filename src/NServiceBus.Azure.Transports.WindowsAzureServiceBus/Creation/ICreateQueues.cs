@@ -10,8 +10,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.Transports
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="address"></param>
+        /// <param name="queuename"></param>
+        /// <param name="namespace"></param>
         /// <returns></returns>
-        QueueDescription Create(Address address);
+        QueueDescription Create(string queuename, string @namespace);
     }
 }

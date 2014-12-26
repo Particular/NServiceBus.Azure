@@ -1,6 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Logging;
@@ -15,9 +16,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         public int ServerWaitTime { get; set; }
         public int BatchSize { get; set; }
         public int BackoffTimeInSeconds { get; set; }
-        public SubscriptionClient SubscriptionClient { get; set; }
+
+        public Func<Type, string, string, SubscriptionClient> SubscriptionClientFactory { get; set; }
+
         public Type MessageType { get; set; }
-        public Address Address { get; set; }
+        public string EntityName { get; set; }
+        public IEnumerable<string> Namespaces { get; set; }
 
         public void Start(Action<BrokeredMessage> tryProcessMessage, Action<Exception> errorProcessingMessage)
         {
@@ -26,7 +30,21 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             this.tryProcessMessage = tryProcessMessage;
             this.errorProcessingMessage = errorProcessingMessage;
 
-            SafeBeginReceive();
+            foreach (var ns in Namespaces)
+            {
+                var client = SubscriptionClientFactory(MessageType, EntityName, ns);
+
+                var map = new SubscriptionClientMapping
+                {
+                    Namespace = ns,
+                    TopicName = EntityName,
+                    SubscriptionClient = client
+                };
+
+                SafeBeginReceive(map);
+            }
+
+            
         }
 
         public void Stop()
@@ -34,43 +52,36 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             cancelRequested = true;
         }
 
-        public event EventHandler Faulted;
-
-        void OnFaulted()
-        {
-            if (Faulted != null)
-                Faulted(this, EventArgs.Empty);
-        }
-
         void OnMessage(IAsyncResult ar)
         {
+            var map = (SubscriptionClientMapping) ar.AsyncState;
             try
             {
-                if (SubscriptionClient.IsClosed)
+                if (!map.SubscriptionClient.IsClosed)
                 {
-                    Stop();
-                    OnFaulted();
-                    return;
+                    var receivedMessages = map.SubscriptionClient.EndReceiveBatch(ar);
+
+                    if (cancelRequested) return;
+
+                    foreach (var receivedMessage in receivedMessages)
+                    {
+                        tryProcessMessage(receivedMessage);
+                    }
                 }
-
-                var receivedMessages = SubscriptionClient.EndReceiveBatch(ar);
-
-                if (cancelRequested) return;
-
-                foreach (var receivedMessage in receivedMessages)
+                else
                 {
-                    tryProcessMessage(receivedMessage);
+                    map.SubscriptionClient = SubscriptionClientFactory(MessageType, map.TopicName, map.Namespace);
                 }
             }
             catch (TimeoutException ex)
             {
 
-                logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", SubscriptionClient.Name), ex);
+                logger.Warn(string.Format("Timeout communication exception occured on subscription {0}", map.SubscriptionClient.Name), ex);
                 // time's up, just continue and retry
             }
             catch (UnauthorizedAccessException ex)
             {
-                logger.Fatal(string.Format("Unauthorized Access Exception occured on subscription {0}", SubscriptionClient.Name), ex);
+                logger.Fatal(string.Format("Unauthorized Access Exception occured on subscription {0}", map.SubscriptionClient.Name), ex);
 
                 // errorProcessingMessage(ex);
                 // return
@@ -85,13 +96,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 
                 if (!ex.IsTransient && !RetriableReceiveExceptionHandling.IsRetryable(ex))
                 {
-                    logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", SubscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+                    logger.Fatal(string.Format("{1} Messaging exception occured on subscription {0}", map.SubscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
 
                     errorProcessingMessage(ex);
                 }
                 else
                 {
-                    logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", SubscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
+                    logger.Warn(string.Format("{1} Messaging exception occured on subscription {0}", map.SubscriptionClient.Name, (ex.IsTransient ? "Transient" : "Non transient")), ex);
                 }
 
 
@@ -101,31 +112,38 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             catch (OperationCanceledException ex)
             {
-                logger.Fatal(string.Format("Operation cancelled exception occured on receive for subscription {0}, most likely due to a closed channel, faulting this notifier", SubscriptionClient.Name), ex);
-                Stop();
-                OnFaulted();
+                logger.Fatal(string.Format("Operation cancelled exception occured on receive for subscription {0}, most likely due to a closed channel, faulting this notifier", map.SubscriptionClient.Name), ex);
+
+                map.SubscriptionClient = SubscriptionClientFactory(MessageType, map.TopicName, map.Namespace);
             }
             finally
             {
-                SafeBeginReceive();
+                SafeBeginReceive(map);
             }
         }
 
-        void SafeBeginReceive()
+        void SafeBeginReceive(SubscriptionClientMapping map)
         {
             if (!cancelRequested)
             {
                 try
                 {
-                    SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, null);
+                    map.SubscriptionClient.BeginReceiveBatch(BatchSize, TimeSpan.FromSeconds(ServerWaitTime), OnMessage, map);
                 }
                 catch (OperationCanceledException ex)
                 {
-                    logger.Fatal(string.Format("Operation cancelled exception occured on receive for subscription {0}, faulting this notifier", SubscriptionClient.Name), ex);
-                    Stop();
-                    OnFaulted();
+                    logger.Fatal(string.Format("Operation cancelled exception occured on receive for subscription {0}, faulting this notifier", map.SubscriptionClient.Name), ex);
+
+                    map.SubscriptionClient = SubscriptionClientFactory(MessageType, map.TopicName, map.Namespace);
                 }
             }
+        }
+
+        class SubscriptionClientMapping
+        {
+            public SubscriptionClient SubscriptionClient { get; set; }
+            public string TopicName { get; set; }
+            public string Namespace { get; set; }
         }
     }
 }

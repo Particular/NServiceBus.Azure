@@ -1,6 +1,7 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEndpoint
 {
     using System;
+    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Logging;
     using Settings;
@@ -22,6 +23,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         ICreateSubscriptionClients subscriptionClients;
         IManageTopicClientsLifecycle topicClients;
         ICreateQueueClients queueClientCreator;
+        readonly ICreateNamespaceManagers createNamespaceManagers;
 
         ILog logger = LogManager.GetLogger(typeof(QueueAndTopicByEndpointTopology));
 
@@ -34,7 +36,8 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             IManageQueueClientsLifecycle queueClients, 
             ICreateSubscriptionClients subscriptionClients,
             IManageTopicClientsLifecycle topicClients, 
-            ICreateQueueClients queueClientCreator)
+            ICreateQueueClients queueClientCreator,
+            ICreateNamespaceManagers createNamespaceManagers)
         {
             this.config = config;
             this.messagingFactories = messagingFactories;
@@ -45,6 +48,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             this.subscriptionClients = subscriptionClients;
             this.topicClients = topicClients;
             this.queueClientCreator = queueClientCreator;
+            this.createNamespaceManagers = createNamespaceManagers;
         }
 
         public void Initialize(ReadOnlySettings settings)
@@ -56,22 +60,25 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
         {
             var publisherAddress = NamingConventions.PublisherAddressConventionForSubscriptions(config.Settings, address);
             var notifier = config.Builder.Build<AzureServiceBusSubscriptionNotifier>();
-            notifier.SubscriptionClient = CreateSubscriptionClient(eventType, publisherAddress);
+            notifier.SubscriptionClientFactory = CreateSubscriptionClient;
             //todo: notifier.BatchSize = maximumConcurrencyLevel;
             notifier.MessageType = eventType;
-            notifier.Address = publisherAddress;
+            notifier.EntityName = publisherAddress.Queue;
+            notifier.Namespaces = new []{ publisherAddress.Machine };
             return notifier;
         }
 
-        SubscriptionClient CreateSubscriptionClient(Type eventType, Address address)
+        SubscriptionClient CreateSubscriptionClient(Type eventType, string topicName, string @namespace)
         {
             var subscriptionname = NamingConventions.SubscriptionNamingConvention(config.Settings, eventType, config.Settings.EndpointName());
-            var factory = messagingFactories.Get(address);
+            var factory = messagingFactories.Get(topicName, @namespace);
+            var ns = createNamespaceManagers.Create(@namespace);
+            SubscriptionClient client;
 
             try
             {
-                var description = subscriptionCreator.Create(address, eventType, subscriptionname);
-                return subscriptionClients.Create(description, factory);
+                var description = subscriptionCreator.Create(topicName, @namespace, eventType, subscriptionname);
+                client = subscriptionClients.Create(description, factory);
             }
             catch (SubscriptionAlreadyInUseException)
             {
@@ -80,46 +87,55 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
                 // that's why we're not defaulting to this convention.
 
                 subscriptionname = NamingConventions.SubscriptionFullNamingConvention(config.Settings, eventType, config.Settings.EndpointName());
-                var description = subscriptionCreator.Create(address, eventType, subscriptionname);
-                return subscriptionClients.Create(description, factory);
+                var description = subscriptionCreator.Create(topicName, @namespace, eventType, subscriptionname);
+                client = subscriptionClients.Create(description, factory);
             }
-
+            AddFilter(client, eventType, subscriptionname, ns, topicName);
+            return client;
         }
 
         public void Unsubscribe(INotifyReceivedBrokeredMessages notifier)
         {
             var subscriptionname = NamingConventions.SubscriptionNamingConvention(config.Settings, notifier.MessageType, config.Settings.EndpointName());
 
-            subscriptionCreator.Delete(notifier.Address, subscriptionname);
+            foreach (var ns in notifier.Namespaces)
+            {
+                subscriptionCreator.Delete(notifier.EntityName, ns, subscriptionname);
+            }
         }
 
         public INotifyReceivedBrokeredMessages GetReceiver(Address original)
         {
             var address = NamingConventions.QueueAddressConvention(config.Settings, original, false);
-            var desc = queueCreator.Create(address); //we shouldn't do this over and over
-            var factory = messagingFactories.Get(address);
-            var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
-            notifier.QueueClient = queueClientCreator.Create(desc, factory);
 
-            //todo: notifier.BatchSize = maximumConcurrencyLevel;
+            var notifier = (AzureServiceBusQueueNotifier)config.Builder.Build(typeof(AzureServiceBusQueueNotifier));
+            notifier.EntityName = address.Queue;
+            notifier.Namespaces = new[] { address.Machine };
+            notifier.QueueClientFactory = (q, n) =>
+            {
+                var desc = queueCreator.Create(q, n); //we shouldn't do this over and over
+                var factory = messagingFactories.Get(q, n);
+                return queueClientCreator.Create(desc, factory);
+            };
+
             return notifier;
         }
 
         public ISendBrokeredMessages GetSender(Address original)
         {
             var address = NamingConventions.QueueAddressConvention(config.Settings, original, true);
-            queueCreator.Create(address); //we shouldn't do this over and over
+            queueCreator.Create(address.Queue, address.Machine); //we shouldn't do this over and over
             var sender = (AzureServiceBusQueueSender)config.Builder.Build(typeof(AzureServiceBusQueueSender));
-            sender.QueueClient = queueClients.Get(address);
+            sender.QueueClient = queueClients.Get(address.Queue, address.Machine);
             return sender;
         }
 
         public IPublishBrokeredMessages GetPublisher(Address original)
         {
             var address = NamingConventions.PublisherAddressConvention(config.Settings, original);
-            topicCreator.Create(address); //we shouldn't do this over and over
+            topicCreator.Create(address.Queue, address.Machine); //we shouldn't do this over and over
             var publisher = (AzureServiceBusTopicPublisher)config.Builder.Build(typeof(AzureServiceBusTopicPublisher));
-            publisher.TopicClient = topicClients.Get(address);
+            publisher.TopicClient = topicClients.Get(address.Queue, address.Machine);
             return publisher;
         }
 
@@ -128,17 +144,49 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
             logger.InfoFormat("Going to create queue for address '{0}' if needed", original.Queue);
 
             var queue = NamingConventions.QueueAddressConvention(config.Settings, original, false);
-            queueCreator.Create(queue);
+            queueCreator.Create(queue.Queue, queue.Machine);
 
             logger.InfoFormat("Going to create topic for address '{0}' if needed", original.Queue);
             if (original == config.LocalAddress)
             {
                 var topic = NamingConventions.PublisherAddressConvention(config.Settings, original);
-                topicCreator.Create(topic);
+                topicCreator.Create(topic.Queue, topic.Machine);
             }
             else
             {
                 logger.InfoFormat("Did not create topic for address  '{0}' as it does not correspond to the local address", original.Queue);
+            }
+        }
+
+
+        private void AddFilter(SubscriptionClient subscriptionClient, Type eventType, string subscriptionname, NamespaceManager namespaceClient, string topicPath)
+        {
+            var filter = "1=1";
+            var n = "$Default";
+
+            if (eventType != null)
+            {
+                filter = new ServicebusSubscriptionFilterBuilder().BuildFor(eventType);
+                n = eventType.FullName;
+            }
+
+            GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(subscriptionname, namespaceClient, topicPath, filter);
+
+            subscriptionClient.RemoveRule(n);
+            subscriptionClient.AddRule(n, new SqlFilter(filter));
+        }
+
+        private void GuardAgainstSubscriptionReuseAcrossLogicalEndpoints(string subscriptionname, NamespaceManager namespaceClient, string topicPath, string filter)
+        {
+            var rules = namespaceClient.GetRules(topicPath, subscriptionname);
+            foreach (var rule in rules)
+            {
+                var sqlFilter = rule.Filter as SqlFilter;
+                if (sqlFilter != null && sqlFilter.SqlExpression != filter)
+                {
+                    throw new SubscriptionAlreadyInUseException(
+                        "Looks like this subscriptionname is already taken by another logical endpoint as the sql filter does not match the subscribed eventtype, please choose a different subscription name!");
+                }
             }
         }
     }
