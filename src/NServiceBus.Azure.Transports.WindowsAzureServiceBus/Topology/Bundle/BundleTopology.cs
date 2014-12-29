@@ -61,7 +61,8 @@
 
         public INotifyReceivedBrokeredMessages Subscribe(Type eventType, Address address)
         {
-            var queueName = NamingConventions.SubscriptionNamingConvention(config.Settings, config.LocalAddress.Queue);
+            var subscriptionName = NamingConventions.SubscriptionNamingConvention(config.Settings, config.LocalAddress.Queue);
+            var forwardQueueName = NamingConventions.QueueNamingConvention(config.Settings, config.LocalAddress.Queue, false);
             var namespaces = new[]
             {
                 primaryConnectionString,
@@ -76,7 +77,7 @@
                 {
                     var fact = messagingFactories.Get(topic, ns);
                     var nsmanager = namespaceManagers.Create(ns);
-                    var desc = subscriptionCreator.Create(topic, ns, eventType, queueName, queueName);
+                    var desc = subscriptionCreator.Create(topic, ns, eventType, subscriptionName, forwardQueueName);
                     var client = subscriptionClients.Create(desc, fact);
                     AddFilter(client, eventType, nsmanager, topic, desc.Name);
                 }
@@ -85,7 +86,7 @@
             var notifier = new EmptyNotifier
             {
                 MessageType = eventType,
-                EntityName = queueName,
+                EntityName = subscriptionName,
                 Namespaces = namespaces
             };
             return notifier;
