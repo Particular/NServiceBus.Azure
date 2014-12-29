@@ -61,7 +61,7 @@
 
         public INotifyReceivedBrokeredMessages Subscribe(Type eventType, Address address)
         {
-            var queueName = NamingConventions.SubscriptionNamingConvention(config.Settings, address.Queue);
+            var queueName = NamingConventions.SubscriptionNamingConvention(config.Settings, config.LocalAddress.Queue);
             var namespaces = new[]
             {
                 primaryConnectionString,
