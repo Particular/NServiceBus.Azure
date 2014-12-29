@@ -10,7 +10,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         public static Func<ReadOnlySettings, string> Apply = settings =>
         {
             var configSection = settings.GetConfigSection<AzureQueueConfig>();
-            var queueName = settings.EndpointName();
+            var queueName = settings.Get<string>("NServiceBus.LocalAddress");
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
             {
@@ -28,6 +28,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
         static bool ShouldIndividualize(AzureQueueConfig configSection, ReadOnlySettings settings)
         {
+            // if this setting is set, then the core is responsible for individualization
+            if (settings != null && settings.HasExplicitValue("IndividualizeEndpointAddress"))
+            {
+                return false;
+            }
+
             // if explicitly set in code
             if (settings != null && settings.HasExplicitValue("ScaleOut.UseSingleBrokerQueue"))
                 return !settings.Get<bool>("ScaleOut.UseSingleBrokerQueue");
