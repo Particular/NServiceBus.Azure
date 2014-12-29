@@ -2,7 +2,6 @@
 {
     using Config;
     using Features;
-    using NServiceBus.Azure.Transports.WindowsAzureServiceBus.Bundle;
     using QueueAndTopicByEndpoint;
     using Transports;
 

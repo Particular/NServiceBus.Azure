@@ -213,6 +213,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.0-beta0001\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.0-beta0001\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.0-beta0001\Volatile\When_sending_to_non_durable_endpoint.cs" />
+    <Compile Include="ConfigureAzureServiceBusTransport.cs" />
     <Compile Include="Receiving\When_sending_a_message_with_no_correlation_id.cs" />
     <Compile Include="Sending\When_sending_an_oversized_message_without_a_transaction_scope.cs" />
     <Compile Include="Sending\When_sending_an_oversized_message_from_a_transaction_scope.cs" />

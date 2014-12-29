@@ -25,8 +25,12 @@
 
             const string typeName = "ConfigureTransport";
 
-            var configurerType = endpointBuilderType.GetNestedType(typeName);
+            var transportType = Type.GetType(settings["Transport"]);
+            var transportTypeName = "Configure" + transportType.Name;
 
+            var configurerType = endpointBuilderType.GetNestedType(typeName) ??
+                                 Type.GetType(transportTypeName, false);
+            
             if (configurerType != null)
             {
                 var configurer = Activator.CreateInstance(configurerType);
@@ -36,8 +40,6 @@
                 dc.Configure(builder);
                 return;
             }
-
-            var transportType = Type.GetType(settings["Transport"]);
 
             builder.UseTransport(transportType).ConnectionString(settings["Transport.ConnectionString"]);
         }

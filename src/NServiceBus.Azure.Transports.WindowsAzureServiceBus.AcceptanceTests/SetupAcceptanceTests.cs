@@ -1,5 +1,5 @@
-    using NServiceBus.AcceptanceTests.Retries;
-    using NUnit.Framework;
+using NServiceBus.AcceptanceTests.Retries;
+using NUnit.Framework;
 
     /// <summary>
     /// Global setup fixture
@@ -14,4 +14,3 @@
             When_doing_flr_with_native_transactions.X = () => 4;
         }
     }
-
