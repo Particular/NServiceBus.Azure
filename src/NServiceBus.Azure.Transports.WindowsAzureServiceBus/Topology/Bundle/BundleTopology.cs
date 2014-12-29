@@ -1,6 +1,8 @@
 ﻿namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.Bundle
 {
     using System;
+    using System.Linq;
+    using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
     using NServiceBus.Azure.Transports.WindowsAzureServiceBus.Transports;
     using NServiceBus.Logging;
@@ -17,6 +19,7 @@
         ICreateSubscriptionClients subscriptionClients;
         IManageTopicClientsLifecycle topicClients;
         ICreateQueueClients queueClientCreator;
+        ICreateNamespaceManagers namespaceManagers;
         Random random = new Random();
 
         ILog logger = LogManager.GetLogger(typeof(BundleTopology));
@@ -37,7 +40,8 @@
             IManageQueueClientsLifecycle queueClients, 
             ICreateSubscriptionClients subscriptionClients,
             IManageTopicClientsLifecycle topicClients, 
-            ICreateQueueClients queueClientCreator)
+            ICreateQueueClients queueClientCreator, 
+            ICreateNamespaceManagers namespaceManagers)
         {
             this.config = config;
             this.messagingFactories = messagingFactories;
@@ -48,6 +52,7 @@
             this.subscriptionClients = subscriptionClients;
             this.topicClients = topicClients;
             this.queueClientCreator = queueClientCreator;
+            this.namespaceManagers = namespaceManagers;
         }
 
         public void Initialize(ReadOnlySettings setting)
@@ -70,9 +75,10 @@
                 foreach (var ns in namespaces)
                 {
                     var fact = messagingFactories.Get(topic, ns);
+                    var nsmanager = namespaceManagers.Create(ns);
                     var desc = subscriptionCreator.Create(topic, ns, eventType, queueName, queueName);
                     var client = subscriptionClients.Create(desc, fact);
-                    AddFilter(client, eventType);
+                    AddFilter(client, eventType, nsmanager, topic, desc.Name);
                 }
             }
 
@@ -167,7 +173,7 @@
             }
         }
 
-        private void AddFilter(SubscriptionClient subscriptionClient, Type eventType)
+        private void AddFilter(SubscriptionClient subscriptionClient, Type eventType, NamespaceManager namespaceClient, string topicPath, string subscriptionName)
         {
             var filter = "1=1";
             var n = "$Default";
@@ -178,8 +184,22 @@
                 n = NamingConventions.SqlFilterNamingConvention(config.Settings, eventType.FullName);
             }
 
-            subscriptionClient.RemoveRule(n);
-            subscriptionClient.AddRule(n, new SqlFilter(filter));
+            var rules = namespaceClient.GetRules(topicPath, subscriptionName).ToList();
+
+            if (n != "$Default")
+            {
+                var rule = rules.FirstOrDefault(r => r.Name == "$Default");
+                if (rule != null)
+                {
+                    subscriptionClient.RemoveRule(rule.Name);
+                }
+
+                rule = rules.FirstOrDefault(r => r.Name == n);
+                if (rule == null)
+                {
+                    subscriptionClient.AddRule(n, new SqlFilter(filter));
+                }
+            }
         }
     }
 }

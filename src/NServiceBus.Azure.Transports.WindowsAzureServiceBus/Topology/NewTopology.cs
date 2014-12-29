@@ -25,12 +25,13 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 var subscriptionClients = b.Build<ICreateSubscriptionClients>();
                 var topicClients = b.Build<IManageTopicClientsLifecycle>();
                 var queueClientCreator = b.Build<ICreateQueueClients>();
+                var namespaceManagers = b.Build<ICreateNamespaceManagers>();
 
                 // isn't there a better way to call initialize on object creation?
                 var topology = new BundleTopology(config,
                     messagingFactories,
                     subscriptionCreator, queueCreator, topicCreator,
-                    queueClients, subscriptionClients, topicClients, queueClientCreator);
+                    queueClients, subscriptionClients, topicClients, queueClientCreator, namespaceManagers);
 
                 topology.Initialize(context.Settings);
 
