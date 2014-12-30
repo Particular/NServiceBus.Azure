@@ -67,7 +67,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             if (timeToSend.HasValue)
                 brokeredMessage.ScheduledEnqueueTimeUtc = timeToSend.Value;
 
-            var timeToLive = TimeSpan.Zero;
+            TimeSpan? timeToLive = null;
             if (message.TimeToBeReceived < TimeSpan.MaxValue)
             {
                 timeToLive = message.TimeToBeReceived;
@@ -77,10 +77,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                 timeToLive = options.TimeToBeReceived.Value;
             }
 
-            if (timeToLive <= TimeSpan.Zero) return null;
+            if (timeToLive.HasValue)
+            {
+                if (timeToLive.Value <= TimeSpan.Zero) return null;
 
-            brokeredMessage.TimeToLive = timeToLive;
-
+                brokeredMessage.TimeToLive = timeToLive.Value;
+            }
             GuardMessageSize(brokeredMessage);
 
             return brokeredMessage;
