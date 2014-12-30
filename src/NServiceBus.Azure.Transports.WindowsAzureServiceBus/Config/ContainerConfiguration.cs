@@ -81,19 +81,28 @@
 
             context.Container.ConfigureComponent<ManageTopicClientsLifeCycle>(DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent<AzureServicebusTopicClientCreator>(DependencyLifecycle.InstancePerCall);
-            context.Container.ConfigureComponent<AzureServicebusTopicCreator>(DependencyLifecycle.InstancePerCall);
-            context.Container.ConfigureProperty<AzureServicebusTopicCreator>(t => t.EnablePartitioning, configSection.EnablePartitioning);
+            context.Container.ConfigureComponent<AzureServiceBusTopicCreator>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.LockDuration, TimeSpan.FromMilliseconds(configSection.LockDuration));
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.MaxSizeInMegabytes, configSection.MaxSizeInMegabytes);
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.RequiresDuplicateDetection, configSection.RequiresDuplicateDetection);
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.RequiresSession, configSection.RequiresSession);
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.DefaultMessageTimeToLive, TimeSpan.FromMilliseconds(configSection.DefaultMessageTimeToLive));
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.EnableDeadLetteringOnMessageExpiration, configSection.EnableDeadLetteringOnMessageExpiration);
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.DuplicateDetectionHistoryTimeWindow, TimeSpan.FromMilliseconds(configSection.DuplicateDetectionHistoryTimeWindow));
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.EnableBatchedOperations, configSection.EnableBatchedOperations);
+            context.Container.ConfigureProperty<AzureServiceBusTopicCreator>(t => t.EnablePartitioning, configSection.EnablePartitioning);
 
             context.Container.ConfigureComponent<AzureServicebusSubscriptionClientCreator>(DependencyLifecycle.InstancePerCall);
             
-            context.Container.ConfigureComponent<AzureServicebusSubscriptionCreator>(DependencyLifecycle.InstancePerCall);
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.LockDuration, TimeSpan.FromMilliseconds(configSection.LockDuration));
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.RequiresSession, configSection.RequiresSession);
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.DefaultMessageTimeToLive, TimeSpan.FromMilliseconds(configSection.DefaultMessageTimeToLive));
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.EnableDeadLetteringOnMessageExpiration, configSection.EnableDeadLetteringOnMessageExpiration);
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.EnableDeadLetteringOnFilterEvaluationExceptions, configSection.EnableDeadLetteringOnFilterEvaluationExceptions);
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
-            context.Container.ConfigureProperty<AzureServicebusSubscriptionCreator>(t => t.EnableBatchedOperations, configSection.EnableBatchedOperations);
+            context.Container.ConfigureComponent<AzureServiceBusSubscriptionCreator>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureProperty<AzureServiceBusSubscriptionCreator>(t => t.LockDuration, TimeSpan.FromMilliseconds(configSection.LockDuration));
+            context.Container.ConfigureProperty<AzureServiceBusSubscriptionCreator>(t => t.RequiresSession, configSection.RequiresSession);
+            context.Container.ConfigureProperty<AzureServiceBusSubscriptionCreator>(t => t.DefaultMessageTimeToLive, TimeSpan.FromMilliseconds(configSection.DefaultMessageTimeToLive));
+            context.Container.ConfigureProperty<AzureServiceBusSubscriptionCreator>(t => t.EnableDeadLetteringOnMessageExpiration, configSection.EnableDeadLetteringOnMessageExpiration);
+            context.Container.ConfigureProperty<AzureServiceBusSubscriptionCreator>(t => t.EnableDeadLetteringOnFilterEvaluationExceptions, configSection.EnableDeadLetteringOnFilterEvaluationExceptions);
+            context.Container.ConfigureProperty<AzureServiceBusSubscriptionCreator>(t => t.MaxDeliveryCount, configSection.MaxDeliveryCount);
+            context.Container.ConfigureProperty<AzureServiceBusSubscriptionCreator>(t => t.EnableBatchedOperations, configSection.EnableBatchedOperations);
         }
 
     }

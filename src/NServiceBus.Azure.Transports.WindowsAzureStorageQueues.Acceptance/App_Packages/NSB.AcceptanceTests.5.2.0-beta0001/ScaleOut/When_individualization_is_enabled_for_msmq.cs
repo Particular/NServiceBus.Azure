@@ -2,7 +2,9 @@
 {
     using System.Linq;
     using NServiceBus.AcceptanceTesting;
+    using NServiceBus.AcceptanceTesting.Support;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
+    using NServiceBus.AcceptanceTests.ScenarioDescriptors;
     using NServiceBus.Settings;
     using NUnit.Framework;
 
@@ -13,9 +15,12 @@
         {
             Scenario.Define<Context>()
                     .WithEndpoint<IndividualizedEndpoint>().Done(c =>c.EndpointsStarted)
-                    .Repeat(r=>r.For(ScenarioDescriptors.Transports.Msmq))
+                    .Repeat(r => r.For<MsmqOnly>())
                     .Should(c=>Assert.AreEqual(c.EndpointName,c.Address.Split('@').First()))
-                    .Run();
+                    .Run(new RunSettings
+                    {
+                        UseSeparateAppDomains = true
+                    });
         }
 
         public class Context : ScenarioContext

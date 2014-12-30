@@ -46,6 +46,12 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 
         static bool ShouldIndividualize(AzureServiceBusQueueConfig configSection, ReadOnlySettings settings)
         {
+            // if this setting is set, then the core is responsible for individualization
+            if (settings != null && settings.HasExplicitValue("IndividualizeEndpointAddress"))
+            {
+                return false;
+            }
+
             // if explicitly set in code
             if (settings != null && settings.HasExplicitValue("ScaleOut.UseSingleBrokerQueue"))
                 return !settings.Get<bool>("ScaleOut.UseSingleBrokerQueue");

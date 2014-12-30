@@ -38,5 +38,22 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
 
             return individualQueueName;
         }
+
+        public static string Discriminator {
+            get
+            {
+                var parser = new ConnectionStringParser();
+                if (SafeRoleEnvironment.IsAvailable)
+                {
+                    var index = parser.ParseIndexFrom(SafeRoleEnvironment.CurrentRoleInstanceId);
+
+                    return "-" + index.ToString(CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    return "-" + RuntimeEnvironment.MachineName;
+                }
+            }
+        }
     }
 }

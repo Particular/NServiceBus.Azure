@@ -7,7 +7,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using NServiceBus.Azure.Transports.WindowsAzureServiceBus.Transports;
     using NServiceBus.Logging;
 
-    class AzureServicebusSubscriptionCreator : ICreateSubscriptions
+    class AzureServiceBusSubscriptionCreator : ICreateSubscriptions
     {
         public TimeSpan LockDuration { get; set; }
         public bool RequiresSession { get; set; }
@@ -24,9 +24,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         static ConcurrentDictionary<string, bool> rememberTopicExistence = new ConcurrentDictionary<string, bool>();
         static ConcurrentDictionary<string, bool> rememberSubscriptionExistence = new ConcurrentDictionary<string, bool>();
      
-        ILog logger = LogManager.GetLogger(typeof(AzureServicebusSubscriptionCreator));
+        ILog logger = LogManager.GetLogger(typeof(AzureServiceBusSubscriptionCreator));
 
-        public AzureServicebusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config, ICreateTopics topicCreator)
+        public AzureServiceBusSubscriptionCreator(ICreateNamespaceManagers createNamespaceManagers, Configure config, ICreateTopics topicCreator)
         {
             this.createNamespaceManagers = createNamespaceManagers;
             this.config = config;
@@ -38,7 +38,9 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             var namespaceClient = createNamespaceManagers.Create(@namespace);
 
             var description = new SubscriptionDescription(topicName, subscriptionname)
+
             {
+                // same as queue section from AzureServiceBusQueueConfig
                 LockDuration = LockDuration,
                 RequiresSession = RequiresSession,
                 DefaultMessageTimeToLive = DefaultMessageTimeToLive,
@@ -131,7 +133,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         bool SubscriptionExists(NamespaceManager namespaceClient, string topicpath, string subscriptionname)
         {
             var key = topicpath + subscriptionname;
-            logger.InfoFormat("Checking existence cache for subscription '{0}' on topic '{1}'", subscriptionname, topicpath);
+            logger.InfoFormat("Checking cache for existence of subscription '{0}' on topic '{1}'", subscriptionname, topicpath);
             var exists = rememberSubscriptionExistence.GetOrAdd(key, s => {
                 logger.InfoFormat("Checking namespace for subscription '{0}' on  topic '{1}'", subscriptionname, topicpath);
                 return namespaceClient.SubscriptionExists(topicpath, subscriptionname);

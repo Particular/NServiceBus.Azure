@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.AcceptanceTests.ScaleOut
 {
     using NServiceBus.AcceptanceTesting;
+    using NServiceBus.AcceptanceTesting.Support;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
     using NUnit.Framework;
 
@@ -14,7 +15,10 @@
         {
             var context = Scenario.Define<Context>()
                     .WithEndpoint<IndividualizedEndpoint>().Done(c =>c.EndpointsStarted)
-                    .Run();
+                    .Run(new RunSettings
+                    {
+                        UseSeparateAppDomains = true
+                    });
 
            
             Assert.True(context.Address.Contains("-something"),context.Address + " should contain the discriminator " + discriminator);

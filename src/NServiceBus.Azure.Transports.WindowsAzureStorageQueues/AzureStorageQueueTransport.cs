@@ -2,6 +2,7 @@ namespace NServiceBus
 {
     using Configuration.AdvanceExtensibility;
     using Features;
+    using NServiceBus.Azure.Transports.WindowsAzureStorageQueues;
     using Transports;
 
     /// <summary>
@@ -31,6 +32,7 @@ namespace NServiceBus
             settings.SetDefault("SelectedSerializer", new JsonSerializer());
 
             settings.SetDefault("ScaleOut.UseSingleBrokerQueue", true); // default to one queue for all instances
+            config.GetSettings().SetDefault("EndpointInstanceDiscriminator", QueueIndividualizer.Discriminator);
             
         }
     }
