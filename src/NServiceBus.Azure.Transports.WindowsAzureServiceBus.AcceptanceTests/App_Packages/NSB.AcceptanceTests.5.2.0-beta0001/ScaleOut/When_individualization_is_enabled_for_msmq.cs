@@ -5,6 +5,7 @@
     using NServiceBus.AcceptanceTests.EndpointTemplates;
     using NServiceBus.Settings;
     using NUnit.Framework;
+    using NServiceBus.AcceptanceTesting.Support;
 
     public class When_individualization_is_enabled_for_msmq : NServiceBusAcceptanceTest
     {
@@ -15,7 +16,10 @@
                     .WithEndpoint<IndividualizedEndpoint>().Done(c =>c.EndpointsStarted)
                     .Repeat(r=>r.For(ScenarioDescriptors.Transports.Msmq))
                     .Should(c=>Assert.AreEqual(c.EndpointName,c.Address.Split('@').First()))
-                    .Run();
+                    .Run(new RunSettings
+                    {
+                        UseSeparateAppDomains = true
+                    });
         }
 
         public class Context : ScenarioContext
