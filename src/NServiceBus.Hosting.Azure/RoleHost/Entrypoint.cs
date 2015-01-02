@@ -1,5 +1,6 @@
 namespace NServiceBus.Hosting.Azure
 {
+    using System.Reflection;
     using NServiceBus.Config;
     using NServiceBus.Hosting.Helpers;
     using NServiceBus.Integration.Azure;
@@ -14,6 +15,8 @@ namespace NServiceBus.Hosting.Azure
         const string ProfileSetting = "AzureProfileConfig.Profiles";
         const string EndpointConfigurationType = "EndpointConfigurationType";
         IHost host;
+
+        static List<Assembly> scannedAssemblies;
 
         public NServiceBusRoleEntrypoint()
         {
@@ -34,8 +37,9 @@ namespace NServiceBus.Hosting.Azure
             }
             else
             {
+                scannedAssemblies = scannedAssemblies ?? new List<Assembly>();
                 host = new GenericHost(specifier, requestedProfiles,
-                    new List<Type> { typeof(Development) });
+                    new List<Type> { typeof(Development) }, scannedAssemblies.Select(s => s.ToString()));
             }
 
         }
@@ -100,15 +104,19 @@ namespace NServiceBus.Hosting.Azure
 
         static IEnumerable<Type> ScanAssembliesForEndpoints()
         {
-            var assemblyScanner = new AssemblyScanner
+            if (scannedAssemblies == null)
             {
-                ThrowExceptions = false
-            };
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
-            assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(NServiceBusRoleEntrypoint).Assembly);
+                var assemblyScanner = new AssemblyScanner
+                {
+                    ThrowExceptions = false
+                };
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IHandleMessages<>).Assembly);
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(IConfigureThisEndpoint).Assembly);
+                assemblyScanner.MustReferenceAtLeastOneAssembly.Add(typeof(NServiceBusRoleEntrypoint).Assembly);
 
-            return assemblyScanner.GetScannableAssemblies().Assemblies.SelectMany(
+                scannedAssemblies = assemblyScanner.GetScannableAssemblies().Assemblies;
+            }
+            return scannedAssemblies.SelectMany(
                 assembly => assembly.GetTypes().Where(
                     t => typeof(IConfigureThisEndpoint).IsAssignableFrom(t)
                          && t != typeof(IConfigureThisEndpoint)
