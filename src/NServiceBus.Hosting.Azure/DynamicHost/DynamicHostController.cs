@@ -1,3 +1,5 @@
+using NServiceBus.Transports;
+
 namespace NServiceBus.Hosting.Azure
 {
     using System;
@@ -58,7 +60,7 @@ namespace NServiceBus.Hosting.Azure
             profileManager.ActivateProfileHandlers(o);
             specifier.Customize(o);
 
-            var bus = (UnicastBus)Bus.Create(o);
+            var bus = (UnicastBus)Bus.CreateSendOnly(o);
 
             loader = bus.Builder.Build<DynamicEndpointLoader>();
             provisioner = bus.Builder.Build<DynamicEndpointProvisioner>();
