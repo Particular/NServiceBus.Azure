@@ -97,23 +97,11 @@
     <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
     <Compile Include="Persisters\When_using_AzureTimeoutStorageGuard.cs" />
     <Compile Include="Persisters\When_using_AzureStorageSagaGuard.cs" />
-    <Compile Include="Transports\AzureStorage\When_naming_queues_on_azure_storage.cs" />
-    <Compile Include="Transports\ServiceBus\When_creating_subscriptions_on_servicebus_topics.cs" />
     <Compile Include="Hosting\When_killing_processes.cs" />
-    <Compile Include="Configuration\When_parsing_connectionstrings.cs" />
     <Compile Include="Configuration\When_using_the_azure_configuration_source.cs" />
-    <Compile Include="Transports\ServiceBus\When_determining_subscription_names.cs" />
     <Compile Include="Persisters\When_using_AzureSubscriptionStorageGuard.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj">
-      <Project>{607c3f29-58d4-4eec-bffb-668976cbb5b8}</Project>
-      <Name>NServiceBus.Azure.Transports.WindowsAzureServiceBus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureStorageQueues\NServiceBus.Azure.Transports.WindowsAzureStorageQueues.csproj">
-      <Project>{b6d6406f-f5a4-46d7-a882-4a831128065e}</Project>
-      <Name>NServiceBus.Azure.Transports.WindowsAzureStorageQueues</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
       <Project>{12f1d9f1-0a2c-4442-8d18-67dd096c6300}</Project>
       <Name>NServiceBus.Azure</Name>

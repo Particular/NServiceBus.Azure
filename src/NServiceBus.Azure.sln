@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure", "NServiceBus.Azure\NServiceBus.Azure.csproj", "{12F1D9F1-0A2C-4442-8D18-67DD096C6300}"
 EndProject
@@ -11,16 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Hosting.Azure.H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Tests", "NServiceBus.Azure.QuickTests\NServiceBus.Azure.Tests.csproj", "{E25B5433-7166-4C10-A76E-C0546F9E2497}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Transports.WindowsAzureServiceBus", "NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj", "{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Transports.WindowsAzureStorageQueues", "NServiceBus.Azure.Transports.WindowsAzureStorageQueues\NServiceBus.Azure.Transports.WindowsAzureStorageQueues.csproj", "{B6D6406F-F5A4-46D7-A882-4A831128065E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.WindowsAzureServiceBus.AcceptanceTests", "NServiceBus.Azure.Transports.WindowsAzureServiceBus.AcceptanceTests\NServiceBus.Azure.WindowsAzureServiceBus.AcceptanceTests.csproj", "{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.WindowsAzureStorageQueues.AcceptanceTests", "NServiceBus.Azure.Transports.WindowsAzureStorageQueues.Acceptance\NServiceBus.Azure.WindowsAzureStorageQueues.AcceptanceTests.csproj", "{09996CDC-90AC-442F-A6CE-601F37CD1352}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{642B64E7-C515-4E9A-BC02-D2C153A8DB81}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
@@ -29,8 +19,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Deployment", "NServiceBus.Azure.Deployment\NServiceBus.Azure.Deployment.csproj", "{82B9D3D2-C2B9-4BC1-AD78-DD4B470DAEE4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{11B81F23-64C6-4341-94AC-38B3C4C6B1E7} = {11B81F23-64C6-4341-94AC-38B3C4C6B1E7}
-		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8} = {607C3F29-58D4-4EEC-BFFB-668976CBB5B8}
-		{B6D6406F-F5A4-46D7-A882-4A831128065E} = {B6D6406F-F5A4-46D7-A882-4A831128065E}
 		{6591ED91-F9A1-4CC3-813E-A33E07439D49} = {6591ED91-F9A1-4CC3-813E-A33E07439D49}
 		{12F1D9F1-0A2C-4442-8D18-67DD096C6300} = {12F1D9F1-0A2C-4442-8D18-67DD096C6300}
 	EndProjectSection
@@ -57,22 +45,6 @@ Global
 		{E25B5433-7166-4C10-A76E-C0546F9E2497}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E25B5433-7166-4C10-A76E-C0546F9E2497}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E25B5433-7166-4C10-A76E-C0546F9E2497}.Release|Any CPU.Build.0 = Release|Any CPU
-		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{607C3F29-58D4-4EEC-BFFB-668976CBB5B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6D6406F-F5A4-46D7-A882-4A831128065E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6D6406F-F5A4-46D7-A882-4A831128065E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6D6406F-F5A4-46D7-A882-4A831128065E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6D6406F-F5A4-46D7-A882-4A831128065E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.Build.0 = Release|Any CPU
 		{82B9D3D2-C2B9-4BC1-AD78-DD4B470DAEE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{82B9D3D2-C2B9-4BC1-AD78-DD4B470DAEE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82B9D3D2-C2B9-4BC1-AD78-DD4B470DAEE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -80,9 +52,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
-		{09996CDC-90AC-442F-A6CE-601F37CD1352} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
 	EndGlobalSection
 EndGlobal
