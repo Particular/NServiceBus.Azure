@@ -9,6 +9,16 @@ namespace NServiceBus
         internal AzureStorageTimeoutPersistence()
         {
             DependsOn<TimeoutManager>();
+            Defaults(s =>
+            {
+                var config = s.GetConfigSection<AzureTimeoutPersisterConfig>() ?? new AzureTimeoutPersisterConfig();
+                s.SetDefault("AzureTimeoutStorage.ConnectionString", config.ConnectionString);
+                s.SetDefault("AzureTimeoutStorage.CreateSchema", config.CreateSchema);
+                s.SetDefault("AzureTimeoutStorage.TimeoutManagerDataTableName", config.TimeoutManagerDataTableName);
+                s.SetDefault("AzureTimeoutStorage.TimeoutDataTableName", config.TimeoutDataTableName);
+                s.SetDefault("AzureTimeoutStorage.CatchUpInterval", config.CatchUpInterval);
+                s.SetDefault("AzureTimeoutStorage.PartitionKeyScope", config.PartitionKeyScope);
+            });
         }
 
         /// <summary>
@@ -16,16 +26,15 @@ namespace NServiceBus
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var configSection = context.Settings.GetConfigSection<AzureTimeoutPersisterConfig>() ?? new AzureTimeoutPersisterConfig();
-
             //TODO: get rid of these statics
-            ServiceContext.TimeoutDataTableName = configSection.TimeoutDataTableName;
-            ServiceContext.TimeoutManagerDataTableName = configSection.TimeoutManagerDataTableName;
+            ServiceContext.CreateSchema = context.Settings.Get<bool>("AzureTimeoutStorage.CreateSchema");
+            ServiceContext.TimeoutDataTableName = context.Settings.Get<string>("AzureTimeoutStorage.TimeoutDataTableName");
+            ServiceContext.TimeoutManagerDataTableName = context.Settings.Get<string>("AzureTimeoutStorage.TimeoutManagerDataTableName");
 
             context.Container.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(tp => tp.ConnectionString, configSection.ConnectionString)
-                .ConfigureProperty(tp => tp.CatchUpInterval, configSection.CatchUpInterval)
-                .ConfigureProperty(tp => tp.PartitionKeyScope, configSection.PartitionKeyScope);
+                .ConfigureProperty(tp => tp.ConnectionString, context.Settings.Get<string>("AzureTimeoutStorage.ConnectionString"))
+                .ConfigureProperty(tp => tp.CatchUpInterval, context.Settings.Get<int>("AzureTimeoutStorage.CatchUpInterval"))
+                .ConfigureProperty(tp => tp.PartitionKeyScope, context.Settings.Get<string>("AzureTimeoutStorage.PartitionKeyScope"));
         }
     }
 }

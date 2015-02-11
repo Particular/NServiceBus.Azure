@@ -1,10 +1,22 @@
 namespace NServiceBus.Config
 {
     using System.Configuration;
+    using NServiceBus.Subscriptions;
 
     public class AzureSubscriptionStorageConfig : ConfigurationSection
     {
-        [ConfigurationProperty("ConnectionString", IsRequired = false, DefaultValue = "UseDevelopmentStorage=true")]
+        public AzureSubscriptionStorageConfig()
+        {
+            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureSubscriptionStorageDefaults.ConnectionString,
+                null, new CallbackValidator(typeof(string), AzureSubscriptionStorageGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
+            
+            base.Properties.Add(new ConfigurationProperty("TableName", typeof(string), AzureSubscriptionStorageDefaults.TableName,
+                null, new CallbackValidator(typeof(string), AzureSubscriptionStorageGuard.CheckTableName), ConfigurationPropertyOptions.None));
+
+            base.Properties.Add(new ConfigurationProperty("CreateSchema", typeof(bool), AzureSubscriptionStorageDefaults.CreateSchema, 
+                ConfigurationPropertyOptions.None));
+        }
+
         public string ConnectionString
         {
             get
@@ -17,7 +29,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("CreateSchema", IsRequired = false,DefaultValue = true)]
         public bool CreateSchema
         {
             get
@@ -31,7 +42,6 @@ namespace NServiceBus.Config
             }
         }
 
-        [ConfigurationProperty("TableName", IsRequired = false, DefaultValue = "Subscription")]
         public string TableName
         {
             get

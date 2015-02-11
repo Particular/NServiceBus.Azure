@@ -157,6 +157,7 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
         {
             blob.ServiceClient.ParallelOperationThreadCount = NumberOfIOThreads;
             container.ServiceClient.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(BackOffInterval), MaxRetries);
+            blob.StreamWriteSizeInBytes = BlockSize;
             blob.UploadFromStream(stream);
         }
 

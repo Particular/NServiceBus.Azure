@@ -54,6 +54,7 @@
             }
 
             result = query
+                        .Take(1000) // fixes isue #208. 
                         .AsTableServiceQuery(context) // fixes issue #191
                         .ToList().OrderBy(c => c.Time);
 
@@ -100,41 +101,41 @@
             TimeoutDataEntity timeoutDataEntity;
             if (TryGetTimeoutData(context, identifier, string.Empty, out timeoutDataEntity)) return;
 
-            var stateAddress = Upload(timeout.State, identifier);
+            Upload(timeout.State, identifier);
             var headers = Serialize(timeout.Headers);
 
-            if (!TryGetTimeoutData(context, timeout.Time.ToString(PartitionKeyScope), stateAddress, out timeoutDataEntity))
+            if (!TryGetTimeoutData(context, timeout.Time.ToString(PartitionKeyScope), identifier, out timeoutDataEntity))
                 context.AddObject(ServiceContext.TimeoutDataTableName,
-                                      new TimeoutDataEntity(timeout.Time.ToString(PartitionKeyScope), stateAddress)
+                                      new TimeoutDataEntity(timeout.Time.ToString(PartitionKeyScope), identifier)
                                       {
                                           Destination = timeout.Destination.ToString(),
                                           SagaId = timeout.SagaId,
-                                          StateAddress = stateAddress,
+                                          StateAddress = identifier,
                                           Time = timeout.Time,
                                           OwningTimeoutManager = timeout.OwningTimeoutManager,
                                           Headers = headers
                                       });
 
-            timeout.Id = stateAddress;
+            timeout.Id = identifier;
 
-            if (timeout.SagaId != default(Guid) && !TryGetTimeoutData(context, timeout.SagaId.ToString(), stateAddress, out timeoutDataEntity))
+            if (timeout.SagaId != default(Guid) && !TryGetTimeoutData(context, timeout.SagaId.ToString(), identifier, out timeoutDataEntity))
                 context.AddObject(ServiceContext.TimeoutDataTableName,
-                                      new TimeoutDataEntity(timeout.SagaId.ToString(), stateAddress)
+                                      new TimeoutDataEntity(timeout.SagaId.ToString(), identifier)
                                       {
                                           Destination = timeout.Destination.ToString(),
                                           SagaId = timeout.SagaId,
-                                          StateAddress = stateAddress,
+                                          StateAddress = identifier,
                                           Time = timeout.Time,
                                           OwningTimeoutManager = timeout.OwningTimeoutManager,
                                           Headers = headers
                                       });
 
             context.AddObject(ServiceContext.TimeoutDataTableName,
-                                new TimeoutDataEntity(stateAddress, string.Empty)
+                                new TimeoutDataEntity(identifier, string.Empty)
                                 {
                                     Destination = timeout.Destination.ToString(),
                                     SagaId = timeout.SagaId,
-                                    StateAddress = stateAddress,
+                                    StateAddress = identifier,
                                     Time = timeout.Time,
                                     OwningTimeoutManager = timeout.OwningTimeoutManager,
                                     Headers = headers
@@ -196,6 +197,7 @@
                 select c);
 
             var results = query
+                .Take(1000) // fixes isue #208.
                 .AsTableServiceQuery(context) // fixes issue #191
                .ToList();
 
@@ -262,21 +264,26 @@
             account = CloudStorageAccount.Parse(connectionString);
             var tableClient = account.CreateCloudTableClient();
             var table = tableClient.GetTableReference(ServiceContext.TimeoutManagerDataTableName);
-            table.CreateIfNotExists();
+            if (ServiceContext.CreateSchema)
+            {
+                table.CreateIfNotExists();
+            }
             table = tableClient.GetTableReference(ServiceContext.TimeoutDataTableName);
-            table.CreateIfNotExists();
+            if (ServiceContext.CreateSchema)
+            {
+                table.CreateIfNotExists();
+            }
             container = account.CreateCloudBlobClient().GetContainerReference("timeoutstate");
             container.CreateIfNotExists();
         }
 
-        string Upload(byte[] state, string stateAddress)
+        void Upload(byte[] state, string stateAddress)
         {
             var blob = container.GetBlockBlobReference(stateAddress);
             using (var stream = new MemoryStream(state))
             {
                 blob.UploadFromStream(stream);
             }
-            return stateAddress;
         }
 
         byte[] Download(string stateAddress)

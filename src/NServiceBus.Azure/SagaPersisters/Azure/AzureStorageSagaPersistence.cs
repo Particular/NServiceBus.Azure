@@ -10,6 +10,12 @@
         internal AzureStorageSagaPersistence()
         {
             DependsOn<Features.Sagas>();
+            Defaults(s =>
+            {
+                var configSection = s.GetConfigSection<AzureSagaPersisterConfig>() ?? new AzureSagaPersisterConfig();
+                s.SetDefault("AzureSagaStorage.ConnectionString", configSection.ConnectionString);
+                s.SetDefault("AzureSagaStorage.CreateSchema", configSection.CreateSchema);
+            });
         }
 
         /// <summary>
@@ -17,16 +23,8 @@
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var connectionstring = string.Empty;
-            var updateSchema = false;
-
-            var configSection = context.Settings.GetConfigSection<AzureSagaPersisterConfig>();
-
-            if (configSection != null)
-            {
-                connectionstring = configSection.ConnectionString;
-                updateSchema = configSection.CreateSchema;
-            }
+            var connectionstring = context.Settings.Get<string>("AzureSagaStorage.ConnectionString");
+            var updateSchema = context.Settings.Get<bool>("AzureSagaStorage.CreateSchema");
 
             var account = CloudStorageAccount.Parse(connectionstring);
 
