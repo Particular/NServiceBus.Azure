@@ -1,7 +1,7 @@
 namespace NServiceBus.Config
 {
     using System.Configuration;
-    using NServiceBus.Timeout;
+    using Timeout;
 
     /// <summary>
     /// 
@@ -10,22 +10,22 @@ namespace NServiceBus.Config
     {
         public AzureTimeoutPersisterConfig()
         {
-            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureTimeoutStorageDefaults.ConnectionString,
+            Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureTimeoutStorageDefaults.ConnectionString,
                 null, new CallbackValidator(typeof(string), AzureTimeoutStorageGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("TimeoutManagerDataTableName", typeof(string), AzureTimeoutStorageDefaults.TimeoutManagerDataTableName,
+            Properties.Add(new ConfigurationProperty("TimeoutManagerDataTableName", typeof(string), AzureTimeoutStorageDefaults.TimeoutManagerDataTableName,
                 null, new CallbackValidator(typeof(string), AzureTimeoutStorageGuard.CheckTableName), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("TimeoutDataTableName", typeof(string), AzureTimeoutStorageDefaults.TimeoutDataTableName,
+            Properties.Add(new ConfigurationProperty("TimeoutDataTableName", typeof(string), AzureTimeoutStorageDefaults.TimeoutDataTableName,
                 null, new CallbackValidator(typeof(string), AzureTimeoutStorageGuard.CheckTableName), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("CatchUpInterval", typeof(int), AzureTimeoutStorageDefaults.CatchUpInterval,
+            Properties.Add(new ConfigurationProperty("CatchUpInterval", typeof(int), AzureTimeoutStorageDefaults.CatchUpInterval,
                 null, new CallbackValidator(typeof(int), AzureTimeoutStorageGuard.CheckCatchUpInterval), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("PartitionKeyScope", typeof(string), AzureTimeoutStorageDefaults.PartitionKeyScope,
+            Properties.Add(new ConfigurationProperty("PartitionKeyScope", typeof(string), AzureTimeoutStorageDefaults.PartitionKeyScope,
                 null, new CallbackValidator(typeof(string), AzureTimeoutStorageGuard.CheckPartitionKeyScope), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("CreateSchema", typeof(bool), AzureTimeoutStorageDefaults.CreateSchema, ConfigurationPropertyOptions.None));
+            Properties.Add(new ConfigurationProperty("CreateSchema", typeof(bool), AzureTimeoutStorageDefaults.CreateSchema, ConfigurationPropertyOptions.None));
 
         }
 
