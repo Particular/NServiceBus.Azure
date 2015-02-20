@@ -4,7 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     using System.Collections.Generic;
     using System.IO;
     using System.Transactions;
-    using NServiceBus.Serialization;
+    using Serialization;
     using System.Collections.Concurrent;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;

@@ -4,7 +4,7 @@ namespace NServiceBus.Hosting.Azure
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-    using NServiceBus.Logging;
+    using Logging;
     using Microsoft.WindowsAzure.Storage;
 
     class DynamicHostMonitor

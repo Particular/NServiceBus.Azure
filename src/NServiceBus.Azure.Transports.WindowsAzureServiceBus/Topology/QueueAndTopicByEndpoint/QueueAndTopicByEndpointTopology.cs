@@ -2,7 +2,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus.QueueAndTopicByEnd
 {
     using System;
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Logging;
+    using Logging;
     using Settings;
     using Transports;
 

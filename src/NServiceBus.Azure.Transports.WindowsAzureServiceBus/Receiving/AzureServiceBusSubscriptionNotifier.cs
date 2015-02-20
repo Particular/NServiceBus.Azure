@@ -3,7 +3,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System;
     using System.Threading;
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Logging;
+    using Logging;
 
     class AzureServiceBusSubscriptionNotifier : INotifyReceivedBrokeredMessages
     {

@@ -8,7 +8,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Threading;
     using System.Threading.Tasks;
     using CircuitBreakers;
-    using NServiceBus.Logging;
+    using Logging;
     using NServiceBus.Transports;
     using Unicast.Transport;
 
@@ -34,7 +34,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         const int PeekInterval = 50;
         const int MaximumWaitTimeWhenIdle = 1000;
         int timeToDelayNextPeek;
-        int maximumConcurrencyLevel;
 
         public AzureServiceBusDequeueStrategy(ITopology topology, CriticalError criticalError)
         {
@@ -66,8 +65,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="maximumConcurrencyLevel">Indicates the maximum concurrency level this <see cref="IDequeueMessages"/> is able to support.</param>
         public virtual void Start(int maximumConcurrencyLevel)
         {
-            this.maximumConcurrencyLevel = maximumConcurrencyLevel;
-
             CreateAndStartNotifier();
             
             tokenSource = new CancellationTokenSource();

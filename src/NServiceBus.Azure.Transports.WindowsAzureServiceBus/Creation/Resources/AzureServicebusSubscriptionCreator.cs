@@ -4,7 +4,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
     using System.Collections.Concurrent;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    using NServiceBus.Logging;
+    using Logging;
 
     class AzureServicebusSubscriptionCreator : ICreateSubscriptions
     {

@@ -1,6 +1,6 @@
 namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
 {
-    using NServiceBus.Logging;
+    using Logging;
 
     public class AzureServiceBusTopologyCreator: NServiceBus.Transports.ICreateQueues
     {
