@@ -1,8 +1,8 @@
 ﻿namespace NServiceBus.AcceptanceTests.WindowsAzureServiceBus
 {
     using System;
-    using EndpointTemplates;
-    using AcceptanceTesting;
+    using NServiceBus.AcceptanceTesting;
+    using NServiceBus.AcceptanceTests.EndpointTemplates;
     using NServiceBus.Config;
     using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;

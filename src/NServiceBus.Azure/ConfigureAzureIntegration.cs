@@ -1,6 +1,6 @@
 namespace NServiceBus
 {
-    using NServiceBus.Integration.Azure;
+    using Integration.Azure;
 
     public static class ConfigureAzureIntegration
     {

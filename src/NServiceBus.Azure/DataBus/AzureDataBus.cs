@@ -1,7 +1,7 @@
 namespace NServiceBus
 {
     using System;
-    using NServiceBus.DataBus;
+    using DataBus;
 
     public class AzureDataBus : DataBusDefinition
     {
