@@ -1,8 +1,8 @@
 ﻿namespace NServiceBus
 {
-    using NServiceBus.Configuration.AdvanceExtensibility;
-    using NServiceBus.Persistence;
-    using NServiceBus.Timeout;
+    using Configuration.AdvanceExtensibility;
+    using Persistence;
+    using Timeout;
 
     /// <summary>
     /// Configuration extensions for the subscription storage

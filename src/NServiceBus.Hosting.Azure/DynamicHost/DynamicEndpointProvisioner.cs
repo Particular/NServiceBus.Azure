@@ -3,7 +3,7 @@ namespace NServiceBus.Hosting.Azure
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using NServiceBus.Logging;
+    using Logging;
     using Config;
 
     class DynamicEndpointProvisioner

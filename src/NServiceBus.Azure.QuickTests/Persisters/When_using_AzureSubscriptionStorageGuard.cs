@@ -1,8 +1,8 @@
 ﻿namespace NServiceBus.Azure.Tests.Persisters
 {
     using System;
-    using NServiceBus.Config;
-    using NServiceBus.Subscriptions;
+    using Config;
+    using Subscriptions;
     using NUnit.Framework;
 
     [TestFixture]
