@@ -34,7 +34,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         const int PeekInterval = 50;
         const int MaximumWaitTimeWhenIdle = 1000;
         int timeToDelayNextPeek;
-        int maximumConcurrencyLevel;
 
         public AzureServiceBusDequeueStrategy(ITopology topology, CriticalError criticalError)
         {
@@ -66,8 +65,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
         /// <param name="maximumConcurrencyLevel">Indicates the maximum concurrency level this <see cref="IDequeueMessages"/> is able to support.</param>
         public virtual void Start(int maximumConcurrencyLevel)
         {
-            this.maximumConcurrencyLevel = maximumConcurrencyLevel;
-
             CreateAndTrackNotifier();
             
             tokenSource = new CancellationTokenSource();
