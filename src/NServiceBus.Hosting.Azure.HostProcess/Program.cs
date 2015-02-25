@@ -6,7 +6,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using NServiceBus.Hosting.Helpers;
+    using Helpers;
     using Topshelf;
     using Topshelf.Configuration;
     using Topshelf.Internal;
