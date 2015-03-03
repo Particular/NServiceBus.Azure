@@ -15,7 +15,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>e11bcf0f</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>35949803</NuGetPackageImportStamp>
     <CreateDeploymentPackage>True</CreateDeploymentPackage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
