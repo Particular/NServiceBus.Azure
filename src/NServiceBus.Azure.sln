@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{642B64
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Deployment", "NServiceBus.Azure.Deployment\NServiceBus.Azure.Deployment.csproj", "{5F4436F7-DCB8-4AAB-884B-EA30E641FFB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F4436F7-DCB8-4AAB-884B-EA30E641FFB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F4436F7-DCB8-4AAB-884B-EA30E641FFB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F4436F7-DCB8-4AAB-884B-EA30E641FFB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F4436F7-DCB8-4AAB-884B-EA30E641FFB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
