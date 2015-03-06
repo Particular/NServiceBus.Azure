@@ -1,19 +1,19 @@
 namespace NServiceBus.Config
 {
     using System.Configuration;
-    using NServiceBus.Subscriptions;
+    using Subscriptions;
 
     public class AzureSubscriptionStorageConfig : ConfigurationSection
     {
         public AzureSubscriptionStorageConfig()
         {
-            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureSubscriptionStorageDefaults.ConnectionString,
+            Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureSubscriptionStorageDefaults.ConnectionString,
                 null, new CallbackValidator(typeof(string), AzureSubscriptionStorageGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
             
-            base.Properties.Add(new ConfigurationProperty("TableName", typeof(string), AzureSubscriptionStorageDefaults.TableName,
+            Properties.Add(new ConfigurationProperty("TableName", typeof(string), AzureSubscriptionStorageDefaults.TableName,
                 null, new CallbackValidator(typeof(string), AzureSubscriptionStorageGuard.CheckTableName), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("CreateSchema", typeof(bool), AzureSubscriptionStorageDefaults.CreateSchema, 
+            Properties.Add(new ConfigurationProperty("CreateSchema", typeof(bool), AzureSubscriptionStorageDefaults.CreateSchema, 
                 ConfigurationPropertyOptions.None));
         }
 

@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.Azure.Tests.DataBus
 {
     using System;
-    using NServiceBus.Config;
+    using Config;
     using NServiceBus.DataBus;
     using NUnit.Framework;
 

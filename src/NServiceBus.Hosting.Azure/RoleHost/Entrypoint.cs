@@ -1,9 +1,9 @@
 namespace NServiceBus.Hosting.Azure
 {
     using System.Reflection;
-    using NServiceBus.Config;
-    using NServiceBus.Hosting.Helpers;
-    using NServiceBus.Integration.Azure;
+    using Config;
+    using Helpers;
+    using Integration.Azure;
     using System;
     using System.Linq;
     using System.Collections.Generic;

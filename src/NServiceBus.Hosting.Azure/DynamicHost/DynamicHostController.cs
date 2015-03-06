@@ -1,5 +1,3 @@
-using NServiceBus.Transports;
-
 namespace NServiceBus.Hosting.Azure
 {
     using System;
