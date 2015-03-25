@@ -183,7 +183,7 @@
 
             context.DeleteObject(timeoutDataEntity);
 
-            context.SaveChanges();
+            context.SaveChangesWithRetries();
 
             return true;
         }
