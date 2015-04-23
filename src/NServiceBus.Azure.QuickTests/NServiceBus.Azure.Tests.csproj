@@ -88,12 +88,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataBus\ValidUntilTest.cs" />
-    <Compile Include="DataBus\ValidUntilV1BlobStorageDataBusTests.cs" />
-    <Compile Include="DataBus\ValidUntilV2BlobStorageDataBusTests.cs" />
-    <Compile Include="DataBus\ValidUntilV3BlobStorageDataBusTests.cs" />
-    <Compile Include="DataBus\ValidUntilV4BlobStorageDataBusTests.cs" />
-    <Compile Include="DataBus\When_using_AzureDataBusGuard.cs" />
     <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
     <Compile Include="Persisters\When_using_AzureTimeoutStorageGuard.cs" />
     <Compile Include="Persisters\When_using_AzureStorageSagaGuard.cs" />

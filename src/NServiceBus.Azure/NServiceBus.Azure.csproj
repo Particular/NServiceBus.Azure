@@ -105,11 +105,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataBus\AzureDataBusGuard.cs" />
-    <Compile Include="DataBus\ConfigureAzureDataBus.cs" />
-    <Compile Include="DataBus\AzureDataBus.cs" />
-    <Compile Include="DataBus\AzureDataBusDefaults.cs" />
-    <Compile Include="DataBus\AzureDataBusPersistence.cs" />
     <Compile Include="AzureStoragePersistence.cs" />
     <Compile Include="SagaPersisters\AzureStorageSagaGuard.cs" />
     <Compile Include="SagaPersisters\AzureStorageSagaDefaults.cs" />
@@ -117,10 +112,8 @@
     <Compile Include="SagaPersisters\ConfigureAzureSagaStorage.cs" />
     <Compile Include="Subscriptions\AzureSubscriptionStorageGuard.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
-    <Compile Include="Config\AzureDataBusConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
-    <Compile Include="DataBus\Azure\BlobStorage\BlobStorageDataBus.cs" />
     <Compile Include="Config\AzureTimeoutPersisterConfig.cs" />
     <Compile Include="SagaPersisters\Azure\AzureSagaPersister.cs" />
     <Compile Include="SagaPersisters\Azure\DictionaryTableEntity.cs" />
