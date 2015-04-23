@@ -127,6 +127,8 @@
     <Compile Include="Subscriptions\AzureSubscriptionStorageGuard.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
     <Compile Include="Obsoletes\ConfigureAzureBlobStorageDataBus.cs" />
+    <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
+    <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Logging\Azure\TraceLogger.cs" />
     <Compile Include="Logging\Azure\TraceLoggerFactory.cs" />
     <Compile Include="Obsoletes\ConfigureAzureSagaPersister.cs" />
