@@ -126,7 +126,6 @@
     <Compile Include="SagaPersisters\ConfigureAzureSagaStorage.cs" />
     <Compile Include="Subscriptions\AzureSubscriptionStorageGuard.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
-    <Compile Include="Config\AzureDataBusConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
     <Compile Include="DataBus\Azure\BlobStorage\BlobStorageDataBus.cs" />

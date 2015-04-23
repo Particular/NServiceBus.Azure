@@ -97,6 +97,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Sagas\BaseAzureSagaPersisterTest.cs" />
     <Compile Include="Sagas\LRUCacheTests.cs" />
+    <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
     <Compile Include="Persisters\When_using_AzureTimeoutStorageGuard.cs" />
     <Compile Include="Persisters\When_using_AzureStorageSagaGuard.cs" />
     <Compile Include="Persisters\When_using_AzureSubscriptionStorageGuard.cs" />
