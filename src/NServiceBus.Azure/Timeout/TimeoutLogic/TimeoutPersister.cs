@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Azure
 {
     using System.Text.RegularExpressions;
-    using Config;
     using System;
     using System.Collections.Generic;
     using System.Data.Services.Client;
@@ -12,16 +11,16 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
-    using Support;
     using Timeout.Core;
     
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
     {
-        Configure config;
+        //Configure config;
+        string _sanitizedEndpointName;
 
         public TimeoutPersister(Configure config)
         {
-            this.config = config;
+            _sanitizedEndpointName = Sanitize(config.Settings.EndpointName());
         }
 
         public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
@@ -43,13 +42,13 @@
                 query = from c in context.TimeoutData
                             where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
                             && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
-                                && c.OwningTimeoutManager == config.Settings.EndpointName()
+                                && c.OwningTimeoutManager == _sanitizedEndpointName
                             select c;
             }
             else
             {
                 query = from c in context.TimeoutData
-                          where c.OwningTimeoutManager == config.Settings.EndpointName()
+                        where c.OwningTimeoutManager == _sanitizedEndpointName
                             select c;
             }
 
@@ -330,13 +329,6 @@
             blob.DeleteIfExists();
         }
 
-        string GetUniqueEndpointName()
-        {
-            var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
-
-            return Sanitize(config.Settings.EndpointName() + "_" + identifier);
-        }
-
         string Sanitize(string s)
         {
             var rgx = new Regex(@"[^a-zA-Z0-9\-_]");
@@ -347,8 +339,8 @@
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)
         {
             var query = from m in context.TimeoutManagerData
-                                            where m.PartitionKey == GetUniqueEndpointName()
-                                        select m;
+                        where m.PartitionKey == _sanitizedEndpointName
+                        select m;
 
             lastSuccessfulReadEntity = query
                 .AsTableServiceQuery(context)
@@ -364,7 +356,7 @@
             {
                 if (read == null)
                 {
-                    read = new TimeoutManagerDataEntity(GetUniqueEndpointName(), string.Empty)
+                    read = new TimeoutManagerDataEntity(_sanitizedEndpointName, string.Empty)
                            {
                                LastSuccessfullRead = DateTime.UtcNow
                            };
