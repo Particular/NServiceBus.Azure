@@ -109,6 +109,7 @@
     <Compile Include="FileVersionRetriever.cs" />
     <Compile Include="GenericHost.cs" />
     <Compile Include="IHost.cs" />
+    <Compile Include="IsHostedIn.cs" />
     <Compile Include="Logging\DevelopmentLoggingHandler.cs" />
     <Compile Include="Profiles\Hosting\IConfigureLoggingForProfile.cs" />
     <Compile Include="Profiles\Hosting\IHandleAnyProfile.cs" />
