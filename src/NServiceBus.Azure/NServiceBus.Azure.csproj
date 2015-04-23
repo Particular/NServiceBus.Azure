@@ -127,7 +127,6 @@
     <Compile Include="Subscriptions\AzureSubscriptionStorageGuard.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
     <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
-    <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Config\AzureDataBusConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />

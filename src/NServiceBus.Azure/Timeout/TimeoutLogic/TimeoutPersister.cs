@@ -12,16 +12,16 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
-    using Support;
     using Timeout.Core;
     
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend, IPersistTimeoutsV2
     {
-        string _endpointName;
+        Configure config;
+        string _sanitizedEndpointName;
 
         public TimeoutPersister(Configure config)
         {
-            _endpointName = config.Settings.EndpointName();
+            this.config = config;
         }
 
         public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
@@ -43,13 +43,13 @@
                 query = from c in context.TimeoutData
                             where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
                             && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
-                            && c.OwningTimeoutManager == _endpointName
+                                && c.OwningTimeoutManager == config.Settings.EndpointName()
                             select c;
             }
             else
             {
                 query = from c in context.TimeoutData
-                        where c.OwningTimeoutManager == _endpointName
+                          where c.OwningTimeoutManager == config.Settings.EndpointName()
                         select c;
             }
 
@@ -388,7 +388,7 @@
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)
         {
             var query = from m in context.TimeoutManagerData
-                        where m.PartitionKey == GetUniqueEndpointName()
+                        where m.PartitionKey == _sanitizedEndpointName
                         select m;
 
             lastSuccessfulReadEntity = query
@@ -405,7 +405,7 @@
             {
                 if (read == null)
                 {
-                    read = new TimeoutManagerDataEntity(GetUniqueEndpointName(), string.Empty)
+                    read = new TimeoutManagerDataEntity(_sanitizedEndpointName, string.Empty)
                            {
                                LastSuccessfullRead = DateTime.UtcNow
                            };
