@@ -175,7 +175,6 @@ namespace NServiceBus.Config
             }
             catch (FileNotFoundException)
             {
-                isAvailable = false;
                 return null;
             }
         }
