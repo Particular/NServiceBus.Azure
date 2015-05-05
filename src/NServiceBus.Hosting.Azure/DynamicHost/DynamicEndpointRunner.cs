@@ -1,6 +1,7 @@
 namespace NServiceBus.Hosting.Azure
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using Logging;
@@ -14,6 +15,7 @@ namespace NServiceBus.Hosting.Azure
         public bool RecycleRoleOnError { get; set; }
 
         public int TimeToWaitUntilProcessIsKilled { get; set; }
+        private static ConcurrentDictionary<int, bool> StoppedProcessIds = new ConcurrentDictionary<int, bool>();
 
         public void Start(IEnumerable<EndpointToHost> toHost)
         {
@@ -46,7 +48,8 @@ namespace NServiceBus.Hosting.Azure
 
                     process.Exited += (o, args) =>
                     {
-                        if (process.ExitCode != 0)
+                        bool trash;
+                        if (process.ExitCode != 0 && !StoppedProcessIds.TryRemove(process.Id, out trash))
                         {
                             if (RecycleRoleOnError) SafeRoleEnvironment.RequestRecycle();
                         }
@@ -89,7 +92,8 @@ namespace NServiceBus.Hosting.Azure
             {
                 return;
             }
-
+            
+            StoppedProcessIds.TryAdd(processId, true);
             process.Kill();
             //As per MSDN "The Kill method executes asynchronously. After calling the Kill method, call the WaitForExit method to wait for the process to exit" 
             if (!process.WaitForExit(timeToWaitUntilProcessIsKilled))
