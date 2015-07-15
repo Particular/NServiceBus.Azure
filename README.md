@@ -9,7 +9,7 @@ NServiceBus.Azure repository is changing. There will be new repositories per Nug
 4. _Future_ https://github.com/Particular/NServiceBus.AzureStoragePersistence → will provide persistence found in NServiceBus.Azure
 5. _Future_ https://github.com/Particular/NServiceBus.AzureBlobStorageDataBus → will provide DataBus found in NServiceBus.Azure
 
-The Windows Azure transports for NServiceBus enables the use of Windows Azure Queues and Windows Azure Service Bus as the underlying transports used by NServiceBus. 
+The Windows Azure transports for NServiceBus enable the use of Windows Azure Queues and Windows Azure Service Bus as the underlying transports used by NServiceBus. 
 
 ## Documentation
 
