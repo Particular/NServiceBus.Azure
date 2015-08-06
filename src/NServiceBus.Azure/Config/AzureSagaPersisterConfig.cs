@@ -1,7 +1,7 @@
 namespace NServiceBus.Config
 {
     using System.Configuration;
-    using NServiceBus.SagaPersisters;
+    using SagaPersisters;
 
     /// <summary>
     /// Config section for the Azure Saga Persister
@@ -10,10 +10,10 @@ namespace NServiceBus.Config
     {
         public AzureSagaPersisterConfig()
         {
-            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureStorageSagaDefaults.ConnectionString,
+            Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureStorageSagaDefaults.ConnectionString,
     null, new CallbackValidator(typeof(string), AzureStorageSagaGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("CreateSchema", typeof(bool), AzureStorageSagaDefaults.CreateSchema,
+            Properties.Add(new ConfigurationProperty("CreateSchema", typeof(bool), AzureStorageSagaDefaults.CreateSchema,
                 ConfigurationPropertyOptions.None));
 
         }

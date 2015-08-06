@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Reflection;
-    using System.Runtime.Caching;
+    using System.Runtime.CompilerServices;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using NServiceBus.Azure;
@@ -16,12 +16,11 @@
     /// </summary>
     public class AzureSagaPersister : ISagaPersister
     {
-        bool autoUpdateSchema;
-        CloudTableClient client;
-        ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
-        static MemoryCache dictionaryTableCache = new MemoryCache("Entities");
-        const int longevity = 60000;
-
+        readonly bool autoUpdateSchema;
+        readonly CloudTableClient client;
+        static readonly ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
+        static readonly ConditionalWeakTable<object, string> etags = new ConditionalWeakTable<object, string>();
+        
         /// <summary>
         /// 
         /// </summary>
@@ -68,29 +67,12 @@
 
             if (!Equals(entity, default(T)))
             {
-                AddToCache(id, tableEntity);
+                etags.Add(entity, tableEntity.ETag);
             }
 
             return entity;
         }
 
-        void AddToCache(string id, DictionaryTableEntity tableEntity)
-        {
-            var item = dictionaryTableCache.GetCacheItem(id);
-            if (item == null)
-            {
-                item = new CacheItem(id, tableEntity);
-                dictionaryTableCache.Set(item, new CacheItemPolicy
-                {
-                    Priority = CacheItemPriority.NotRemovable,
-                    SlidingExpiration = TimeSpan.FromMilliseconds(longevity)
-                });
-            }
-            else
-            {
-                item.Value = tableEntity;
-            }
-        }
 
         DictionaryTableEntity GetDictionaryTableEntity(string sagaId, Type entityType)
         {
@@ -111,8 +93,7 @@
 
             if (!Equals(entity, default(T)))
             {
-                var id = entity.Id.ToString();
-                AddToCache(id, tableEntity);
+                etags.Add(entity, tableEntity.ETag);
             }
 
             try
@@ -237,14 +218,12 @@
             if (rowkey == "") rowkey = partitionKey; // just to be backward compat with original implementation
 
             var type = entity.GetType();
-            var cacheItem = dictionaryTableCache.GetCacheItem(partitionKey);
-            var toPersist = cacheItem != null ? (DictionaryTableEntity)(cacheItem.Value) : new DictionaryTableEntity { PartitionKey = partitionKey, RowKey = rowkey };
-                
+            string etag;
+            var update = etags.TryGetValue(entity, out etag);
+
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-            toPersist = ToDictionaryTableEntity(entity, toPersist, properties);
-
-            var update = !string.IsNullOrEmpty(toPersist.ETag);
+            var toPersist = ToDictionaryTableEntity(entity, new DictionaryTableEntity { PartitionKey = partitionKey, RowKey = rowkey, ETag = etag}, properties);
 
             //no longer using InsertOrReplace as it ignores concurrency checks
             batch.Add(update ? TableOperation.Replace(toPersist) : TableOperation.Insert(toPersist));
