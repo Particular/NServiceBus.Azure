@@ -1,14 +1,14 @@
 ﻿namespace NServiceBus.Azure
 {
     using System.Text.RegularExpressions;
-    using Config;
     using System;
     using System.Collections.Generic;
     using System.Data.Services.Client;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Web.Script.Serialization;
-    using Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
@@ -17,11 +17,11 @@
     
     public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
     {
-        Configure config;
+        string _endpointName;
 
         public TimeoutPersister(Configure config)
         {
-            this.config = config;
+            _endpointName = config.Settings.EndpointName();
         }
 
         public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
@@ -43,14 +43,14 @@
                 query = from c in context.TimeoutData
                             where c.PartitionKey.CompareTo(lastSuccessfulRead.Value.ToString(PartitionKeyScope)) >= 0
                             && c.PartitionKey.CompareTo(now.ToString(PartitionKeyScope)) <= 0
-                                && c.OwningTimeoutManager == config.Settings.EndpointName()
+                            && c.OwningTimeoutManager == _endpointName
                             select c;
             }
             else
             {
                 query = from c in context.TimeoutData
-                          where c.OwningTimeoutManager == config.Settings.EndpointName()
-                            select c;
+                        where c.OwningTimeoutManager == _endpointName
+                        select c;
             }
 
             result = query
@@ -183,7 +183,7 @@
 
             context.DeleteObject(timeoutDataEntity);
 
-            context.SaveChanges();
+            context.SaveChangesWithRetries();
 
             return true;
         }
@@ -330,13 +330,6 @@
             blob.DeleteIfExists();
         }
 
-        string GetUniqueEndpointName()
-        {
-            var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;
-
-            return Sanitize(config.Settings.EndpointName() + "_" + identifier);
-        }
-
         string Sanitize(string s)
         {
             var rgx = new Regex(@"[^a-zA-Z0-9\-_]");
@@ -344,11 +337,18 @@
             return n;
         }
 
+        string GetUniqueEndpointName()		
+        {		
+            var identifier = SafeRoleEnvironment.IsAvailable ? SafeRoleEnvironment.CurrentRoleInstanceId : RuntimeEnvironment.MachineName;		
+		
+            return Sanitize(_endpointName + "_" + identifier);		
+        }
+
         bool TryGetLastSuccessfulRead(ServiceContext context, out TimeoutManagerDataEntity lastSuccessfulReadEntity)
         {
             var query = from m in context.TimeoutManagerData
-                                            where m.PartitionKey == GetUniqueEndpointName()
-                                        select m;
+                        where m.PartitionKey == GetUniqueEndpointName()
+                        select m;
 
             lastSuccessfulReadEntity = query
                 .AsTableServiceQuery(context)
@@ -397,10 +397,102 @@
 
         }
 
+        // Partial copy of SafeRoleEnvironment from NSB.Host.AzureCloudService needed as a result of NSB.Azure repo split
+        [DebuggerNonUserCode]
+        class SafeRoleEnvironment
+        {
+            static bool isAvailable = true;
+            static Type roleEnvironmentType;
+            static Type roleInstanceType;
+
+            static SafeRoleEnvironment()
+            {
+                try
+                {
+                    TryLoadRoleEnvironment();
+                }
+                catch
+                {
+                    isAvailable = false;
+                }
+            }
+
+            public static bool IsAvailable
+            {
+                get { return isAvailable; }
+            }
+
+            public static string CurrentRoleInstanceId
+            {
+                get
+                {
+                    var instance = roleEnvironmentType.GetProperty("CurrentRoleInstance").GetValue(null, null);
+                    return (string) roleInstanceType.GetProperty("Id").GetValue(instance, null);
+                }
+            }
+
+            static void TryLoadRoleEnvironment()
+            {
+                var serviceRuntimeAssembly = TryLoadServiceRuntimeAssembly();
+                if (!isAvailable)
+                {
+                    return;
+                }
+
+                TryGetRoleEnvironmentTypes(serviceRuntimeAssembly);
+                if (!isAvailable)
+                {
+                    return;
+                }
+
+                isAvailable = IsAvailableInternal();
+            }
+
+            static void TryGetRoleEnvironmentTypes(Assembly serviceRuntimeAssembly)
+            {
+                try
+                {
+                    roleEnvironmentType = serviceRuntimeAssembly.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleEnvironment");
+                    roleInstanceType = serviceRuntimeAssembly.GetType("Microsoft.WindowsAzure.ServiceRuntime.RoleInstance");
+                    serviceRuntimeAssembly.GetType("Microsoft.WindowsAzure.ServiceRuntime.Role");
+                    serviceRuntimeAssembly.GetType("Microsoft.WindowsAzure.ServiceRuntime.LocalResource");
+                }
+                catch (ReflectionTypeLoadException)
+                {
+                    isAvailable = false;
+                }
+            }
+
+            static bool IsAvailableInternal()
+            {
+                try
+                {
+                    return (bool) roleEnvironmentType.GetProperty("IsAvailable").GetValue(null, null);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            static Assembly TryLoadServiceRuntimeAssembly()
+            {
+                try
+                {
+                    var ass = Assembly.LoadWithPartialName("Microsoft.WindowsAzure.ServiceRuntime");
+                    isAvailable = ass != null;
+                    return ass;
+                }
+                catch (FileNotFoundException)
+                {
+                    isAvailable = false;
+                    return null;
+                }
+            }
+        }
+
         string connectionString;
         CloudStorageAccount account;
         CloudBlobContainer container;
-
-        static ILog Logger = LogManager.GetLogger(typeof(TimeoutPersister));
     }
 }
