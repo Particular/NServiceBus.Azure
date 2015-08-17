@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.SagaPersisters
 {
-    using NServiceBus.Configuration.AdvanceExtensibility;
-    using NServiceBus.Persistence;
+    using Configuration.AdvanceExtensibility;
+    using Persistence;
 
     /// <summary>
     /// Configuration extensions for the sagas storage

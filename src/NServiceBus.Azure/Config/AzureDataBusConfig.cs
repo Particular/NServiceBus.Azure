@@ -1,34 +1,34 @@
 namespace NServiceBus.Config
 {
     using System.Configuration;
-    using NServiceBus.DataBus;
+    using DataBus;
 
     public class AzureDataBusConfig : ConfigurationSection
     {
         public AzureDataBusConfig()
         {
-            base.Properties.Add(new ConfigurationProperty("MaxRetries", typeof(int), AzureDataBusDefaults.DefaultMaxRetries,
+            Properties.Add(new ConfigurationProperty("MaxRetries", typeof(int), AzureDataBusDefaults.DefaultMaxRetries,
                 null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckMaxRetries), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("BackOffInterval", typeof(int), AzureDataBusDefaults.DefaultBackOffInterval,
+            Properties.Add(new ConfigurationProperty("BackOffInterval", typeof(int), AzureDataBusDefaults.DefaultBackOffInterval,
                 null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckBackOffInterval), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("BlockSize", typeof(int), AzureDataBusDefaults.DefaultBlockSize,
+            Properties.Add(new ConfigurationProperty("BlockSize", typeof(int), AzureDataBusDefaults.DefaultBlockSize,
                 null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckBlockSize), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("NumberOfIOThreads", typeof(int), AzureDataBusDefaults.DefaultNumberOfIOThreads,
+            Properties.Add(new ConfigurationProperty("NumberOfIOThreads", typeof(int), AzureDataBusDefaults.DefaultNumberOfIOThreads,
                 null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckNumberOfIOThreads), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureDataBusDefaults.DefaultConnectionString,
+            Properties.Add(new ConfigurationProperty("ConnectionString", typeof(string), AzureDataBusDefaults.DefaultConnectionString,
                 null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckConnectionString), ConfigurationPropertyOptions.None));
             
-            base.Properties.Add(new ConfigurationProperty("Container", typeof(string), AzureDataBusDefaults.DefaultContainer,
+            Properties.Add(new ConfigurationProperty("Container", typeof(string), AzureDataBusDefaults.DefaultContainer,
                 null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckContainerName), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("BasePath", typeof(string), AzureDataBusDefaults.DefaultBasePath,
+            Properties.Add(new ConfigurationProperty("BasePath", typeof(string), AzureDataBusDefaults.DefaultBasePath,
                 null, new CallbackValidator(typeof(string), AzureDataBusGuard.CheckBasePath), ConfigurationPropertyOptions.None));
 
-            base.Properties.Add(new ConfigurationProperty("DefaultTTL", typeof(long), AzureDataBusDefaults.DefaultTTL,
+            Properties.Add(new ConfigurationProperty("DefaultTTL", typeof(long), AzureDataBusDefaults.DefaultTTL,
                 null, new CallbackValidator(typeof(long), AzureDataBusGuard.CheckDefaultTTL), ConfigurationPropertyOptions.None));
         }
 

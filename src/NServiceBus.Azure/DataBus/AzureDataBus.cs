@@ -1,7 +1,7 @@
 namespace NServiceBus
 {
     using System;
-    using NServiceBus.DataBus;
+    using DataBus;
 
     /// <summary>
     /// Defines Azure databus that can be used by NServiceBus
