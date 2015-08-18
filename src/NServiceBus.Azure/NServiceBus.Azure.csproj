@@ -118,9 +118,6 @@
     <Compile Include="Subscriptions\AzureSubscriptionStorageGuard.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
     <Compile Include="Obsoletes\ConfigureAzureBlobStorageDataBus.cs" />
-    <Compile Include="Config\IsHostedIn.cs" />
-    <Compile Include="Config\RoleEnvironmentUnavailableException.cs" />
-    <Compile Include="Config\SafeRoleEnvironment.cs" />
     <Compile Include="Logging\Azure\TraceLogger.cs" />
     <Compile Include="Logging\Azure\TraceLoggerFactory.cs" />
     <Compile Include="Obsoletes\ConfigureAzureSagaPersister.cs" />
@@ -128,11 +125,7 @@
     <Compile Include="Config\AzureDataBusConfig.cs" />
     <Compile Include="Config\AzureSagaPersisterConfig.cs" />
     <Compile Include="Config\AzureSubscriptionStorageConfig.cs" />
-    <Compile Include="ConfigureAzureIntegration.cs" />
     <Compile Include="DataBus\Azure\BlobStorage\BlobStorageDataBus.cs" />
-    <Compile Include="ConfigurationSource\Azure\AzureConfigurationSettings.cs" />
-    <Compile Include="ConfigurationSource\Azure\AzureConfigurationSource.cs" />
-    <Compile Include="ConfigurationSource\Azure\IAzureConfigurationSettings.cs" />
     <Compile Include="Logging\Azure\SetLoggingLibrary.cs" />
     <Compile Include="Config\AzureTimeoutPersisterConfig.cs" />
     <Compile Include="SagaPersisters\Azure\AzureSagaPersister.cs" />

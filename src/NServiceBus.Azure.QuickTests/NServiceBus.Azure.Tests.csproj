@@ -94,25 +94,14 @@
     <Compile Include="DataBus\ValidUntilV3BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\ValidUntilV4BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\When_using_AzureDataBusGuard.cs" />
-    <Compile Include="Hosting\When_checking_if_roleenvironment_is_available.cs" />
     <Compile Include="Persisters\When_using_AzureTimeoutStorageGuard.cs" />
     <Compile Include="Persisters\When_using_AzureStorageSagaGuard.cs" />
-    <Compile Include="Hosting\When_killing_processes.cs" />
-    <Compile Include="Configuration\When_using_the_azure_configuration_source.cs" />
     <Compile Include="Persisters\When_using_AzureSubscriptionStorageGuard.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
       <Project>{12f1d9f1-0a2c-4442-8d18-67dd096c6300}</Project>
       <Name>NServiceBus.Azure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NServiceBus.Hosting.Azure.HostProcess\NServiceBus.Hosting.Azure.HostProcess.csproj">
-      <Project>{11b81f23-64c6-4341-94ac-38b3c4c6b1e7}</Project>
-      <Name>NServiceBus.Hosting.Azure.HostProcess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NServiceBus.Hosting.Azure\NServiceBus.Hosting.Azure.csproj">
-      <Project>{6591ed91-f9a1-4cc3-813e-a33e07439d49}</Project>
-      <Name>NServiceBus.Hosting.Azure</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
