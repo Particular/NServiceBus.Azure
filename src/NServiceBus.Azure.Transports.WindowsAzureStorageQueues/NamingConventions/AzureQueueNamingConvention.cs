@@ -9,12 +9,15 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
     {
         public static Func<string, string> Apply = queueName =>
         {
+            // ReSharper disable once RedundantNameQualifier
             var configSection = NServiceBus.Configure.GetConfigSection<AzureQueueConfig>();
 
             if (configSection != null && !string.IsNullOrEmpty(configSection.QueueName))
             {
+                // ReSharper disable once RedundantCast
                 queueName = (string) configSection.QueueName;
 
+                // ReSharper disable once RedundantCast
                 if ((bool) configSection.QueuePerInstance)
                 {
                     SettingsHolder.SetDefault("ScaleOut.UseSingleBrokerQueue", false);

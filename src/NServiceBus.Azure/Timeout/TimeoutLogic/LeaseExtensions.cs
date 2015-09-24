@@ -5,7 +5,6 @@ namespace NServiceBus.Azure
 {
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
-    using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 
     public static class LeaseBlobExtensions
     {
