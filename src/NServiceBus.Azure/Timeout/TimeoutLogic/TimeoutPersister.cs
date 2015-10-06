@@ -6,13 +6,13 @@
     using System.Data.Services.Client;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Security.Cryptography;
     using System.Text;
     using System.Web.Script.Serialization;
     using Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
-    using Microsoft.WindowsAzure.Storage.RetryPolicies;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
     using Timeout.Core;
     using RuntimeEnvironment = Support.RuntimeEnvironment;
@@ -167,8 +167,19 @@
 
         public bool TryRemove(string timeoutId)
         {
-            TimeoutData data;
-            return TryRemove(timeoutId, out data);
+            try
+            {
+                TimeoutData data;
+                return TryRemove(timeoutId, out data);
+            }
+            catch (DataServiceRequestException) // table entries were already removed
+            {
+               return false;
+            }
+            catch (StorageException) // blob file was already removed
+            {
+                return false;
+            }
         }
 
         public bool TryRemove(string timeoutId, out TimeoutData timeoutData)

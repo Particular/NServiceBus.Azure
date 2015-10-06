@@ -71,7 +71,9 @@
   <ItemGroup>
     <Compile Include="AzurePersistenceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Test_Helper.cs" />
     <Compile Include="Timeouts\When_removing_timeouts_from_the_storage.cs" />
+    <Compile Include="Timeouts\When_timeout_is_added.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ripple.dependencies.config">

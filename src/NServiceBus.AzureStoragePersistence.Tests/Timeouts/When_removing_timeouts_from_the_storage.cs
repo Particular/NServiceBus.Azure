@@ -3,12 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Blob;
-    using Microsoft.WindowsAzure.Storage.RetryPolicies;
-    using Microsoft.WindowsAzure.Storage.Table;
-    using NServiceBus.Azure;
-    using NServiceBus.Config;
+    using System.Threading.Tasks;
     using NServiceBus.Timeout.Core;
     using NUnit.Framework;
 
@@ -17,10 +12,10 @@
     public class When_removing_timeouts_from_the_storage
     {
 
-        [TestFixtureTearDown]
-        public void FixtureTearDown()
+        [SetUp]
+        public void Perform_storage_cleanup()
         {
-            Test_Helper.Remove_All_Blobs();
+            Test_Helper.Perform_Storage_Cleanup();
         }
 
         [Test]
@@ -31,7 +26,7 @@
             var timeout = Test_Helper.Generate_Timeout_With_Headers();
             timeoutPersister.Add(timeout);
 
-            var timeouts = Test_Helper.Get_All_Timeouts(timeoutPersister);
+            var timeouts = Test_Helper.Get_All_Timeouts_Using_GetNextChunk(timeoutPersister);
 
             Assert.True(timeouts.Count == 1);
 
@@ -39,20 +34,18 @@
             timeoutPersister.TryRemove(timeouts.First().Item1, out timeoutData);
 
             CollectionAssert.AreEqual(new Dictionary<string, string> { { "Prop1", "1234" }, { "Prop2", "text" } }, timeoutData.Headers);
-
-            Test_Helper.Cleanup_Storage_Account(timeoutData, timeoutPersister);
         }
 
 
         [Test]
-        public void Should_return_orrect_headers_when_timeout_is_Peeked()
+        public void Should_return_correct_headers_when_timeout_is_Peeked()
         {
             var timeoutPersister = Test_Helper.Create_TimeoutPersister();
 
             var timeout = Test_Helper.Generate_Timeout_With_Headers();
             timeoutPersister.Add(timeout);
 
-            var timeouts = Test_Helper.Get_All_Timeouts(timeoutPersister);
+            var timeouts = Test_Helper.Get_All_Timeouts_Using_GetNextChunk(timeoutPersister);
 
             Assert.True(timeouts.Count == 1);
 
@@ -60,8 +53,6 @@
             var timeoutData = timeoutPersister.Peek(timeoutId);
 
             CollectionAssert.AreEqual(new Dictionary<string, string> { { "Prop1", "1234" }, { "Prop2", "text" } }, timeoutData.Headers);
-
-            Test_Helper.Cleanup_Storage_Account(timeout, timeoutPersister);
         }
 
         [Test]
@@ -83,7 +74,7 @@
             timeoutPersister.Add(timeout1);
             timeoutPersister.Add(timeout2);
 
-            var timeouts = Test_Helper.Get_All_Timeouts(timeoutPersister);
+            var timeouts = Test_Helper.Get_All_Timeouts_Using_GetNextChunk(timeoutPersister);
             Assert.IsTrue(timeouts.Count == 2);
 
             foreach (var timeout in timeouts)
@@ -93,115 +84,94 @@
             }
 
             Test_Helper.Assert_All_Timeouts_Have_Been_Removed(timeoutPersister);
-
-            Test_Helper.Cleanup_Storage_Account(timeout1, timeoutPersister, false);
         }
 
         [Test]
         public void Should_remove_timeouts_by_id_and_return_true_using_new_interface()
         {
+            var timeoutPersister = Test_Helper.Create_TimeoutPersister();
+            var timeout1 = Test_Helper.Generate_Timeout_With_Headers();
+            var timeout2 = Test_Helper.Generate_Timeout_With_Headers();
+            timeoutPersister.Add(timeout1);
+            timeoutPersister.Add(timeout2);
+
+            var timeouts = Test_Helper.Get_All_Timeouts_Using_GetNextChunk(timeoutPersister);
+            Assert.IsTrue(timeouts.Count == 2);
+
+            var itemRemoved = true;
+            foreach (var timeout in timeouts)
+            {
+                itemRemoved &= timeoutPersister.TryRemove(timeout.Item1);
+            }
+
+            Assert.IsTrue(itemRemoved, "Expected 2 ivocations to return true, but one or both of them returned false");
+
+            Test_Helper.Assert_All_Timeouts_Have_Been_Removed(timeoutPersister);
+        }
+
+        [Test]
+        public void Should_return_false_if_timeout_already_deleted_for_TryRemove_invocation()
+        {
+            var timeoutPersister = Test_Helper.Create_TimeoutPersister();
+
+            var timeout = Test_Helper.Generate_Timeout_With_Headers();
+            timeoutPersister.Add(timeout);
+
+            var timeouts = Test_Helper.Get_All_Timeouts_Using_GetNextChunk(timeoutPersister);
+            Assert.IsTrue(timeouts.Count == 1);
+
+            var timeoutId = timeouts.First().Item1;
+
+            Assert.IsTrue(timeoutPersister.TryRemove(timeoutId));
+            Assert.IsFalse(timeoutPersister.TryRemove(timeoutId));
         }
 
         [Test]
         public void Should_remove_timeouts_by_sagaid()
         {
+            var timeoutPersister = Test_Helper.Create_TimeoutPersister();
+            var sagaId1 = Guid.NewGuid();
+            var sagaId2 = Guid.NewGuid();
+            var timeout1 = Test_Helper.Getnerate_Timeout_With_Saga_Id(sagaId1);
+            var timeout2 = Test_Helper.Getnerate_Timeout_With_Saga_Id(sagaId2);
+            timeoutPersister.Add(timeout1);
+            timeoutPersister.Add(timeout2);
+
+            var timeouts = Test_Helper.Get_All_Timeouts_Using_GetNextChunk(timeoutPersister);
+            Assert.IsTrue(timeouts.Count == 2);
+
+            timeoutPersister.RemoveTimeoutBy(sagaId1);
+            timeoutPersister.RemoveTimeoutBy(sagaId2);
+
+            Test_Helper.Assert_All_Timeouts_Have_Been_Removed(timeoutPersister);
         }
 
         [Test]
-        public void TryRemove_should_work_with_concurrent_operations()
+        public async Task TryRemove_should_work_with_concurrent_operations()
         {
+            var timeoutPersister = Test_Helper.Create_TimeoutPersister();
+            var timeout = Test_Helper.Generate_Timeout_With_Headers();
+            timeoutPersister.Add(timeout);
+
+            var task1 = Task.Run(() => timeoutPersister.TryRemove(timeout.Id));
+            var task2 = Task.Run(() => timeoutPersister.TryRemove(timeout.Id));
+
+            await Task.WhenAll(task1, task2).ConfigureAwait(false);
+
+            Assert.IsTrue(task1.Result || task2.Result);
+            Assert.IsFalse(task1.Result && task2.Result);
         }
 
-        static class Test_Helper
+        [Test]
+        public void Should_retain_timeout_state()
         {
-            internal static TimeoutPersister Create_TimeoutPersister()
-            {
-                return new TimeoutPersister
-                {
-                    ConnectionString = AzurePersistenceTests.GetConnectionString(),
-                    PartitionKeyScope = new AzureTimeoutPersisterConfig().PartitionKeyScope
-                };
-            }
+            var timeoutPersister = Test_Helper.Create_TimeoutPersister();
+            var timeout = Test_Helper.Generate_Timeout_With_Headers();
+            timeoutPersister.Add(timeout);
 
+            var peekedTimeout = timeoutPersister.Peek(timeout.Id);
 
-            internal static TimeoutData Generate_Timeout_With_Headers()
-            {
-                return new TimeoutData
-                {
-                    Time = DateTime.UtcNow.AddYears(-1),
-                    Destination = new Address("timeouts", "some_azure_connection_string"),
-                    SagaId = Guid.NewGuid(),
-                    State = new byte[] { 1, 2, 3, 4 },
-                    Headers = new Dictionary<string, string>
-                    {
-                        {"Prop1", "1234"},
-                        {"Prop2", "text"}
-                    },
-                    OwningTimeoutManager = Configure.EndpointName
-                };
-            }
-
-            internal static List<Tuple<string, DateTime>> Get_All_Timeouts(TimeoutPersister persister)
-            {
-                DateTime nextRun;
-                var timeouts = persister.GetNextChunk(DateTime.Now.AddYears(-3), out nextRun).ToList();
-                return timeouts;
-            }
-
-            public static void Assert_All_Timeouts_Have_Been_Removed(TimeoutPersister timeoutPersister)
-            {
-                var cloudStorageAccount = CloudStorageAccount.Parse(timeoutPersister.ConnectionString);
-
-                var table = cloudStorageAccount.CreateCloudTableClient().GetTableReference(ServiceContext.TimeoutDataTableName);
-                var results = table.ExecuteQuery(new TableQuery()).ToList();
-                Assert.IsFalse(results.Any());
-            }
-
-            internal static void Cleanup_Storage_Account(TimeoutData timeoutDataToCleanup, TimeoutPersister timeoutPersister, bool deleteTimeoutDataRecords = true, bool deleteTimeDataManagerRecors = true)
-            {
-                var stateAddress = timeoutDataToCleanup.Id;
-                var cloudStorageAccount = CloudStorageAccount.Parse(timeoutPersister.ConnectionString);
-
-                if (deleteTimeoutDataRecords)
-                {
-                    // 1/3 - (state_address, empty)
-
-                    var table = cloudStorageAccount.CreateCloudTableClient().GetTableReference(ServiceContext.TimeoutDataTableName);
-                    var tableEntity = new DynamicTableEntity(stateAddress, string.Empty) { ETag = "*" };
-
-                    table.Execute(TableOperation.Delete(tableEntity));
-                    // 2/3 - (Date, state_address)
-                    tableEntity = new DynamicTableEntity(timeoutDataToCleanup.Time.ToString(timeoutPersister.PartitionKeyScope), stateAddress)
-                    {
-                        ETag = "*"
-                    };
-                    table.Execute(TableOperation.Delete(tableEntity));
-                    // 3/3 - (saga_id, state_address)
-                    tableEntity = new DynamicTableEntity(timeoutDataToCleanup.SagaId.ToString(), stateAddress)
-                    {
-                        ETag = "*"
-                    };
-                    table.Execute(TableOperation.Delete(tableEntity));
-                }
-
-                if (deleteTimeDataManagerRecors)
-                {
-                    // 1/1 - (unique_endpoint_name, empty)
-                    var table = cloudStorageAccount.CreateCloudTableClient().GetTableReference(ServiceContext.TimeoutManagerDataTableName);
-                    var tableEntity = new DynamicTableEntity(Configure.EndpointName + "_" + Environment.MachineName, string.Empty)
-                    {
-                        ETag = "*"
-                    };
-                    table.Execute(TableOperation.Delete(tableEntity));
-                }
-            }
-
-            public static void Remove_All_Blobs()
-            {
-                var cloudStorageAccount = CloudStorageAccount.Parse(AzurePersistenceTests.GetConnectionString());
-                var blob = cloudStorageAccount.CreateCloudBlobClient().GetContainerReference("timeoutstate");
-                blob.Delete(null, new BlobRequestOptions {RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(15), 5)});
-            }
+            Assert.AreEqual(timeout.State, peekedTimeout.State);
         }
     }
 }
