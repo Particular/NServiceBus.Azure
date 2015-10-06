@@ -12,11 +12,12 @@
     using Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.WindowsAzure.Storage.RetryPolicies;
     using Microsoft.WindowsAzure.Storage.Table.DataServices;
     using Timeout.Core;
     using RuntimeEnvironment = Support.RuntimeEnvironment;
 
-    public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend
+    public class TimeoutPersister : IPersistTimeouts, IDetermineWhoCanSend, IPersistTimeoutsV2
     {
         public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
         {
@@ -138,6 +139,36 @@
                                 });
 
             context.SaveChanges();
+        }
+
+        public TimeoutData Peek(string timeoutId)
+        {
+            var context = new ServiceContext(account.CreateCloudTableClient()) { IgnoreResourceNotFoundException = true};
+       
+            TimeoutDataEntity timeoutDataEntity;
+            if (!TryGetTimeoutData(context, timeoutId, string.Empty, out timeoutDataEntity))
+            {
+                return null;
+            }
+
+            var timeoutData = new TimeoutData
+            {
+                Destination = Address.Parse(timeoutDataEntity.Destination),
+                SagaId = timeoutDataEntity.SagaId,
+                State = Download(timeoutDataEntity.StateAddress),
+                Time = timeoutDataEntity.Time,
+                CorrelationId = timeoutDataEntity.CorrelationId,
+                Id = timeoutDataEntity.RowKey,
+                OwningTimeoutManager = timeoutDataEntity.OwningTimeoutManager,
+                Headers = Deserialize(timeoutDataEntity.Headers)
+            };
+            return timeoutData;
+        }
+
+        public bool TryRemove(string timeoutId)
+        {
+            TimeoutData data;
+            return TryRemove(timeoutId, out data);
         }
 
         public bool TryRemove(string timeoutId, out TimeoutData timeoutData)
