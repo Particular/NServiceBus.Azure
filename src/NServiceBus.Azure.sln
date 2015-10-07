@@ -28,6 +28,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{642B64
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.Deployment", "NServiceBus.Azure.Deployment\NServiceBus.Azure.Deployment.csproj", "{5F4436F7-DCB8-4AAB-884B-EA30E641FFB0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NugetPackageDefinition", "NugetPackageDefinition", "{0C340C2B-1517-4D91-9D1F-829CC09DA6D4}"
+	ProjectSection(SolutionItems) = preProject
+		..\packaging\nuget\nservicebus.azure.nuspec = ..\packaging\nuget\nservicebus.azure.nuspec
+		..\packaging\nuget\nservicebus.azure.transports.windowsazureservicebus.nuspec = ..\packaging\nuget\nservicebus.azure.transports.windowsazureservicebus.nuspec
+		..\packaging\nuget\nservicebus.azure.transports.windowsazurestoragequeues.nuspec = ..\packaging\nuget\nservicebus.azure.transports.windowsazurestoragequeues.nuspec
+		..\packaging\nuget\nservicebus.hosting.azure.hostprocess.nuspec = ..\packaging\nuget\nservicebus.hosting.azure.hostprocess.nuspec
+		..\packaging\nuget\nservicebus.hosting.azure.nuspec = ..\packaging\nuget\nservicebus.hosting.azure.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
