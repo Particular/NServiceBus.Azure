@@ -150,8 +150,6 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
                         {
                             tryProcessMessage(transportMessage);
                         }
-
-                        brokeredMessage.SafeComplete(); 
                     }
                 }
                 catch (Exception ex)
