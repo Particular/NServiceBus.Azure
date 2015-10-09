@@ -12,45 +12,45 @@
 
     public class When_timeout_already_removed : NServiceBusAcceptanceTest
     {
-        [Test]
-        public void Should_rollback_and_not_deliver_timeout_when_using_dtc()
-        {
-            var context = new Context();
+//        [Test]
+//        public void Should_rollback_and_not_deliver_timeout_when_using_dtc()
+//        {
+//            var context = new Context();
+//
+//            Scenario.Define(context)
+//                .WithEndpoint<Endpoint>(b => b
+//                    .CustomConfig(configure => configure.Transactions().EnableDistributedTransactions())
+//                    .Given(bus =>
+//                    {
+//                        bus.Defer(TimeSpan.FromSeconds(5), new MyMessage());
+//                    }))
+//                .Done(c => c.AttemptedToRemoveTimeout || c.MessageReceived)
+//                .Run();
+//
+//            Assert.IsFalse(context.MessageReceived, "Message should not be delivered using dtc.");
+//            Assert.AreEqual(2, context.NumberOfProcessingAttempts, "The rollback should cause a retry.");
+//            Assert.IsTrue(context.AttemptedToRemoveTimeout);
+//        }
 
-            Scenario.Define(context)
-                .WithEndpoint<Endpoint>(b => b
-                    .CustomConfig(configure => configure.Transactions().EnableDistributedTransactions())
-                    .Given(bus =>
-                    {
-                        bus.Defer(TimeSpan.FromSeconds(5), new MyMessage());
-                    }))
-                .Done(c => c.AttemptedToRemoveTimeout || c.MessageReceived)
-                .Run();
-
-            Assert.IsFalse(context.MessageReceived, "Message should not be delivered using dtc.");
-            Assert.AreEqual(2, context.NumberOfProcessingAttempts, "The rollback should cause a retry.");
-            Assert.IsTrue(context.AttemptedToRemoveTimeout);
-        }
-
-        [Test]
-        public void Should_rollback_and_deliver_timeout_anyway_when_using_native_tx()
-        {
-            var context = new Context();
-
-            Scenario.Define(context)
-                .WithEndpoint<Endpoint>(b => b
-                    .CustomConfig(configure => configure.Transactions().DisableDistributedTransactions())
-                    .Given(bus =>
-                    {
-                        bus.Defer(TimeSpan.FromSeconds(5), new MyMessage());
-                    }))
-                .Done(c => c.AttemptedToRemoveTimeout && c.MessageReceived)
-                .Run();
-
-            Assert.IsTrue(context.MessageReceived, "Message should be delivered although transaction was aborted.");
-            Assert.AreEqual(2, context.NumberOfProcessingAttempts, "The rollback should cause a retry.");
-            Assert.IsTrue(context.AttemptedToRemoveTimeout);
-        }
+//        [Test]
+//        public void Should_rollback_and_deliver_timeout_anyway_when_using_native_tx()
+//        {
+//            var context = new Context();
+//
+//            Scenario.Define(context)
+//                .WithEndpoint<Endpoint>(b => b
+//                    .CustomConfig(configure => configure.Transactions().DisableDistributedTransactions())
+//                    .Given(bus =>
+//                    {
+//                        bus.Defer(TimeSpan.FromSeconds(5), new MyMessage());
+//                    }))
+//                .Done(c => c.AttemptedToRemoveTimeout && c.MessageReceived)
+//                .Run();
+//
+//            Assert.IsTrue(context.MessageReceived, "Message should be delivered although transaction was aborted.");
+//            Assert.AreEqual(2, context.NumberOfProcessingAttempts, "The rollback should cause a retry.");
+//            Assert.IsTrue(context.AttemptedToRemoveTimeout);
+//        }
 
         [Test]
         public void Should_deliver_timeout_anyway_when_using_no_tx()
