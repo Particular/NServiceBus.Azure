@@ -24,7 +24,7 @@
         [ObsoleteEx(
             RemoveInVersion = "7", 
             TreatAsErrorFromVersion = "6", 
-            Replacement = "ProfileActivated(ConfigurationBuilder config)")]
+            ReplacementTypeOrMember = "ProfileActivated(ConfigurationBuilder config)")]
 // ReSharper disable once UnusedParameter.Global
         void ProfileActivated(Configure config);
     }

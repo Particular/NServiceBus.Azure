@@ -6,14 +6,14 @@ namespace NServiceBus
     public static class ConfigureAzureMessageQueue
     {
 
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UseTransport<AzureStorageQueue>()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", ReplacementTypeOrMember = "config.UseTransport<AzureStorageQueue>()")]
         public static Configure AzureMessageQueue(this Configure config)
         {
             throw new InvalidOperationException();
         }
 
         
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UseTransport<AzureStorageQueue>().PeekInterval()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", ReplacementTypeOrMember = "config.UseTransport<AzureStorageQueue>().PeekInterval()")]
         public static Configure PeekInterval(this Configure config, int value)
         {
             throw new InvalidOperationException();
