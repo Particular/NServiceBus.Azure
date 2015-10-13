@@ -23,6 +23,7 @@ namespace NServiceBus.Hosting
         public DynamicHostController(IConfigureThisEndpoint specifier, string[] requestedProfiles, List<Type> defaultProfiles, string endpointName)
         {
             this.specifier = specifier;
+            // ReSharper disable once RedundantCast
             Configure.GetEndpointNameAction = (Func<string>)(() => endpointName);
 
             var assembliesToScan = new List<Assembly> {GetType().Assembly};

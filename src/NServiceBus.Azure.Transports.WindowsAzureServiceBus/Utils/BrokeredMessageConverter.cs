@@ -31,6 +31,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureServiceBus
             }
             else
             {
+                // ReSharper disable once UseObjectOrCollectionInitializer
                 t = new TransportMessage();
                 t.Body = rawMessage;
             }

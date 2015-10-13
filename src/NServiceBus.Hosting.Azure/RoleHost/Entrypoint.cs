@@ -47,6 +47,7 @@ namespace NServiceBus.Hosting.Azure
 
         static void CurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            // ReSharper disable once RedundantToStringCall
             Trace.WriteLine("Unhandled exception occured: " + e.ExceptionObject.ToString());
         }
 

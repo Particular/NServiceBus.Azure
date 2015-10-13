@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30324.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure", "NServiceBus.Azure\NServiceBus.Azure.csproj", "{12F1D9F1-0A2C-4442-8D18-67DD096C6300}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Azure.WindowsAzureStorageQueues.AcceptanceTests", "NServiceBus.Azure.Transports.WindowsAzureStorageQueues.Acceptance\NServiceBus.Azure.WindowsAzureStorageQueues.AcceptanceTests.csproj", "{09996CDC-90AC-442F-A6CE-601F37CD1352}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.AzureStoragePersistence.Tests", "NServiceBus.AzureStoragePersistence.Tests\NServiceBus.AzureStoragePersistence.Tests.csproj", "{D577B035-4D84-44C6-B912-765827BD39A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09996CDC-90AC-442F-A6CE-601F37CD1352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D577B035-4D84-44C6-B912-765827BD39A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D577B035-4D84-44C6-B912-765827BD39A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D577B035-4D84-44C6-B912-765827BD39A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D577B035-4D84-44C6-B912-765827BD39A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,5 +72,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{54FCA3C9-F153-4FDF-A7F6-46595275AE6E} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
 		{09996CDC-90AC-442F-A6CE-601F37CD1352} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
+		{D577B035-4D84-44C6-B912-765827BD39A2} = {C52BC8D5-E041-4A46-8983-8A0C6ABF7C98}
 	EndGlobalSection
 EndGlobal
