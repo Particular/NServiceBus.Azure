@@ -3,6 +3,7 @@ namespace NServiceBus.AcceptanceTests.HostInformation
     using System;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
+    using NServiceBus.Utils;
     using NUnit.Framework;
     using System.Security.Cryptography;
     using System.Text;
@@ -36,7 +37,7 @@ namespace NServiceBus.AcceptanceTests.HostInformation
                 .Done(c => c.HostId != Guid.Empty)
                 .Run();
 
-            Assert.AreEqual(DeterministicGuid.Create(instanceName, hostName), context.HostId);
+            Assert.AreEqual(DeterministicGuid(instanceName, hostName), context.HostId);
         }
 
         public class UsingNames_Endpoint : EndpointConfigurationBuilder
@@ -74,15 +75,13 @@ namespace NServiceBus.AcceptanceTests.HostInformation
             public string HostDisplayName { get; set; }
         }
 
-        static class DeterministicGuid
+        static Guid DeterministicGuid(params object[] data)
         {
-            public static Guid Create(params object[] data)
+            using (var provider = new MD5CryptoServiceProvider())
             {
-                using (var cryptoServiceProvider = new MD5CryptoServiceProvider())
-                {
-                    var bytes = Encoding.Default.GetBytes(string.Concat(data));
-                    return new Guid(cryptoServiceProvider.ComputeHash(bytes));
-                }
+                var inputBytes = Encoding.Default.GetBytes(String.Concat(data));
+                var hashBytes = provider.ComputeHash(inputBytes);
+                return new Guid(hashBytes);
             }
         }
 
