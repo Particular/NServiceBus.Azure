@@ -9,6 +9,7 @@
     using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
     using NServiceBus.Serialization;
     using NUnit.Framework;
+    using System.Runtime.Serialization.Formatters.Binary;
 
     public class When_registering_custom_serializer : NServiceBusAcceptanceTest
     {
@@ -114,24 +115,27 @@
 
         class MyCustomSerializer : IMessageSerializer
         {
-            object lastMessage;
-
             public Context Context { get; set; }
 
             public void Serialize(object message, Stream stream)
             {
+                var serializer = new BinaryFormatter();
+                serializer.Serialize(stream, message);
+
                 Context.SerializeCalled = true;
-                stream.WriteByte(1); //Need this because we internally we check to see if body is 0
-                lastMessage = message;
             }
 
             public object[] Deserialize(Stream stream, IList<Type> messageTypes = null)
             {
+                var serializer = new BinaryFormatter();
+
                 Context.DeserializeCalled = true;
+                stream.Position = 0;
+                var msg = serializer.Deserialize(stream);
 
                 return new[]
                 {
-                    lastMessage
+                    msg
                 };
             }
 

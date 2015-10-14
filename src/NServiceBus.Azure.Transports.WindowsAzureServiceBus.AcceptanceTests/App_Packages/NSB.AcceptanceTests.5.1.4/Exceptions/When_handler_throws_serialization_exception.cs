@@ -10,6 +10,8 @@
 
     public class When_handler_throws_serialization_exception : NServiceBusAcceptanceTest
     {
+        internal static Func<int> MaxNumberOfRetries = () => 5;
+
         [Test]
         public void Should_retry_the_message_using_flr()
         {
@@ -21,7 +23,7 @@
                     .Done(c => c.HandedOverToSlr)
                     .Run();
 
-            Assert.AreEqual(5, context.NumberOfTimesInvoked);
+            Assert.AreEqual(MaxNumberOfRetries(), context.NumberOfTimesInvoked);
             Assert.IsFalse(context.SerializationFailedCalled);
         }
 
