@@ -20,7 +20,7 @@ namespace NServiceBus.Azure.Transports.WindowsAzureStorageQueues
         public PollingDequeueStrategy(AzureMessageQueueReceiver messageReceiver, CriticalError criticalError)
         {
             this.messageReceiver = messageReceiver;
-            circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => criticalError.Raise(string.Format("Failed to receive message from Azure Storage Queue."), ex));
+            circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker("AzureStoragePollingDequeueStrategy", TimeSpan.FromSeconds(30), ex => criticalError.Raise("Failed to receive message from Azure Storage Queue.", ex));
         }
 
         /// <summary>
