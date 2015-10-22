@@ -86,6 +86,8 @@
     <Compile Include="Configuration\When_parsing_connectionstrings.cs" />
     <Compile Include="Configuration\When_using_the_azure_configuration_source.cs" />
     <Compile Include="Transports\ServiceBus\When_determining_subscription_names.cs" />
+    <Compile Include="Transports\ServiceBus\When_getting_items_from_circular_buffer.cs" />
+    <Compile Include="Transports\ServiceBus\When_putting_items_into_circular_buffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Azure.Transports.WindowsAzureServiceBus\NServiceBus.Azure.Transports.WindowsAzureServiceBus.csproj">
