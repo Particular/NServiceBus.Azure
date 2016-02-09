@@ -14,7 +14,7 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStoragePersistence>()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", ReplacementTypeOrMember = "config.UsePersistence<AzureStoragePersistence>()")]
         public static Configure AzureSubscriptionStorage(this Configure config)
         {
             throw new InvalidOperationException();
@@ -29,7 +29,7 @@ namespace NServiceBus
         /// <param name="createSchema"></param>
         /// <param name="tableName"> </param>
         /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStoragePersistence>()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", ReplacementTypeOrMember = "config.UsePersistence<AzureStoragePersistence>()")]
         public static Configure AzureSubscriptionStorage(this Configure config,
 
             string connectionString,

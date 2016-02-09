@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", ReplacementTypeOrMember = "config.UsePersistence<AzureStorage>()")]
         public static Configure AzureSagaPersister(this Configure config)
         {
             throw new InvalidOperationException();
@@ -27,7 +27,7 @@
         /// <param name="connectionString"></param>
         /// <param name="autoUpdateSchema"></param>
         /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", Replacement = "config.UsePersistence<AzureStorage>()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.4", ReplacementTypeOrMember = "config.UsePersistence<AzureStorage>()")]
 
         public static Configure AzureSagaPersister(this Configure config,
 
