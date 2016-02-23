@@ -15,3 +15,5 @@ The Windows Azure transports for NServiceBus enable the use of Windows Azure Que
 
 [Azure Transport](http://docs.particular.net/nservicebus/windows-azure-transport)
 [Samples](https://github.com/Particular/NServiceBus.Azure.samples)
+
+foo
