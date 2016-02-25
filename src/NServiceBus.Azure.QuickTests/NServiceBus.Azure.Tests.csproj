@@ -94,6 +94,7 @@
     <Compile Include="DataBus\ValidUntilV3BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\ValidUntilV4BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\When_using_AzureDataBusGuard.cs" />
+    <Compile Include="Sagas\LRUCacheTests.cs" />
     <Compile Include="Persisters\When_using_AzureTimeoutStorageGuard.cs" />
     <Compile Include="Persisters\When_using_AzureStorageSagaGuard.cs" />
     <Compile Include="Persisters\When_using_AzureSubscriptionStorageGuard.cs" />
