@@ -13,12 +13,13 @@
 
     public class SecondaryIndexPersister
     {
-        readonly Func<Type, CloudTable> getTableForSaga;
-        readonly ScanForSaga scanner;
-        readonly Action<IContainSagaData> persist;
-        
+        public delegate Guid? ScanForSaga(Type sagaType, string propertyName, object propertyValue);
+
         const int LRUCapacity = 1000;
         readonly LRUCache<PartitionRowKeyTuple, Guid> cache = new LRUCache<PartitionRowKeyTuple, Guid>(LRUCapacity);
+        readonly Func<Type, CloudTable> getTableForSaga;
+        readonly Action<IContainSagaData> persist;
+        readonly ScanForSaga scanner;
 
         public SecondaryIndexPersister(Func<Type, CloudTable> getTableForSaga, ScanForSaga scanner, Action<IContainSagaData> persist)
         {
@@ -26,8 +27,6 @@
             this.scanner = scanner;
             this.persist = persist;
         }
-
-        public delegate Guid? ScanForSaga(Type sagaType, string propertyName, object propertyValue);
 
         public void Insert(IContainSagaData sagaData)
         {
@@ -98,7 +97,7 @@
             var ix = IndexDefintion.Get(sagaType);
             if (ix == null)
             {
-                throw new ArgumentException($"Saga {typeof(TSagaData)} has no correlation properties. Ensure that your saga is correlated by this property and only then, mark it with `Unique` attribute.");
+                throw new ArgumentException($"Saga '{typeof(TSagaData)}' has no correlation properties. Ensure that your saga is correlated by this property and only then, mark it with `Unique` attribute.");
             }
 
             ix.ValidateProperty(propertyName);
@@ -153,11 +152,9 @@
             static readonly object NullValue = new object();
 
             static readonly ParameterExpression ObjectParameter = Expression.Parameter(typeof(object));
-
-            readonly string sagaTypeName;
             readonly string propertyName;
 
-            public Func<object, object> Accessor { get; }
+            readonly string sagaTypeName;
 
             private IndexDefintion(Type sagaType, PropertyInfo pi)
             {
@@ -165,6 +162,8 @@
                 propertyName = pi.Name;
                 Accessor = Expression.Lambda<Func<object, object>>(Expression.Convert(Expression.MakeMemberAccess(Expression.Convert(ObjectParameter, sagaType), pi), typeof(object)), ObjectParameter).Compile();
             }
+
+            public Func<object, object> Accessor { get; }
 
             public static IndexDefintion Get(Type sagaType)
             {
@@ -191,7 +190,7 @@
             {
                 if (this.propertyName != propertyName)
                 {
-                    throw new ArgumentException($"The following saga '{sagaTypeName} is not indexed by '{propertyName}'. The only secondary index is defined for '{this.propertyName}'. " +
+                    throw new ArgumentException($"The following saga '{sagaTypeName}' is not indexed by '{propertyName}'. The only secondary index is defined for '{this.propertyName}'. " +
                                                 $"Ensure that the saga is correlated properly.");
                 }
             }
