@@ -197,7 +197,7 @@
 
             public PartitionRowKeyTuple BuildTableKey(object propertyValue)
             {
-                return new PartitionRowKeyTuple($"Index_{sagaTypeName}", $"{propertyName}_{Serialize(propertyValue)}");
+                return new PartitionRowKeyTuple($"Index_{sagaTypeName}_{propertyName}_{Serialize(propertyValue)}", "");
             }
 
             private static string Serialize(object propertyValue)
