@@ -1,10 +1,25 @@
 ﻿namespace NServiceBus.AzureStoragePersistence.Tests
 {
-    using NServiceBus.SagaPersisters.Azure.SecondaryIndeces;
     using NUnit.Framework;
+    using SagaPersisters.Azure.SecondaryIndeces;
 
     public class LRUCacheTests
     {
+        private static void AssertValue(LRUCache<int, int> lruCache, int key, int expectedValue)
+        {
+            int value;
+            Assert.IsTrue(lruCache.TryGet(key, out value));
+            Assert.AreEqual(expectedValue, value);
+        }
+
+        private static void AssertNoValue(LRUCache<int, int> lruCache, int key)
+        {
+            int value;
+            var tryGet = lruCache.TryGet(key, out value);
+            Assert.AreEqual(false, tryGet);
+            Assert.AreEqual(default(int), value);
+        }
+
         public class When_cache_is_empty
         {
             private readonly LRUCache<int, int> Empty = new LRUCache<int, int>(0);
@@ -24,7 +39,6 @@
 
         public class When_cache_is_full
         {
-            private LRUCache<int, int> cache;
             private const int Key1 = 1;
             private const int Key2 = 2;
             private const int Key3 = 3;
@@ -32,6 +46,7 @@
             private const int Value11 = 111;
             private const int Value2 = 22;
             private const int Value3 = 32;
+            private LRUCache<int, int> cache;
 
             [SetUp]
             public void SetUp()
@@ -79,21 +94,6 @@
                 AssertValue(cache, Key1, Value1);
                 AssertValue(cache, Key3, Value3);
             }
-        }
-
-        private static void AssertValue(LRUCache<int, int> lruCache, int key, int expectedValue)
-        {
-            int value;
-            Assert.IsTrue(lruCache.TryGet(key, out value));
-            Assert.AreEqual(expectedValue, value);
-        }
-
-        private static void AssertNoValue(LRUCache<int, int> lruCache, int key)
-        {
-            int value;
-            var tryGet = lruCache.TryGet(key, out value);
-            Assert.AreEqual(false, tryGet);
-            Assert.AreEqual(default(int), value);
         }
     }
 }

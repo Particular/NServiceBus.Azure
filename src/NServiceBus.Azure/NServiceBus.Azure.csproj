@@ -114,6 +114,7 @@
     <Compile Include="SagaPersisters\AzureStorageSagaGuard.cs" />
     <Compile Include="SagaPersisters\AzureStorageSagaDefaults.cs" />
     <Compile Include="SagaPersisters\Azure\AzureStorageSagaPersistence.cs" />
+    <Compile Include="SagaPersisters\Azure\Class1.cs" />
     <Compile Include="SagaPersisters\Azure\RetryNeededException.cs" />
     <Compile Include="SagaPersisters\Azure\SecondaryIndeces\LRUCache.cs" />
     <Compile Include="SagaPersisters\Azure\SecondaryIndeces\PartitionRowKeyTuple.cs" />

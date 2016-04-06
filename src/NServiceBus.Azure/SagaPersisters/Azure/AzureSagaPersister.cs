@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Microsoft.WindowsAzure.Storage;
@@ -104,41 +105,48 @@
             var tableName = type.Name;
             var table = client.GetTableReference(tableName);
 
+            var query = BuildWherePropertyQuery(type, property, value);
+            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
+            return tableEntity;
+        }
+
+        private static TableQuery<DictionaryTableEntity> BuildWherePropertyQuery(Type type, string property, object value)
+        {
             TableQuery<DictionaryTableEntity> query;
 
             var propertyInfo = type.GetProperty(property);
 
             if (propertyInfo.PropertyType == typeof(byte[]))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBinary(property, QueryComparisons.Equal, (byte[])value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBinary(property, QueryComparisons.Equal, (byte[]) value));
             }
             else if (propertyInfo.PropertyType == typeof(bool))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBool(property, QueryComparisons.Equal, (bool)value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForBool(property, QueryComparisons.Equal, (bool) value));
             }
             else if (propertyInfo.PropertyType == typeof(DateTime))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDate(property, QueryComparisons.Equal, (DateTime)value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDate(property, QueryComparisons.Equal, (DateTime) value));
             }
             else if (propertyInfo.PropertyType == typeof(Guid))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForGuid(property, QueryComparisons.Equal, (Guid)value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForGuid(property, QueryComparisons.Equal, (Guid) value));
             }
             else if (propertyInfo.PropertyType == typeof(Int32))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForInt(property, QueryComparisons.Equal, (int)value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForInt(property, QueryComparisons.Equal, (int) value));
             }
             else if (propertyInfo.PropertyType == typeof(Int64))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForLong(property, QueryComparisons.Equal, (long)value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForLong(property, QueryComparisons.Equal, (long) value));
             }
             else if (propertyInfo.PropertyType == typeof(Double))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDouble(property, QueryComparisons.Equal, (double)value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterConditionForDouble(property, QueryComparisons.Equal, (double) value));
             }
             else if (propertyInfo.PropertyType == typeof(string))
             {
-                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition(property, QueryComparisons.Equal, (string)value));
+                query = new TableQuery<DictionaryTableEntity>().Where(TableQuery.GenerateFilterCondition(property, QueryComparisons.Equal, (string) value));
             }
             else
             {
@@ -146,8 +154,7 @@
                     string.Format("The property type '{0}' is not supported in windows azure table storage",
                         propertyInfo.PropertyType.Name));
             }
-            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
-            return tableEntity;
+            return query;
         }
 
         /// <summary>
@@ -197,15 +204,19 @@
             return table;
         }
 
-        private Guid? ScanForSaga(Type sagatype, string propertyName, object propertyValue)
+        private Guid[] ScanForSaga(Type sagaType, string propertyName, object propertyValue)
         {
-            var entity = GetDictionaryTableEntity(sagatype, propertyName, propertyValue);
-            if (entity == null)
+            var query = BuildWherePropertyQuery(sagaType, propertyName, propertyValue);
+            query.SelectColumns = new List<string>
             {
-                return null;
-            }
+                "PartitionKey",
+                "RowKey"
+            };
 
-            return Guid.ParseExact(entity.PartitionKey, "D");
+            var tableName = sagaType.Name;
+            var table = client.GetTableReference(tableName);
+            var entities = table.ExecuteQuery(query);
+            return entities.Select(entity => Guid.ParseExact(entity.PartitionKey, "D")).ToArray();
         }
 
         void AddObjectToBatch(TableBatchOperation batch, object entity, string partitionKey, string rowkey = "")

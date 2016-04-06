@@ -9,11 +9,11 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using Newtonsoft.Json;
-    using NServiceBus.Saga;
+    using Saga;
 
     public class SecondaryIndexPersister
     {
-        public delegate Guid? ScanForSaga(Type sagaType, string propertyName, object propertyValue);
+        public delegate Guid[] ScanForSaga(Type sagaType, string propertyName, object propertyValue);
 
         const int LRUCapacity = 1000;
         readonly LRUCache<PartitionRowKeyTuple, Guid> cache = new LRUCache<PartitionRowKeyTuple, Guid>(LRUCapacity);
@@ -118,15 +118,22 @@
                 return secondaryIndexEntry.SagaId;
             }
 
-            var sagaId = scanner(sagaType, propertyName, propertyValue);
-            if (sagaId == null)
+            var ids = scanner(sagaType, propertyName, propertyValue);
+            if (ids == null || ids.Length == 0)
             {
                 return null;
             }
 
+            if (ids.Length > 1)
+            {
+                throw new DuplicatedSagaFoundException(sagaType, propertyName, ids);
+            }
+
+            var id = ids[0];
+
             var entity = new SecondaryIndexTableEntity();
             key.Apply(entity);
-            entity.SagaId = sagaId.Value;
+            entity.SagaId = id;
 
             try
             {
@@ -137,8 +144,8 @@
                 throw new RetryNeededException();
             }
 
-            cache.Put(key, sagaId.Value);
-            return sagaId;
+            cache.Put(key, id);
+            return id;
         }
 
         private static bool IsConflict(StorageException ex)
