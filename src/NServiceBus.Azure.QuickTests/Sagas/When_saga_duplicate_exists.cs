@@ -3,6 +3,7 @@ namespace NServiceBus.AzureStoragePersistence.Tests
     using System;
     using NUnit.Framework;
     using Saga;
+    using SagaPersisters.Azure;
 
     [Explicit]
     public class When_saga_duplicate_exists : BaseAzureSagaPersisterTest
@@ -22,9 +23,9 @@ namespace NServiceBus.AzureStoragePersistence.Tests
             Insert(s1);
             Insert(s2);
 
-            Assert.Throws(Is.AssignableTo<Exception>(), () =>
+            Assert.Throws(Is.AssignableTo<DuplicatedSagaFoundException>(), () =>
             {
-                var state = ((ISagaPersister)persister).Get<TwoInstanceSagaState>("OrderId", orderID);
+                var state = ((ISagaPersister) persister).Get<TwoInstanceSagaState>("OrderId", orderID);
                 persister.Update(state);
             });
         }
