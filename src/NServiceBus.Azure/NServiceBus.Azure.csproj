@@ -114,6 +114,13 @@
     <Compile Include="SagaPersisters\AzureStorageSagaGuard.cs" />
     <Compile Include="SagaPersisters\AzureStorageSagaDefaults.cs" />
     <Compile Include="SagaPersisters\Azure\AzureStorageSagaPersistence.cs" />
+    <Compile Include="SagaPersisters\Azure\Class1.cs" />
+    <Compile Include="SagaPersisters\Azure\RetryNeededException.cs" />
+    <Compile Include="SagaPersisters\Azure\SecondaryIndeces\LRUCache.cs" />
+    <Compile Include="SagaPersisters\Azure\SecondaryIndeces\PartitionRowKeyTuple.cs" />
+    <Compile Include="SagaPersisters\Azure\SecondaryIndeces\SagaDataSerializer.cs" />
+    <Compile Include="SagaPersisters\Azure\SecondaryIndeces\SecondaryIndexPersister.cs" />
+    <Compile Include="SagaPersisters\Azure\SecondaryIndeces\SecondaryIndexTableEntity.cs" />
     <Compile Include="SagaPersisters\ConfigureAzureSagaStorage.cs" />
     <Compile Include="Subscriptions\AzureSubscriptionStorageGuard.cs" />
     <Compile Include="Subscriptions\Azure\AzureStorageSubscriptionPersistence.cs" />
@@ -149,6 +156,7 @@
     <Compile Include="Subscriptions\Azure\Subscription.cs" />
     <Compile Include="Subscriptions\Azure\SubscriptionServiceContext.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
