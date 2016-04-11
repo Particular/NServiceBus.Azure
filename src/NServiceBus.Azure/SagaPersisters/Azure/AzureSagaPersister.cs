@@ -3,13 +3,12 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Net;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using NServiceBus.Azure;
-    using NServiceBus.SagaPersisters.Azure.SecondaryIndeces;
     using Saga;
 
     /// <summary>
@@ -19,11 +18,9 @@
     {
         readonly bool autoUpdateSchema;
         readonly CloudTableClient client;
-        readonly SecondaryIndexPersister secondaryIndeces;
-
         static readonly ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
         static readonly ConditionalWeakTable<object, string> etags = new ConditionalWeakTable<object, string>();
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -33,7 +30,6 @@
         {
             this.autoUpdateSchema = autoUpdateSchema;
             client = account.CreateCloudTableClient();
-            secondaryIndeces = new SecondaryIndexPersister(GetTable, ScanForSaga, Persist);
         }
 
         /// <summary>
@@ -43,7 +39,6 @@
         /// <param name="saga">the saga entity that will be saved.</param>
         public void Save(IContainSagaData saga)
         {
-            secondaryIndeces.Insert(saga);
             Persist(saga);
         }
 
@@ -78,6 +73,7 @@
             return entity;
         }
 
+
         DictionaryTableEntity GetDictionaryTableEntity(string sagaId, Type entityType)
         {
             var tableName = entityType.Name;
@@ -91,13 +87,38 @@
 
         T ISagaPersister.Get<T>(string property, object value)
         {
-            var sagaId = secondaryIndeces.FindPossiblyCreatingIndexEntry<T>(property, value);
-            if (sagaId != null)
+            var type = typeof(T);
+            var tableEntity = GetDictionaryTableEntity(type, property, value);
+            var entity = (T) ToEntity(type, tableEntity);
+
+            if (!Equals(entity, default(T)))
             {
-                return Get<T>(sagaId.Value);
+                etags.Add(entity, tableEntity.ETag);
             }
 
-            return default(T);
+            try
+            {
+                return entity;
+            }
+            catch (WebException ex)
+            {
+                // can occur when table has not yet been created, but already looking for absence of instance
+                if (ex.Status == WebExceptionStatus.ProtocolError && ex.Response != null)
+                {
+                    var response = (HttpWebResponse) ex.Response;
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        return default(T);
+                    }
+                }
+
+                throw;
+            }
+            catch (StorageException)
+            {
+                // can occur when table has not yet been created, but already looking for absence of instance
+                return default(T);
+            }
         }
 
         DictionaryTableEntity GetDictionaryTableEntity(Type type, string property, object value)
@@ -105,13 +126,6 @@
             var tableName = type.Name;
             var table = client.GetTableReference(tableName);
 
-            var query = BuildWherePropertyQuery(type, property, value);
-            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
-            return tableEntity;
-        }
-
-        private static TableQuery<DictionaryTableEntity> BuildWherePropertyQuery(Type type, string property, object value)
-        {
             TableQuery<DictionaryTableEntity> query;
 
             var propertyInfo = type.GetProperty(property);
@@ -154,7 +168,8 @@
                     string.Format("The property type '{0}' is not supported in windows azure table storage",
                         propertyInfo.PropertyType.Name));
             }
-            return query;
+            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
+            return tableEntity;
         }
 
         /// <summary>
@@ -181,42 +196,21 @@
         void Persist(IContainSagaData saga)
         {
             var type = saga.GetType();
-            var table = GetTable(type);
-
-            var partitionKey = saga.Id.ToString();
-
-            var batch = new TableBatchOperation();
-
-            AddObjectToBatch(batch, saga, partitionKey);
-
-            table.ExecuteBatch(batch);
-        }
-
-        private CloudTable GetTable(Type sagaType)
-        {
-            var tableName = sagaType.Name;
+            var tableName = type.Name;
             var table = client.GetTableReference(tableName);
             if (autoUpdateSchema && !tableCreated.ContainsKey(tableName))
             {
                 table.CreateIfNotExists();
                 tableCreated[tableName] = true;
             }
-            return table;
-        }
 
-        private Guid[] ScanForSaga(Type sagaType, string propertyName, object propertyValue)
-        {
-            var query = BuildWherePropertyQuery(sagaType, propertyName, propertyValue);
-            query.SelectColumns = new List<string>
-            {
-                "PartitionKey",
-                "RowKey"
-            };
+            var partitionKey = saga.Id.ToString();
+                
+            var batch = new TableBatchOperation();
 
-            var tableName = sagaType.Name;
-            var table = client.GetTableReference(tableName);
-            var entities = table.ExecuteQuery(query);
-            return entities.Select(entity => Guid.ParseExact(entity.PartitionKey, "D")).ToArray();
+            AddObjectToBatch(batch, saga, partitionKey);
+
+            table.ExecuteBatch(batch);
         }
 
         void AddObjectToBatch(TableBatchOperation batch, object entity, string partitionKey, string rowkey = "")
@@ -227,44 +221,39 @@
             string etag;
             var update = etags.TryGetValue(entity, out etag);
 
-            var properties = SelectPropertiesToPersist(type);
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-            var toPersist = ToDictionaryTableEntity(entity, new DictionaryTableEntity { PartitionKey = partitionKey, RowKey = rowkey, ETag = etag }, properties);
+            var toPersist = ToDictionaryTableEntity(entity, new DictionaryTableEntity { PartitionKey = partitionKey, RowKey = rowkey, ETag = etag}, properties);
 
             //no longer using InsertOrReplace as it ignores concurrency checks
             batch.Add(update ? TableOperation.Replace(toPersist) : TableOperation.Insert(toPersist));
-        }
-
-        internal static PropertyInfo[] SelectPropertiesToPersist(Type sagaType)
-        {
-            return sagaType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
         }
 
         DictionaryTableEntity ToDictionaryTableEntity(object entity, DictionaryTableEntity toPersist, IEnumerable<PropertyInfo> properties)
         {
             foreach (var propertyInfo in properties)
             {
-                if (propertyInfo.PropertyType == typeof(byte[]))
+                if (propertyInfo.PropertyType == typeof (byte[]))
                 {
-                    toPersist[propertyInfo.Name] = new EntityProperty((byte[])propertyInfo.GetValue(entity, null));
+                    toPersist[propertyInfo.Name]= new EntityProperty((byte[]) propertyInfo.GetValue(entity, null)) ;
                 }
-                else if (propertyInfo.PropertyType == typeof(bool))
+                else if (propertyInfo.PropertyType == typeof (bool))
                 {
                     toPersist[propertyInfo.Name] = new EntityProperty((bool)propertyInfo.GetValue(entity, null));
                 }
-                else if (propertyInfo.PropertyType == typeof(DateTime))
+                else if (propertyInfo.PropertyType == typeof (DateTime))
                 {
                     toPersist[propertyInfo.Name] = new EntityProperty((DateTime)propertyInfo.GetValue(entity, null));
                 }
-                else if (propertyInfo.PropertyType == typeof(Guid))
+                else if (propertyInfo.PropertyType == typeof (Guid))
                 {
                     toPersist[propertyInfo.Name] = new EntityProperty((Guid)propertyInfo.GetValue(entity, null));
                 }
-                else if (propertyInfo.PropertyType == typeof(Int32))
+                else if (propertyInfo.PropertyType == typeof (Int32))
                 {
                     toPersist[propertyInfo.Name] = new EntityProperty((Int32)propertyInfo.GetValue(entity, null));
                 }
-                else if (propertyInfo.PropertyType == typeof(Int64))
+                else if (propertyInfo.PropertyType == typeof (Int64))
                 {
                     toPersist[propertyInfo.Name] = new EntityProperty((Int64)propertyInfo.GetValue(entity, null));
                 }
@@ -272,7 +261,7 @@
                 {
                     toPersist[propertyInfo.Name] = new EntityProperty((Double)propertyInfo.GetValue(entity, null));
                 }
-                else if (propertyInfo.PropertyType == typeof(string))
+                else if (propertyInfo.PropertyType == typeof (string))
                 {
                     toPersist[propertyInfo.Name] = new EntityProperty((string)propertyInfo.GetValue(entity, null));
                 }
@@ -344,6 +333,6 @@
             return toCreate;
         }
     }
-
-
+    
+  
 }
