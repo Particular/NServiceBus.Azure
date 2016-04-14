@@ -13,5 +13,8 @@ The Windows Azure transports for NServiceBus enable the use of Windows Azure Que
 
 ## Documentation
 
-[Azure Transport](http://docs.particular.net/nservicebus/windows-azure-transport)
-[Samples](https://github.com/Particular/NServiceBus.Azure.samples)
+- [Azure Service Bus Transport](http://docs.particular.net/nservicebus/azure-servicebus/)
+- [Azure Storage Queues Transport](http://docs.particular.net/nservicebus/azure-storage-queues/)
+- [Azure Storage Persistence](http://docs.particular.net/nservicebus/azure-storage-persistence/)
+- [Azure Cloud Services Host](http://docs.particular.net/nservicebus/hosting/cloudservices-host/)
+- [Samples](http://docs.particular.net/samples/azure/)
