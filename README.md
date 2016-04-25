@@ -1,6 +1,6 @@
 # Important Notice
 
-NServiceBus.Azure repository is changing. There will be new repositories per Nuget package. All new development will be done in the new repositories only. This repository will be kept solely for support perposes.
+NServiceBus.Azure repository is changing. There will be new repositories per Nuget package. All new development will be done in the new repositories only. This repository will be kept solely for support purposes.
 
 # Repositories & NuGet packages
 1. https://github.com/Particular/NServiceBus.AzureStorageQueues → NServiceBus.Azure.Transports.WindowsAzureStorageQueues
