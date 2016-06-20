@@ -4,15 +4,16 @@
     <id>NServiceBus.Azure</id>
     <title>NServiceBus Azure</title>
     <version>$version$</version>
-    <authors>NServiceBus Ltd</authors>
-    <owners>NServiceBus Ltd</owners>
-    <licenseUrl>http://particular.net/LicenseAgreement</licenseUrl>
-    <projectUrl>http://particular.net/</projectUrl>
-    <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <authors>$authors$</authors>
+    <owners>$owners$</owners>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <iconUrl>$iconUrl$</iconUrl>
+    <copyright>$copyright$</copyright>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <description>Azure support for NServicebus</description>
     <copyright>Copyright 2010-2014 NServiceBus. All rights reserved</copyright>
-    <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
+    <tags>$tags$</tags>
     <dependencies>
       <dependency id="WindowsAzure.Storage" version="[3.1.0.1, 5.0.0.0)" />
       <dependency id="Microsoft.Data.OData" version="[5.6.0.0, 6.0.0.0)" />

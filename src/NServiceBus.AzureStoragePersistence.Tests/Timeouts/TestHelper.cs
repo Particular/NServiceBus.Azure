@@ -120,6 +120,11 @@ namespace NServiceBus.AzureStoragePersistence.Tests.Timeouts
         {
             var cloudStorageAccount = CloudStorageAccount.Parse(AzurePersistenceTests.GetConnectionString());
             var container = cloudStorageAccount.CreateCloudBlobClient().GetContainerReference("timeoutstate");
+            if (!container.Exists())
+            {
+                return;
+            }
+
             foreach (var blob in container.ListBlobs())
             {
                 ((ICloudBlob)blob).Delete(DeleteSnapshotsOption.None, AccessCondition.GenerateEmptyCondition(), new BlobRequestOptions { RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(15), 5) });
