@@ -12,10 +12,11 @@
         protected readonly AzureSagaPersister persister;
         protected readonly CloudTable sagaTable;
         protected readonly CloudTableClient tables;
+        protected readonly string connectionString;
 
         protected BaseAzureSagaPersisterTest()
         {
-            var connectionString = Environment.GetEnvironmentVariable("AzureStoragePersistence.ConnectionString");
+            connectionString = Environment.GetEnvironmentVariable("AzureStoragePersistence.ConnectionString");
             cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
             persister = new AzureSagaPersister(cloudStorageAccount, true);
             tables = cloudStorageAccount.CreateCloudTableClient();

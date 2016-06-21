@@ -94,12 +94,15 @@
     <Compile Include="DataBus\ValidUntilV3BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\ValidUntilV4BlobStorageDataBusTests.cs" />
     <Compile Include="DataBus\When_using_AzureDataBusGuard.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Sagas\BaseAzureSagaPersisterTest.cs" />
     <Compile Include="Sagas\LRUCacheTests.cs" />
     <Compile Include="Persisters\When_using_AzureTimeoutStorageGuard.cs" />
     <Compile Include="Persisters\When_using_AzureStorageSagaGuard.cs" />
     <Compile Include="Persisters\When_using_AzureSubscriptionStorageGuard.cs" />
+    <Compile Include="Sagas\When_executing_concurrently.cs" />
     <Compile Include="Sagas\When_saga_duplicate_exists.cs" />
+    <Compile Include="Sagas\When_saga_is_completed.cs" />
     <Compile Include="Sagas\When_searched_by_property_without_existing_index.cs" />
   </ItemGroup>
   <ItemGroup>

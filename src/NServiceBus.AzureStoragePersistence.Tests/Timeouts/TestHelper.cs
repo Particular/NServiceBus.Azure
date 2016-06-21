@@ -8,13 +8,13 @@ namespace NServiceBus.AzureStoragePersistence.Tests.Timeouts
     using Microsoft.WindowsAzure.Storage.Blob;
     using Microsoft.WindowsAzure.Storage.RetryPolicies;
     using Microsoft.WindowsAzure.Storage.Table;
-    using NServiceBus.Azure;
-    using NServiceBus.Config;
-    using NServiceBus.ObjectBuilder;
-    using NServiceBus.ObjectBuilder.Common;
-    using NServiceBus.Pipeline;
-    using NServiceBus.Settings;
-    using NServiceBus.Timeout.Core;
+    using Azure;
+    using Config;
+    using ObjectBuilder;
+    using ObjectBuilder.Common;
+    using Pipeline;
+    using Settings;
+    using Timeout.Core;
     using NUnit.Framework;
 
     static class TestHelper

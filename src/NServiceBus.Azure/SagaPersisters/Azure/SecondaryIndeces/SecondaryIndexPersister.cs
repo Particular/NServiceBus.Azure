@@ -28,14 +28,14 @@
             this.persist = persist;
         }
 
-        public void Insert(IContainSagaData sagaData)
+        public PartitionRowKeyTuple Insert(IContainSagaData sagaData)
         {
             var sagaType = sagaData.GetType();
             var table = getTableForSaga(sagaType);
             var ix = IndexDefintion.Get(sagaType);
             if (ix == null)
             {
-                return;
+                return null;
             }
 
             var propertyValue = ix.Accessor(sagaData);
@@ -57,6 +57,7 @@
             try
             {
                 table.Execute(TableOperation.Insert(entity));
+                return key;
             }
             catch (StorageException ex)
             {
@@ -146,6 +147,43 @@
 
             cache.Put(key, id);
             return id;
+        }
+
+        public void RemoveSecondary(Type sagaType, PartitionRowKeyTuple secondaryIndexKey)
+        {
+            var table = getTableForSaga(sagaType);
+            var e = new TableEntity
+            {
+                ETag = "*"
+            };
+
+            secondaryIndexKey.Apply(e);
+            cache.Remove(secondaryIndexKey);
+            table.DeleteIgnoringNotFound(e);
+        }
+
+        public void MarkAsHavingPrimaryPersisted(IContainSagaData sagaData)
+        {
+            var sagaType = sagaData.GetType();
+            var table = getTableForSaga(sagaType);
+            var ix = IndexDefintion.Get(sagaType);
+            if (ix == null)
+            {
+                return;
+            }
+
+            var propertyValue = ix.Accessor(sagaData);
+            var secondaryIndexKey = ix.BuildTableKey(propertyValue);
+
+            var secondaryIndexTableEntity = new SecondaryIndexTableEntity
+                {
+                    SagaId = sagaData.Id
+                };
+            secondaryIndexKey.Apply(secondaryIndexTableEntity);
+
+            secondaryIndexTableEntity.ETag = "*";
+
+            table.ExecuteAsync(TableOperation.Replace(secondaryIndexTableEntity));
         }
 
         private static bool IsConflict(StorageException ex)
