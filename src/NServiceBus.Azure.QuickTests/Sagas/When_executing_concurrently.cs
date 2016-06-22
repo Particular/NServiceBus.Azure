@@ -40,13 +40,13 @@
             Save(persister1, v, Id1);
 
             // get by property just to load to cache
-            GetByCorrelationProperty(persister2);
+            GetSagaDataByCorrelationProperty(persister2);
 
-            DeletePrimary(Id1);
+            DeleteSagaRecord(Id1);
 
             // only secondary exists now, ensure it's null
-            var byProperty = GetByCorrelationProperty(persister2);
-            Assert.IsNull(byProperty);
+            var sagaData = GetSagaDataByCorrelationProperty(persister2);
+            Assert.IsNull(sagaData);
         }
 
         [Test(Description = "The test covering a scenario, when a secondary index wasn't deleted properly")]
@@ -56,20 +56,20 @@
             Save(persister1, v, Id1);
 
             // get by property just to load to cache
-            GetByCorrelationProperty(persister2);
+            GetSagaDataByCorrelationProperty(persister2);
 
-            DeletePrimary(Id1);
+            DeleteSagaRecord(Id1);
 
             const string v2 = "2";
 
             // save a new saga with the same correlation id
             Save(persister1, v2, Id2);
 
-            var saga = GetByCorrelationProperty(persister2);
+            var saga = GetSagaDataByCorrelationProperty(persister2);
             AssertSaga(saga, v2, Id2);
         }
 
-        void DeletePrimary(Guid sagaId)
+        void DeleteSagaRecord(Guid sagaId)
         {
             var entities = cloudTable.ExecuteQuery(new TableQuery<TableEntity>());
             Guid guid;
@@ -91,76 +91,76 @@
 
         void Should_enable_insert_saga_again(ISagaPersister p)
         {
-            const string v = "1";
+            const string version1 = "1";
 
-            Save(persister1, v, Id1);
+            Save(persister1, version1, Id1);
 
-            var saga1 = Get(persister1, Id1);
-            var saga2 = Get(persister2, Id1);
-            var saga1ByProperty = GetByCorrelationProperty(persister1);
-            var saga2ByProperty = GetByCorrelationProperty(persister2);
+            var sagaData1 = Get(persister1, Id1);
+            var sagaData2 = Get(persister2, Id1);
+            var sagaData1ByProperty = GetSagaDataByCorrelationProperty(persister1);
+            var sagaData2ByProperty = GetSagaDataByCorrelationProperty(persister2);
 
-            AssertSaga(saga1, v, Id1);
-            AssertSaga(saga2, v, Id1);
-            AssertSaga(saga1ByProperty, v, Id1);
-            AssertSaga(saga2ByProperty, v, Id1);
+            AssertSaga(sagaData1, version1, Id1);
+            AssertSaga(sagaData2, version1, Id1);
+            AssertSaga(sagaData1ByProperty, version1, Id1);
+            AssertSaga(sagaData2ByProperty, version1, Id1);
 
-            Complete(saga1, persister1);
+            Complete(sagaData1, persister1);
 
-            saga1 = Get(persister1, Id1);
-            saga2 = Get(persister2, Id1);
-            saga1ByProperty = GetByCorrelationProperty(persister1);
-            saga2ByProperty = GetByCorrelationProperty(persister2);
+            sagaData1 = Get(persister1, Id1);
+            sagaData2 = Get(persister2, Id1);
+            sagaData1ByProperty = GetSagaDataByCorrelationProperty(persister1);
+            sagaData2ByProperty = GetSagaDataByCorrelationProperty(persister2);
 
-            Assert.IsNull(saga1);
-            Assert.IsNull(saga2);
-            Assert.IsNull(saga1ByProperty);
-            Assert.IsNull(saga2ByProperty);
+            Assert.IsNull(sagaData1);
+            Assert.IsNull(sagaData2);
+            Assert.IsNull(sagaData1ByProperty);
+            Assert.IsNull(sagaData2ByProperty);
 
-            const string v2 = "2";
-            Save(p, v2, Id2);
+            const string version2 = "2";
+            Save(p, version2, Id2);
 
-            saga1 = Get(persister1, Id2);
-            saga2 = Get(persister2, Id2);
-            saga1ByProperty = GetByCorrelationProperty(persister1);
-            saga2ByProperty = GetByCorrelationProperty(persister2);
+            sagaData1 = Get(persister1, Id2);
+            sagaData2 = Get(persister2, Id2);
+            sagaData1ByProperty = GetSagaDataByCorrelationProperty(persister1);
+            sagaData2ByProperty = GetSagaDataByCorrelationProperty(persister2);
 
-            AssertSaga(saga1, v2, Id2);
-            AssertSaga(saga2, v2, Id2);
-            AssertSaga(saga1ByProperty, v2, Id2);
-            AssertSaga(saga2ByProperty, v2, Id2);
+            AssertSaga(sagaData1, version2, Id2);
+            AssertSaga(sagaData2, version2, Id2);
+            AssertSaga(sagaData1ByProperty, version2, Id2);
+            AssertSaga(sagaData2ByProperty, version2, Id2);
         }
 
-        static void Complete(IContainSagaData saga, ISagaPersister persister)
+        static void Complete(IContainSagaData sagaData, ISagaPersister persister)
         {
-            persister.Complete(saga);
+            persister.Complete(sagaData);
         }
 
-        static void AssertSaga(ConcurrentSagaData saga, string value, Guid id)
+        static void AssertSaga(TwoInstanceSagaState sagaData, string value, Guid id)
         {
-            Assert.NotNull(saga);
-            Assert.AreEqual(id, saga.Id);
-            Assert.AreEqual(SagaCorrelationPropertyValue.Value, saga.CorrelationId);
-            Assert.AreEqual(value, saga.Value);
+            Assert.NotNull(sagaData);
+            Assert.AreEqual(id, sagaData.Id);
+            Assert.AreEqual(SagaCorrelationPropertyValue.Value, sagaData.OrderId);
+            Assert.AreEqual(value, sagaData.OriginalMessageId);
         }
 
-        static ConcurrentSagaData Get(ISagaPersister persister, Guid id)
+        static TwoInstanceSagaState Get(ISagaPersister persister, Guid id)
         {
-            return persister.Get<ConcurrentSagaData>(id);
+            return persister.Get<TwoInstanceSagaState>(id);
         }
 
-        static ConcurrentSagaData GetByCorrelationProperty(ISagaPersister persister)
+        static TwoInstanceSagaState GetSagaDataByCorrelationProperty(ISagaPersister persister)
         {
-            return persister.Get<ConcurrentSagaData>(SagaCorrelationPropertyValue.Name, SagaCorrelationPropertyValue.Value);
+            return persister.Get<TwoInstanceSagaState>(SagaCorrelationPropertyValue.Name, SagaCorrelationPropertyValue.Value);
         }
 
         static void Save(ISagaPersister persister, string value, Guid id)
         {
-            persister.Save(new ConcurrentSagaData
+            persister.Save(new TwoInstanceSagaState
             {
                 Id = id,
-                CorrelationId = CorrelationIdValue,
-                Value = value
+                OrderId =  CorrelationIdValue,
+                OriginalMessageId = value
             });
         }
 
@@ -172,12 +172,6 @@
 
         static readonly Guid Id1 = new Guid("7FCF55F6-4AEB-40C7-86B9-2AB535664381");
         static readonly Guid Id2 = new Guid("2C739583-0077-4482-BA6E-E569DD129BD6");
-        static readonly SagaCorrelationProperty SagaCorrelationPropertyValue = new SagaCorrelationProperty("CorrelationId", CorrelationIdValue);
-
-        class ConcurrentSagaData : ContainSagaData
-        {
-            public string CorrelationId { get; set; }
-            public string Value { get; set; }
-        }
+        static readonly SagaCorrelationProperty SagaCorrelationPropertyValue = new SagaCorrelationProperty(nameof(TwoInstanceSagaState.OrderId), CorrelationIdValue);
     }
 }

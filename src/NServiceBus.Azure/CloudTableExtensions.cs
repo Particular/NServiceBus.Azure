@@ -16,7 +16,7 @@
         {
             try
             {
-                table.ExecuteAsync(TableOperation.Delete(entity));
+                table.Execute(TableOperation.Delete(entity));
             }
             catch (StorageException ex)
             {

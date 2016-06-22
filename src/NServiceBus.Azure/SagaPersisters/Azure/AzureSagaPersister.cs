@@ -20,7 +20,7 @@
     {
         readonly bool autoUpdateSchema;
         readonly CloudTableClient client;
-        readonly SecondaryIndexPersister secondaryIndeces;
+        readonly SecondaryIndexPersister secondaryIndices;
         readonly ILog log = LogManager.GetLogger<AzureSagaPersister>();
 
         static readonly ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
@@ -35,7 +35,7 @@
         {
             this.autoUpdateSchema = autoUpdateSchema;
             client = account.CreateCloudTableClient();
-            secondaryIndeces = new SecondaryIndexPersister(GetTable, ScanForSaga, saga => Persist(saga, null));
+            secondaryIndices = new SecondaryIndexPersister(GetTable, ScanForSaga, saga => Persist(saga, null));
         }
 
         /// <summary>
@@ -50,9 +50,9 @@
             // 2) insert the primary saga data in its row, storing the identifier of the secondary index as well (for completions)
             // 3) remove the data of the primary from the 2nd index. It will be no longer needed
 
-            var secondaryIndexKey = secondaryIndeces.Insert(saga);
+            var secondaryIndexKey = secondaryIndices.Insert(saga);
             Persist(saga, secondaryIndexKey);
-            secondaryIndeces.MarkAsHavingPrimaryPersisted(saga);
+            secondaryIndices.MarkAsHavingPrimaryPersisted(saga);
         }
         
         /// <summary>
@@ -104,26 +104,33 @@
 
         T ISagaPersister.Get<T>(string property, object value)
         {
-            var sagaId = secondaryIndeces.FindPossiblyCreatingIndexEntry<T>(property, value);
-            if (sagaId != null)
+            return GetByCorrelationProperty<T>(property, value, false);
+        }
+
+        TSagaData GetByCorrelationProperty<TSagaData>(string propertyName, object propertyValue, bool triedAlreadyOnce)
+            where TSagaData : IContainSagaData
+        {
+            var sagaId = secondaryIndices.FindSagaIdAndCreateIndexEntryIfNotFound<TSagaData>(propertyName, propertyValue);
+            if (sagaId == null)
             {
-                return Get<T>(sagaId.Value);
+                return default(TSagaData);
             }
 
-            return default(T);
+            var sagaData = Get<TSagaData>(sagaId.Value);
+            if (Equals(sagaData, default(TSagaData)))
+            {
+                // saga is not found, try invalidate cache and try getting value one more time
+                secondaryIndices.InvalidateCacheIfAny(propertyName, propertyValue, typeof(TSagaData));
+                if (triedAlreadyOnce == false)
+                {
+                    return GetByCorrelationProperty<TSagaData>(propertyName, propertyValue, true);
+                }
+            }
+
+            return sagaData;
         }
 
-        DictionaryTableEntity GetDictionaryTableEntity(Type type, string property, object value)
-        {
-            var tableName = type.Name;
-            var table = client.GetTableReference(tableName);
-
-            var query = BuildWherePropertyQuery(type, property, value);
-            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
-            return tableEntity;
-        }
-
-        private static TableQuery<DictionaryTableEntity> BuildWherePropertyQuery(Type type, string property, object value)
+        static TableQuery<DictionaryTableEntity> BuildWherePropertyQuery(Type type, string property, object value)
         {
             TableQuery<DictionaryTableEntity> query;
 
@@ -204,7 +211,7 @@
             PartitionRowKeyTuple secondaryIndexKey;
             if (secondaryIndexLocalCache.TryGetValue(sagaData, out secondaryIndexKey))
             {
-                secondaryIndeces.RemoveSecondary(sagaData.GetType(), secondaryIndexKey);
+                secondaryIndices.RemoveSecondary(sagaData.GetType(), secondaryIndexKey);
             }
         }
 
