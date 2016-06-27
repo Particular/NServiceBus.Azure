@@ -104,8 +104,8 @@
 
                         try
                         {
-                            table.Execute(TableOperation.Delete(existingSecondaryIndexEntity));
-                            table.Execute(TableOperation.Insert(entity));
+                            entity.ETag = existingSecondaryIndexEntity?.ETag ?? "*";
+                            table.Execute(TableOperation.InsertOrReplace(entity));
                             return key;
                         }
                         catch (Exception exception)
