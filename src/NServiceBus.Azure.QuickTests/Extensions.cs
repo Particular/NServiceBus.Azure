@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.AzureStoragePersistence.Tests
 {
-    using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage.Table;
 
     public static class Extensions
@@ -19,14 +18,14 @@
             }
         }
 
-        public static async Task<int> CountAllEntities(this CloudTable table)
+        public static int CountAllEntities(this CloudTable table)
         {
             TableQuerySegment<DynamicTableEntity> segment = null;
 
             var count = 0;
             while (segment == null || segment.ContinuationToken != null)
             {
-                segment = await table.ExecuteQuerySegmentedAsync(new TableQuery().Take(100), segment?.ContinuationToken);
+                segment = table.ExecuteQuerySegmented(new TableQuery().Take(100), segment?.ContinuationToken);
                 if (segment != null)
                 {
                     count += segment.Results.Count;

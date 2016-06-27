@@ -9,10 +9,10 @@
     public abstract class BaseAzureSagaPersisterTest
     {
         protected readonly CloudStorageAccount cloudStorageAccount;
-        protected readonly AzureSagaPersister persister;
+        protected readonly string connectionString;
+        protected readonly ISagaPersister persister;
         protected readonly CloudTable sagaTable;
         protected readonly CloudTableClient tables;
-        protected readonly string connectionString;
 
         protected BaseAzureSagaPersisterTest()
         {

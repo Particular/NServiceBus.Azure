@@ -11,7 +11,7 @@
     /// <summary>
     /// These tests try to mimic different concurrent scenarios using two persiters trying to access the same saga.
     /// </summary>
-    public class When_executing_concurrently:BaseAzureSagaPersisterTest
+    public class When_executing_concurrently : BaseAzureSagaPersisterTest
     {
         public When_executing_concurrently()
         {
@@ -159,7 +159,7 @@
             persister.Save(new TwoInstanceSagaState
             {
                 Id = id,
-                OrderId =  CorrelationIdValue,
+                OrderId = CorrelationIdValue,
                 OriginalMessageId = value
             });
         }
