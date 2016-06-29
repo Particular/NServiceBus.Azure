@@ -15,6 +15,7 @@ namespace NServiceBus.AzureStoragePersistence.Tests
         public When_saga_is_completed()
         {
             cloudTable = tables.GetTableReference(typeof(RemovingSecondaryIndexState).Name);
+            cloudTable.CreateIfNotExists();
         }
 
         [SetUp]
@@ -24,6 +25,7 @@ namespace NServiceBus.AzureStoragePersistence.Tests
             var entities = cloudTable.ExecuteQuery(new TableQuery<TableEntity>());
             foreach (var te in entities)
             {
+                te.ETag = "*";
                 cloudTable.DeleteIgnoringNotFound(te);
             }
         }
