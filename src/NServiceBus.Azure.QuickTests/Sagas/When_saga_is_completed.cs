@@ -7,6 +7,9 @@ namespace NServiceBus.AzureStoragePersistence.Tests
 
     public class When_saga_is_completed : BaseAzureSagaPersisterTest
     {
+        const int GetById = 1;
+        const int GetByProperty = 2;
+
         readonly CloudTable cloudTable;
 
         public When_saga_is_completed()
@@ -25,20 +28,31 @@ namespace NServiceBus.AzureStoragePersistence.Tests
             }
         }
 
-        [Test]
-        public void Entities_should_be_removed()
+        [TestCase(GetById)]
+        [TestCase(GetByProperty)]
+        public void Entities_should_be_removed(int getBy)
         {
             const string orderID = "unique-order-id";
+            var id = Guid.NewGuid();
+
             var state = new RemovingSecondaryIndexState
             {
                 OrderId = orderID,
-                Id = Guid.NewGuid()
+                Id = id
             };
 
             persister.Save(state);
 
-            // if not retrieved by the secondary index, it fails
-            // state = persister.Get<RemovingSecondaryIndexState>("OrderId", orderID);
+            // get saga
+            switch (getBy)
+            {
+                case GetById:
+                    state = persister.Get<RemovingSecondaryIndexState>(id);
+                    break;
+                case GetByProperty:
+                    state = persister.Get<RemovingSecondaryIndexState>("OrderId", orderID);
+                    break;
+            }
 
             persister.Complete(state);
 
