@@ -9,13 +9,24 @@
     using SagaPersisters.Azure;
 
     /// <summary>
-    /// These tests try to mimic different concurrent scenarios using two persiters trying to access the same saga.
+    ///     These tests try to mimic different concurrent scenarios using two persiters trying to access the same saga.
     /// </summary>
     public class When_executing_concurrently : BaseAzureSagaPersisterTest
     {
+        const string CorrelationIdValue = "DB0F4000-5B9C-4ADE-9AB0-04305A5CABBD";
+
+        static readonly Guid Id1 = new Guid("7FCF55F6-4AEB-40C7-86B9-2AB535664381");
+        static readonly Guid Id2 = new Guid("2C739583-0077-4482-BA6E-E569DD129BD6");
+        static readonly SagaCorrelationProperty SagaCorrelationPropertyValue = new SagaCorrelationProperty(nameof(TwoInstanceSagaState.OrderId), CorrelationIdValue);
+
+        readonly CloudTable cloudTable;
+
+        AzureSagaPersister persister1;
+        AzureSagaPersister persister2;
+
         public When_executing_concurrently()
         {
-            cloudTable = this.sagaTable;
+            cloudTable = sagaTable;
         }
 
         [SetUp]
@@ -29,6 +40,7 @@
             var entities = cloudTable.ExecuteQuery(new TableQuery<TableEntity>());
             foreach (var te in entities)
             {
+                te.ETag = "*";
                 cloudTable.DeleteIgnoringNotFound(te);
             }
         }
@@ -163,15 +175,5 @@
                 OriginalMessageId = value
             });
         }
-
-        readonly CloudTable cloudTable;
-
-        AzureSagaPersister persister1;
-        AzureSagaPersister persister2;
-        const string CorrelationIdValue = "DB0F4000-5B9C-4ADE-9AB0-04305A5CABBD";
-
-        static readonly Guid Id1 = new Guid("7FCF55F6-4AEB-40C7-86B9-2AB535664381");
-        static readonly Guid Id2 = new Guid("2C739583-0077-4482-BA6E-E569DD129BD6");
-        static readonly SagaCorrelationProperty SagaCorrelationPropertyValue = new SagaCorrelationProperty(nameof(TwoInstanceSagaState.OrderId), CorrelationIdValue);
     }
 }
