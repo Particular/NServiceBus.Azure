@@ -4,7 +4,12 @@
 
     public class RetryNeededException : Exception
     {
-        public RetryNeededException() : base("This operation requires a retry as it wasn't possible to successfully process it now.")
+        const string errorMessage = "This operation requires a retry as it wasn't possible to successfully process it now.";
+        public RetryNeededException() : base(errorMessage)
+        {
+        }
+
+        public RetryNeededException(Exception innerException) : base(errorMessage, innerException)
         {
         }
     }

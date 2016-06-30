@@ -105,12 +105,14 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloudTableExtensions.cs" />
     <Compile Include="DataBus\AzureDataBusGuard.cs" />
     <Compile Include="DataBus\ConfigureAzureDataBus.cs" />
     <Compile Include="DataBus\AzureDataBus.cs" />
     <Compile Include="DataBus\AzureDataBusDefaults.cs" />
     <Compile Include="DataBus\AzureDataBusPersistence.cs" />
     <Compile Include="AzureStoragePersistence.cs" />
+    <Compile Include="SagaCorrelationProperty.cs" />
     <Compile Include="SagaPersisters\AzureStorageSagaGuard.cs" />
     <Compile Include="SagaPersisters\AzureStorageSagaDefaults.cs" />
     <Compile Include="SagaPersisters\Azure\AzureStorageSagaPersistence.cs" />
