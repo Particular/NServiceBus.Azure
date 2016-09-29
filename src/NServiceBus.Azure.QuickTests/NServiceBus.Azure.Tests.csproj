@@ -104,6 +104,8 @@
     <Compile Include="Sagas\When_saga_duplicate_exists.cs" />
     <Compile Include="Sagas\When_saga_is_completed.cs" />
     <Compile Include="Sagas\When_searched_by_property_without_existing_index.cs" />
+    <Compile Include="Subscriptions\SubscriptionTestHelper.cs" />
+    <Compile Include="Subscriptions\When_subscribing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Azure\NServiceBus.Azure.csproj">
