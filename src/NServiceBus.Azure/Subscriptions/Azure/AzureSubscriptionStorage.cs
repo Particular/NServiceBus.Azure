@@ -84,10 +84,8 @@
                 foreach (var messageType in messageTypes)
                 {
                     var name = messageType.TypeName;
-                    var lastNameChar = name[name.Length - 1];
-                    var nextChar = (char)(lastNameChar + 1);
                     var lowerBound = name;
-                    var upperBound = name.Substring(0, name.Length - 1) + nextChar;
+                    var upperBound = GetUpperBound(name);
 
                     var query = from s in context.Subscriptions
                         where s.PartitionKey.CompareTo(lowerBound) >= 0 &&
@@ -106,6 +104,11 @@
             }
           
             return subscribers;
+        }
+
+        static string GetUpperBound(string name)
+        {
+            return name + ", Version=z";
         }
 
         public void Init()
