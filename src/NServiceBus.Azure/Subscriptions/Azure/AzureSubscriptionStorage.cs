@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Unicast.Subscriptions
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Azure;
@@ -76,26 +77,38 @@
 
         IEnumerable<Address> ISubscriptionStorage.GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes)
         {
-            var subscribers = new List<Address>();
+            var subscribers = new HashSet<Address>();
 
             using (var context = new SubscriptionServiceContext(client))
             {
                 foreach (var messageType in messageTypes)
                 {
-                    var type = messageType;
+                    var name = messageType.TypeName;
+                    var lowerBound = name;
+                    var upperBound = GetUpperBound(name);
+
                     var query = from s in context.Subscriptions
-                                where s.PartitionKey == type.ToString() 
-                                select s;
+                        where s.PartitionKey.CompareTo(lowerBound) >= 0 &&
+                              s.PartitionKey.CompareTo(upperBound) < 0
+                        select s;
 
                     var result = query
                         .AsTableServiceQuery(context) // Fixes #191
                         .ToList();
 
-                    subscribers.AddRange(result.Select(s => Address.Parse(DecodeFrom64(s.RowKey))));
+                    foreach (var subscriber in result.Select(s => Address.Parse(DecodeFrom64(s.RowKey))))
+                    {
+                        subscribers.Add(subscriber);
+                    }
                 }
             }
           
             return subscribers;
+        }
+
+        static string GetUpperBound(string name)
+        {
+            return name + ", Version=z";
         }
 
         public void Init()
@@ -106,13 +119,13 @@
         static string EncodeTo64(string toEncode)
         {
             var toEncodeAsBytes = System.Text.Encoding.ASCII.GetBytes(toEncode);
-            var returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
+            var returnValue = Convert.ToBase64String(toEncodeAsBytes);
             return returnValue;
         }
 
         static string DecodeFrom64(string encodedData)
         {
-            var encodedDataAsBytes = System.Convert.FromBase64String(encodedData);
+            var encodedDataAsBytes = Convert.FromBase64String(encodedData);
             var returnValue = System.Text.Encoding.ASCII.GetString(encodedDataAsBytes);
             return returnValue;
         }
