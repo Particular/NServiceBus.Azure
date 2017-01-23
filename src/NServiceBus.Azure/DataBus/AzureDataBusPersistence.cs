@@ -31,6 +31,7 @@ namespace NServiceBus
                 s.SetDefault("AzureDataBus.NumberOfIOThreads", configSection.NumberOfIOThreads);
                 s.SetDefault("AzureDataBus.BlockSize", configSection.BlockSize);
                 s.SetDefault("AzureDataBus.DefaultTTL", configSection.DefaultTTL);
+                s.SetDefault("AzureDataBus.CleanupInterval", configSection.CleanupInterval);
             });
         }
 
@@ -48,7 +49,8 @@ namespace NServiceBus
                 BackOffInterval = context.Settings.Get<int>("AzureDataBus.BackOffInterval"),
                 NumberOfIOThreads = context.Settings.Get<int>("AzureDataBus.NumberOfIOThreads"),
                 BlockSize = context.Settings.Get<int>("AzureDataBus.BlockSize"),
-                DefaultTTL = context.Settings.Get<long>("AzureDataBus.DefaultTTL")
+                DefaultTTL = context.Settings.Get<long>("AzureDataBus.DefaultTTL"),
+                CleanupInterval = context.Settings.Get<int>("AzureDataBus.CleanupInterval")
             };
 
             context.Container.RegisterSingleton<IDataBus>(dataBus);

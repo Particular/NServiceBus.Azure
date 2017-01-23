@@ -30,6 +30,9 @@ namespace NServiceBus.Config
 
             Properties.Add(new ConfigurationProperty("DefaultTTL", typeof(long), AzureDataBusDefaults.DefaultTTL,
                 null, new CallbackValidator(typeof(long), AzureDataBusGuard.CheckDefaultTTL), ConfigurationPropertyOptions.None));
+
+            Properties.Add(new ConfigurationProperty("CleanupInterval", typeof(int), AzureDataBusDefaults.DefaultCleanupInterval,
+               null, new CallbackValidator(typeof(int), AzureDataBusGuard.CheckCleanupInterval), ConfigurationPropertyOptions.None));
         }
 
         public int MaxRetries
@@ -125,6 +128,18 @@ namespace NServiceBus.Config
             set
             {
                 this["DefaultTTL"] = value;
+            }
+        }
+
+        public int CleanupInterval
+        {
+            get
+            {
+                return (int)this["CleanupInterval"];
+            }
+            set
+            {
+                this["CleanupInterval"] = value;
             }
         }
     }
