@@ -2,7 +2,7 @@
 {
     using System;
     using Config;
-    using NServiceBus.DataBus;
+    using global::NServiceBus.DataBus;
     using NUnit.Framework;
 
     [TestFixture]

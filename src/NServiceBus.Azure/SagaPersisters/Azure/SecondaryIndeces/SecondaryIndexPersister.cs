@@ -9,6 +9,7 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using Newtonsoft.Json;
+    using NServiceBus.Sagas;
     using Saga;
 
     public class SecondaryIndexPersister
@@ -28,14 +29,14 @@
             this.persist = persist;
         }
 
-        public void Insert(IContainSagaData sagaData)
+        public PartitionRowKeyTuple Insert(IContainSagaData sagaData)
         {
             var sagaType = sagaData.GetType();
             var table = getTableForSaga(sagaType);
             var ix = IndexDefintion.Get(sagaType);
             if (ix == null)
             {
-                return;
+                return null;
             }
 
             var propertyValue = ix.Accessor(sagaData);
@@ -57,14 +58,15 @@
             try
             {
                 table.Execute(TableOperation.Insert(entity));
+                return key;
             }
             catch (StorageException ex)
             {
                 var indexRowAlreadyExists = IsConflict(ex);
                 if (indexRowAlreadyExists)
                 {
-                    var indexRow = table.Execute(TableOperation.Retrieve<SecondaryIndexTableEntity>(key.PartitionKey, key.RowKey)).Result as SecondaryIndexTableEntity;
-                    var data = indexRow?.InitialSagaData;
+                    var existingSecondaryIndexEntity = table.Execute(TableOperation.Retrieve<SecondaryIndexTableEntity>(key.PartitionKey, key.RowKey)).Result as SecondaryIndexTableEntity;
+                    var data = existingSecondaryIndexEntity?.InitialSagaData;
                     if (data != null)
                     {
                         var deserializeSagaData = SagaDataSerializer.DeserializeSagaData(sagaType, data);
@@ -73,6 +75,7 @@
                         try
                         {
                             persist(deserializeSagaData);
+                            return key;
                         }
                         catch (StorageException e)
                         {
@@ -81,13 +84,126 @@
                                 // swallow ex as another worker created the primary under this key
                             }
                         }
+                        throw new RetryNeededException();
+                    }
+                    // ReSharper disable once RedundantIfElseBlock to make it visible for a reader
+                    else
+                    {
+                        // data is null, this means that either the entry has been created as the secondary index after scanning the table or after storing the primary
+                        var sagaId = existingSecondaryIndexEntity?.SagaId;
+                        if (sagaId != null)
+                        {
+                            var primary = table.Execute(TableOperation.Retrieve<TableEntity>(sagaId.Value.ToString(), string.Empty)).Result;
+                            if (primary != null)
+                            {
+                                // if the primary exist though, it means that a retry is required as the previous saga with the specified correlation hasn't been completed yet
+                                // and the secondary index isn't a leftover from a completion
+                                throw new RetryNeededException();
+                            }
+                        }
+
+                        try
+                        {
+                            entity.ETag = existingSecondaryIndexEntity?.ETag ?? "*";
+                            table.Execute(TableOperation.InsertOrReplace(entity));
+                            return key;
+                        }
+                        catch (Exception exception)
+                        {
+                            throw new RetryNeededException(exception);
+                        }
                     }
 
-                    throw new RetryNeededException();
                 }
 
                 throw;
             }
+        }
+
+        public Guid? FindSagaIdAndCreateIndexEntryIfNotFound<TSagaData>(string propertyName, object propertyValue)
+            where TSagaData : IContainSagaData
+        {
+            var sagaType = typeof(TSagaData);
+            var key = TryBuildKey(propertyName, propertyValue, sagaType);
+
+            if (key == null)
+            {
+                return null;
+            }
+
+            Guid guid;
+            if (cache.TryGet(key, out guid))
+            {
+                return guid;
+            }
+
+            var table = getTableForSaga(sagaType);
+            var exec = table.Execute(TableOperation.Retrieve<SecondaryIndexTableEntity>(key.PartitionKey, key.RowKey));
+            var secondaryIndexEntry = exec.Result as SecondaryIndexTableEntity;
+            if (secondaryIndexEntry != null)
+            {
+                cache.Put(key, secondaryIndexEntry.SagaId);
+                return secondaryIndexEntry.SagaId;
+            }
+
+            var ids = scanner(sagaType, propertyName, propertyValue);
+            if (ids == null || ids.Length == 0)
+            {
+                return null;
+            }
+
+            if (ids.Length > 1)
+            {
+                throw new DuplicatedSagaFoundException(sagaType, propertyName, ids);
+            }
+
+            var id = ids[0];
+
+            var entity = CreateIndexingOnlyEntity(key, id);
+
+            try
+            {
+                table.Execute(TableOperation.Insert(entity));
+            }
+            catch (StorageException)
+            {
+                throw new RetryNeededException();
+            }
+
+            cache.Put(key, id);
+            return id;
+        }
+
+        /// <summary>
+        /// Creates an indexing only entity, without payload of the primary.
+        /// </summary>
+        static SecondaryIndexTableEntity CreateIndexingOnlyEntity(PartitionRowKeyTuple key, Guid id)
+        {
+            var entity = new SecondaryIndexTableEntity();
+            key.Apply(entity);
+            entity.SagaId = id;
+            return entity;
+        }
+
+        /// <summary>
+        /// Invalidates the secondary index cache if any exists for the specified property value.
+        /// </summary>
+        public void InvalidateCacheIfAny(string propertyName, object propertyValue, Type sagaType)
+        {
+            var key = TryBuildKey(propertyName, propertyValue, sagaType);
+            if (key != null)
+            {
+                cache.Remove(key);
+            }
+        }
+
+        static PartitionRowKeyTuple TryBuildKey(string propertyName, object propertyValue, Type sagaType)
+        {
+            if (string.IsNullOrEmpty(propertyName) || propertyValue == null)
+            {
+                return null;
+            }
+            return IndexDefintion.Get(sagaType).BuildTableKey(propertyValue);
         }
 
         public Guid? FindPossiblyCreatingIndexEntry<TSagaData>(string propertyName, object propertyValue)
@@ -131,9 +247,7 @@
 
             var id = ids[0];
 
-            var entity = new SecondaryIndexTableEntity();
-            key.Apply(entity);
-            entity.SagaId = id;
+            var entity = CreateIndexingOnlyEntity(key, id);
 
             try
             {
@@ -146,6 +260,44 @@
 
             cache.Put(key, id);
             return id;
+        }
+
+        public void RemoveSecondary(Type sagaType, PartitionRowKeyTuple secondaryIndexKey)
+        {
+            var table = getTableForSaga(sagaType);
+            var e = new TableEntity
+            {
+                ETag = "*"
+            };
+
+            secondaryIndexKey.Apply(e);
+            cache.Remove(secondaryIndexKey);
+            table.DeleteIgnoringNotFound(e);
+        }
+
+        public void MarkAsHavingPrimaryPersisted(IContainSagaData sagaData)
+        {
+            var sagaType = sagaData.GetType();
+            var table = getTableForSaga(sagaType);
+            var ix = IndexDefintion.Get(sagaType);
+            if (ix == null)
+            {
+                return;
+            }
+
+            var propertyValue = ix.Accessor(sagaData);
+            var secondaryIndexKey = ix.BuildTableKey(propertyValue);
+
+            var secondaryIndexTableEntity = new SecondaryIndexTableEntity
+                {
+                    InitialSagaData = null, // this nullification is required for v4.3 of WindowsAzure.Storage. Changed to not be needed in WindowsAzure.Storage v7
+                    SagaId = sagaData.Id
+                };
+            secondaryIndexKey.Apply(secondaryIndexTableEntity);
+
+            secondaryIndexTableEntity.ETag = "*";
+
+            table.ExecuteAsync(TableOperation.Replace(secondaryIndexTableEntity));
         }
 
         private static bool IsConflict(StorageException ex)

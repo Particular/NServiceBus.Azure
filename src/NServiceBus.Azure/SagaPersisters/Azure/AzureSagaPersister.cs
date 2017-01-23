@@ -6,10 +6,11 @@
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using global::NServiceBus.Azure;
+    using Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
-    using NServiceBus.Azure;
-    using NServiceBus.SagaPersisters.Azure.SecondaryIndeces;
+    using SecondaryIndeces;
     using Saga;
 
     /// <summary>
@@ -19,7 +20,8 @@
     {
         readonly bool autoUpdateSchema;
         readonly CloudTableClient client;
-        readonly SecondaryIndexPersister secondaryIndeces;
+        readonly SecondaryIndexPersister secondaryIndices;
+        readonly ILog log = LogManager.GetLogger<AzureSagaPersister>();
 
         static readonly ConcurrentDictionary<string, bool> tableCreated = new ConcurrentDictionary<string, bool>();
         static readonly ConditionalWeakTable<object, string> etags = new ConditionalWeakTable<object, string>();
@@ -33,7 +35,7 @@
         {
             this.autoUpdateSchema = autoUpdateSchema;
             client = account.CreateCloudTableClient();
-            secondaryIndeces = new SecondaryIndexPersister(GetTable, ScanForSaga, Persist);
+            secondaryIndices = new SecondaryIndexPersister(GetTable, ScanForSaga, saga => Persist(saga, null));
         }
 
         /// <summary>
@@ -43,10 +45,16 @@
         /// <param name="saga">the saga entity that will be saved.</param>
         public void Save(IContainSagaData saga)
         {
-            secondaryIndeces.Insert(saga);
-            Persist(saga);
-        }
+            // The following operations have to be executed sequentially:
+            // 1) insert the 2nd index, containing the primary saga data (just in case of a failure)
+            // 2) insert the primary saga data in its row, storing the identifier of the secondary index as well (for completions)
+            // 3) remove the data of the primary from the 2nd index. It will be no longer needed
 
+            var secondaryIndexKey = secondaryIndices.Insert(saga);
+            Persist(saga, secondaryIndexKey);
+            secondaryIndices.MarkAsHavingPrimaryPersisted(saga);
+        }
+        
         /// <summary>
         /// Updates the given saga entity using the current session of the
         /// injected session factory.
@@ -54,7 +62,7 @@
         /// <param name="saga">the saga entity that will be updated.</param>
         public void Update(IContainSagaData saga)
         {
-            Persist(saga);
+            Persist(saga, null);
         }
 
         /// <summary>
@@ -73,6 +81,11 @@
             if (!Equals(entity, default(T)))
             {
                 etags.Add(entity, tableEntity.ETag);
+                EntityProperty value;
+                if (tableEntity.TryGetValue(SecondaryIndexIndicatorProperty, out value))
+                {
+                    secondaryIndexLocalCache.Add(entity, PartitionRowKeyTuple.Parse(value.StringValue));
+                }
             }
 
             return entity;
@@ -91,26 +104,33 @@
 
         T ISagaPersister.Get<T>(string property, object value)
         {
-            var sagaId = secondaryIndeces.FindPossiblyCreatingIndexEntry<T>(property, value);
-            if (sagaId != null)
+            return GetByCorrelationProperty<T>(property, value, false);
+        }
+
+        TSagaData GetByCorrelationProperty<TSagaData>(string propertyName, object propertyValue, bool triedAlreadyOnce)
+            where TSagaData : IContainSagaData
+        {
+            var sagaId = secondaryIndices.FindSagaIdAndCreateIndexEntryIfNotFound<TSagaData>(propertyName, propertyValue);
+            if (sagaId == null)
             {
-                return Get<T>(sagaId.Value);
+                return default(TSagaData);
             }
 
-            return default(T);
+            var sagaData = Get<TSagaData>(sagaId.Value);
+            if (Equals(sagaData, default(TSagaData)))
+            {
+                // saga is not found, try invalidate cache and try getting value one more time
+                secondaryIndices.InvalidateCacheIfAny(propertyName, propertyValue, typeof(TSagaData));
+                if (triedAlreadyOnce == false)
+                {
+                    return GetByCorrelationProperty<TSagaData>(propertyName, propertyValue, true);
+                }
+            }
+
+            return sagaData;
         }
 
-        DictionaryTableEntity GetDictionaryTableEntity(Type type, string property, object value)
-        {
-            var tableName = type.Name;
-            var table = client.GetTableReference(tableName);
-
-            var query = BuildWherePropertyQuery(type, property, value);
-            var tableEntity = table.ExecuteQuery(query).SafeFirstOrDefault();
-            return tableEntity;
-        }
-
-        private static TableQuery<DictionaryTableEntity> BuildWherePropertyQuery(Type type, string property, object value)
+        static TableQuery<DictionaryTableEntity> BuildWherePropertyQuery(Type type, string property, object value)
         {
             TableQuery<DictionaryTableEntity> query;
 
@@ -175,10 +195,27 @@
                 return; // should not try to delete saga data that does not exist, this situation can occur on retry or parallel execution
             }
 
-            table.Execute(TableOperation.Delete(entity));
+            table.DeleteIgnoringNotFound(entity);
+            try
+            {
+                RemoveSecondaryIndex(saga);
+            }
+            catch
+            {
+                log.Warn($"Removal of the secondary index entry for the following saga failed: '{saga.Id}'");
+            }
         }
 
-        void Persist(IContainSagaData saga)
+        void RemoveSecondaryIndex(IContainSagaData sagaData)
+        {
+            PartitionRowKeyTuple secondaryIndexKey;
+            if (secondaryIndexLocalCache.TryGetValue(sagaData, out secondaryIndexKey))
+            {
+                secondaryIndices.RemoveSecondary(sagaData.GetType(), secondaryIndexKey);
+            }
+        }
+
+        void Persist(IContainSagaData saga, PartitionRowKeyTuple secondaryIndexKey)
         {
             var type = saga.GetType();
             var table = GetTable(type);
@@ -187,7 +224,7 @@
 
             var batch = new TableBatchOperation();
 
-            AddObjectToBatch(batch, saga, partitionKey);
+            AddObjectToBatch(batch, saga, partitionKey, secondaryIndexKey);
 
             table.ExecuteBatch(batch);
         }
@@ -219,17 +256,37 @@
             return entities.Select(entity => Guid.ParseExact(entity.PartitionKey, "D")).ToArray();
         }
 
-        void AddObjectToBatch(TableBatchOperation batch, object entity, string partitionKey, string rowkey = "")
+        void AddObjectToBatch(TableBatchOperation batch, object entity, string partitionKey, PartitionRowKeyTuple secondaryIndexKey, string rowkey = "")
         {
-            if (rowkey == "") rowkey = partitionKey; // just to be backward compat with original implementation
+            if (rowkey == "")
+            {
+                // just to be backward compat with original implementation
+                rowkey = partitionKey;
+            }
 
             var type = entity.GetType();
             string etag;
+
             var update = etags.TryGetValue(entity, out etag);
+
+            if (secondaryIndexKey == null && update)
+            {
+                secondaryIndexLocalCache.TryGetValue(entity, out secondaryIndexKey);
+            }
 
             var properties = SelectPropertiesToPersist(type);
 
-            var toPersist = ToDictionaryTableEntity(entity, new DictionaryTableEntity { PartitionKey = partitionKey, RowKey = rowkey, ETag = etag }, properties);
+            var toPersist = ToDictionaryTableEntity(entity, new DictionaryTableEntity
+            {
+                PartitionKey = partitionKey,
+                RowKey = rowkey,
+                ETag = etag
+            }, properties);
+
+            if (secondaryIndexKey != null)
+            {
+                toPersist.Add(SecondaryIndexIndicatorProperty, secondaryIndexKey.ToString());
+            }
 
             //no longer using InsertOrReplace as it ignores concurrency checks
             batch.Add(update ? TableOperation.Replace(toPersist) : TableOperation.Insert(toPersist));
@@ -343,6 +400,8 @@
             }
             return toCreate;
         }
+        const string SecondaryIndexIndicatorProperty = "NServiceBus_2ndIndexKey";
+        static ConditionalWeakTable<object, PartitionRowKeyTuple> secondaryIndexLocalCache = new ConditionalWeakTable<object, PartitionRowKeyTuple>();
     }
 
 

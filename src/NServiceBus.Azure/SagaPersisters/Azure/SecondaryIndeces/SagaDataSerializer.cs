@@ -7,7 +7,7 @@ namespace NServiceBus.SagaPersisters.Azure.SecondaryIndeces
     using System.Linq;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    using NServiceBus.Saga;
+    using Saga;
 
     /// <summary>
     /// A helper saga data serializer for internal purposes
