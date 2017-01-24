@@ -73,17 +73,25 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
                 {
                     if (blockBlob == null) continue;
 
-                    blockBlob.FetchAttributes();
-                    var validUntil = GetValidUntil(blockBlob, DefaultTTL);
-                    if (validUntil < DateTime.UtcNow)
+                    try
                     {
-                        blockBlob.DeleteIfExists();
+                        blockBlob.FetchAttributes();
+                        var validUntil = GetValidUntil(blockBlob, DefaultTTL);
+                        if (validUntil < DateTime.UtcNow)
+                        {
+                            blockBlob.DeleteIfExists();
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        // Another endpoint instance could have deleted the blob just a moment ago after blobs were listed by the current instance
+                        logger.WarnFormat($"{nameof(BlobStorageDataBus)} has encountered an exception while deleting blob {blockBlob.Name}.", ex);
                     }
                 }
             }
             catch (StorageException ex) // needs to stay as it runs on a background thread
             {
-                logger.Warn(ex.Message);
+                logger.WarnFormat($"{nameof(BlobStorageDataBus)} has encountered an exception.", ex);
             }
             finally
             {

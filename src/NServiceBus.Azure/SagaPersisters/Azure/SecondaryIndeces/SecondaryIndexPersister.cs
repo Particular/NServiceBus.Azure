@@ -9,7 +9,6 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using Newtonsoft.Json;
-    using NServiceBus.Sagas;
     using Saga;
 
     public class SecondaryIndexPersister
