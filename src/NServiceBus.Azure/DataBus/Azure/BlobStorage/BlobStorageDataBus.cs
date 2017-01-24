@@ -82,10 +82,10 @@ namespace NServiceBus.DataBus.Azure.BlobStorage
                             blockBlob.DeleteIfExists();
                         }
                     }
-                    // ReSharper disable once EmptyGeneralCatchClause
-                    catch
+                    catch(Exception ex)
                     {
                         // Another endpoint instance could have deleted the blob just a moment ago after blobs were listed by the current instance
+                        logger.WarnFormat($"{nameof(BlobStorageDataBus)} has encountered an exception while deleting blob {blockBlob.Name}.", ex);
                     }
                 }
             }
