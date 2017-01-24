@@ -12,5 +12,6 @@ namespace NServiceBus
         public const int DefaultBlockSize = 4 * 1024 * 1024; // Maximum 4MB
         public const int DefaultBackOffInterval = 30; // seconds
         public const long DefaultTTL = Int64.MaxValue; // seconds
+        public const int DefaultCleanupInterval = 300000; // milli seconds
     }
 }

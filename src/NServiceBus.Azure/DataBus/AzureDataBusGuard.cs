@@ -74,5 +74,13 @@ namespace NServiceBus.DataBus
                 throw new ArgumentOutOfRangeException("defaultTTL", defaultTTL, "DefaultTTL should not be negative.");
             }            
         }
+
+        public static void CheckCleanupInterval(object cleanupInterval)
+        {
+            if ((int)cleanupInterval < 0)
+            {
+                throw new ArgumentOutOfRangeException("cleanupInterval", cleanupInterval, "CleanupInterval should not be negative.");
+            }
+        }
     }
 }

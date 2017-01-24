@@ -67,5 +67,13 @@
             config.GetSettings().Set("AzureDataBus.DefaultTTL", defaultTTLInSeconds);
             return config;
         }
+
+        public static DataBusExtentions<AzureDataBus> CleanupInterval(this DataBusExtentions<AzureDataBus> config, int cleanupInterval)
+        {
+            AzureDataBusGuard.CheckCleanupInterval(cleanupInterval);
+
+            config.GetSettings().Set("AzureDataBus.CleanupInterval", cleanupInterval);
+            return config;
+        }
     }
 }
