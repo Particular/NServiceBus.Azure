@@ -18,3 +18,21 @@ The Windows Azure transports for NServiceBus enable the use of Windows Azure Que
 - [Azure Storage Persistence](https://github.com/Particular/NServiceBus.Persistence.AzureStorage)
 - [Azure Cloud Services Host](http://docs.particular.net/nservicebus/hosting/cloudservices-host/)
 - [Samples](http://docs.particular.net/samples/azure/)
+
+## Third Party Dependency Update Policy
+
+The azure related nuget packages depend on third party packages. As each of these packages is maintained by different parties in different ways, our update policy regarding them also varies.
+
+The following aspects are taken into account:
+
+- Third party follows SemVer
+- API surface size
+- Past experience with behavioral changes in the dependency
+
+
+| Dependency                   | Current Policy                   |  Suggested Future Policy          | 
+| ---------------------------- |---------------------------------:| ---------------------------------:|
+| WindowsAzure.ServiceBus      | Fixed Major                      |  Fixed Major                      |
+| WindowsAzure.Storage         | Fixed Major & Closed Major Range |  Closed Major Range               |
+| Newtonsoft.Json              | Fixed Major                      |  Open Major Range                 |
+| Microsoft.ServiceFabric.Data | Closed Minor Range               |  Closed Minor Range               |
