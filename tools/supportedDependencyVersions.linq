@@ -142,15 +142,33 @@ public static class TextWriterExtensions
 
         foreach (var version in relevantVersions.OrderByDescending(version => version.First.Identity.Version))
         {
-            var dependencies = string.Join(", ", version.Dependencies?.Select(s => s.ToString()).ToArray());
-			
-            output.Write($"| ");
-            output.Write($"{version.First.Identity.Version.ToMinorString()}".PadRight(9));
-            output.Write($" | ");
-            output.Write($"{version.First.Published.Value.UtcDateTime.Date.ToString("yyyy-MM-dd")}".PadRight(14));
-            output.Write($" | ");
-            output.Write($"{ dependencies }".PadRight(17));
-            output.WriteLine($" |");
+			if(version.Dependencies.Count() == 0)
+			{
+				output.Write($"| ");
+	            output.Write($"{version.First.Identity.Version.ToMinorString()}".PadRight(9));
+	            output.Write($" | ");
+	            output.Write($"{version.First.Published.Value.UtcDateTime.Date.ToString("yyyy-MM-dd")}".PadRight(14));
+	            output.Write($" | ");
+	            output.Write($"".PadRight(17));
+	            output.WriteLine($" |");
+			}
+			else{
+				var first = true;
+				foreach (var dependency in version.Dependencies)
+	            {
+					var id = (first) ? version.First.Identity.Version.ToMinorString() : "";
+					var pub = (first) ? version.First.Published.Value.UtcDateTime.Date.ToString("yyyy-MM-dd") : "";
+				    output.Write($"| ");
+		            output.Write($"{id}".PadRight(9));
+		            output.Write($" | ");
+		            output.Write($"{pub}".PadRight(14));
+		            output.Write($" | ");
+		            output.Write($"{ dependency.Id } { dependency.VersionRange }".PadRight(17));
+		            output.WriteLine($" |");
+					
+					first = false;
+				}
+			}
         }
 
         output.WriteLine();
