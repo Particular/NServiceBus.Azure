@@ -30,9 +30,9 @@ The following aspects are taken into account:
 - Past experience with behavioral changes in the dependency
 
 
-| Dependency                   | Current Policy                   |  Suggested Future Policy          | 
-| ---------------------------- |---------------------------------:| ---------------------------------:|
-| WindowsAzure.ServiceBus      | Fixed Major                      |  Fixed Major                      |
-| WindowsAzure.Storage         | Fixed Major & Closed Major Range |  Closed Major Range               |
-| Newtonsoft.Json              | Fixed Major                      |  Open Major Range                 |
-| Microsoft.ServiceFabric.Data | Closed Minor Range               |  Closed Minor Range               |
+| Dependency                   | Policy                           |  Range          | 
+| ---------------------------- |---------------------------------:| ----------------|
+| WindowsAzure.ServiceBus      | Fixed Major                      |  [4.0.0, 5.0.0) |
+| WindowsAzure.Storage         | Fixed Major                      |  [8.0.0, 9.0.0) |
+| Newtonsoft.Json              | Fixed Major                      |  [9.0.0, 10.0.0)|
+| Microsoft.ServiceFabric.Data | Closed Minor Range               |  [2.5.0, 3.0.0) |
