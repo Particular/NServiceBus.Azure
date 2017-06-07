@@ -34,5 +34,5 @@ The following aspects are taken into account:
 | ---------------------------- |---------------------------------:| ----------------|
 | WindowsAzure.ServiceBus      | Fixed Major                      |  [4.0.0, 5.0.0) |
 | WindowsAzure.Storage         | Fixed Major                      |  [8.0.0, 9.0.0) |
-| Newtonsoft.Json              | Fixed Major                      |  [9.0.0, 10.0.0)|
+| Newtonsoft.Json              | Fixed Major                      |  [10.0.0, 11.0.0)|
 | Microsoft.ServiceFabric.Data | Closed Minor Range               |  [2.5.0, 3.0.0) |
