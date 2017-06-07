@@ -24,11 +24,31 @@ async Task Main()
     var source = "https://api.nuget.org/v3/index.json";
     var componentsPath = Path.Combine(Util.CurrentQuery.Location, @"components.yaml");
     var outputPath = Path.Combine(Util.CurrentQuery.Location, @"dependencies.md");
+	
+	 var corePackageId = "NServiceBus";
+
+    var coreMajorOverlapYears = 2;
+    var coreMinorOverlapMonths = 6;
+    var coreMonthsToShowUnsupportedVersions = 12;
+
+    var downstreamMajorOverlapYears = 1;
+    var downstreamMinorOverlapMonths = 3;
+    var downstreamMonthsToShowUnsupportedVersions = 6;
 
     var utcTomorrow = DateTime.UtcNow.Date.AddDays(1);
     var logger = new Logger();
 
     var packageMetadata = await new SourceRepository(new PackageSource(source), Repository.Provider.GetCoreV3()).GetResourceAsync<PackageMetadataResource>();
+	
+	var corePackage = new Package
+    {
+        Id = corePackageId,
+        Category = ComponentCategory.Core,
+        Versions = await packageMetadata.GetVersions(corePackageId, logger, false, downstreamMajorOverlapYears, downstreamMinorOverlapMonths, new List<Version>(), endOfLifePackages)
+    };
+
+  //  corePackage.Dump(utcTomorrow);
+
 
     var downstreamPackages =
         (await Task.WhenAll(GetComponents(componentsPath)
@@ -46,7 +66,7 @@ async Task Main()
                 {
                     Id = package.Id,
                     Category = package.Category,
-                    Versions = await packageMetadata.GetVersions(package.Id, logger, true)
+                    Versions = await packageMetadata.GetVersions(package.Id, logger, true, downstreamMajorOverlapYears, downstreamMinorOverlapMonths, corePackage.Versions, endOfLifePackages)
                 })))
         .OrderBy(package => package.Id)
         .ToList();
@@ -142,31 +162,34 @@ public static class TextWriterExtensions
 
         foreach (var version in relevantVersions.OrderByDescending(version => version.First.Identity.Version))
         {
-			if(version.Dependencies.Count() == 0)
-			{
-				output.Write($"| ");
-	            output.Write($"{version.First.Identity.Version.ToMinorString()}".PadRight(9));
-	            output.Write($" | ");
-	            output.Write($"{version.First.Published.Value.UtcDateTime.Date.ToString("yyyy-MM-dd")}".PadRight(14));
-	            output.Write($" | ");
-	            output.Write($"".PadRight(17));
-	            output.WriteLine($" |");
-			}
-			else{
-				var first = true;
-				foreach (var dependency in version.Dependencies)
-	            {
-					var id = (first) ? version.First.Identity.Version.ToMinorString() : "";
-					var pub = (first) ? version.First.Published.Value.UtcDateTime.Date.ToString("yyyy-MM-dd") : "";
-				    output.Write($"| ");
-		            output.Write($"{id}".PadRight(9));
+			var isSupported = !version.PatchingEnd.HasValue || version.PatchingEnd.Value > utcTomorrow;
+			if(isSupported){
+				if(version.Dependencies.Count() == 0)
+				{
+					output.Write($"| ");
+		            output.Write($"{version.First.Identity.Version.ToMinorString()}".PadRight(9));
 		            output.Write($" | ");
-		            output.Write($"{pub}".PadRight(14));
+		            output.Write($"{version.First.Published.Value.UtcDateTime.Date.ToString("yyyy-MM-dd")}".PadRight(14));
 		            output.Write($" | ");
-		            output.Write($"{ dependency.Id } { dependency.VersionRange }".PadRight(17));
+		            output.Write($"".PadRight(17));
 		            output.WriteLine($" |");
-					
-					first = false;
+				}
+				else{
+					var first = true;
+					foreach (var dependency in version.Dependencies)
+		            {
+						var id = (first) ? version.First.Identity.Version.ToMinorString() : "";
+						var pub = (first) ? version.First.Published.Value.UtcDateTime.Date.ToString("yyyy-MM-dd") : "";
+					    output.Write($"| ");
+			            output.Write($"{id}".PadRight(9));
+			            output.Write($" | ");
+			            output.Write($"{pub}".PadRight(14));
+			            output.Write($" | ");
+			            output.Write($"{ dependency.Id } { dependency.VersionRange }".PadRight(17));
+			            output.WriteLine($" |");
+						
+						first = false;
+					}
 				}
 			}
         }
@@ -177,7 +200,7 @@ public static class TextWriterExtensions
 
 public static class PackageMetadataResourceExtensions
 {
-    public static async Task<List<Version>> GetVersions(this PackageMetadataResource resource, string packageId, ILogger logger, bool excludeOwnDependencies)
+    public static async Task<List<Version>> GetVersions(this PackageMetadataResource resource, string packageId, ILogger logger, bool excludeOwnDependencies, int majorOverlapYears, int minorOverlapMonths, List<Version> upstreamVersions, List<string> endOfLifePackages)
     {
         var minors = (await resource.GetMetadataAsync(packageId, true, false, logger, CancellationToken.None))
             .OrderBy(package => package.Identity.Version)
@@ -194,11 +217,73 @@ public static class PackageMetadataResourceExtensions
 
         return minors
             .Select(minor =>
-            {                
+            {     
+				var latestUpstreamsWithPatchingEnd = minor.Last.DependencySets
+                    .SelectMany(set => set.Packages)
+                    .Select(dep => upstreamVersions.LastOrDefault(version =>
+                        version.Last.Identity.Id == dep.Id && dep.VersionRange.Satisfies(version.Last.Identity.Version)))
+                    .Where(version => version != null && version.PatchingEnd.HasValue)
+                    .OrderBy(version => version.PatchingEnd)
+                    .ToList();
+
+                var lastUpstreamToEndPatching = latestUpstreamsWithPatchingEnd.LastOrDefault();
+
+                var lastMinorToSupportLastUpstreamToEndPatching = lastUpstreamToEndPatching == null
+                    ? null
+                    : minors.LastOrDefault(candidate =>
+                        candidate.Last.DependencySets.Any(set =>
+                            set.Packages.Any(dep =>
+                                dep.Id == lastUpstreamToEndPatching.Last.Identity.Id &&
+                                dep.VersionRange.Satisfies(lastUpstreamToEndPatching.Last.Identity.Version))));
+
+                var nextMajor = minors
+                    .GroupBy(candidate => candidate.First.Identity.Version.Major)
+                    .Select(group => new { Package = group.First().First, ImpliedPatchingEnd = group.First().First.Published.Value.UtcDateTime.Date.AddYears(majorOverlapYears) })
+                    .FirstOrDefault(comparand => comparand.Package.Identity.Version.Major > minor.First.Identity.Version.Major);
+
+                var nextMinor = minors
+                    .Select(candidate => new { Package = candidate.First, ImpliedPatchingEnd = candidate.First.Published.Value.UtcDateTime.Date.AddMonths(minorOverlapMonths) })
+                    .FirstOrDefault(comparand =>
+                        comparand.Package.Identity.Version.Major == minor.Last.Identity.Version.Major &&
+                        comparand.Package.Identity.Version.Minor > minor.Last.Identity.Version.Minor);
+
+                DateTime? patchingEnd = null;
+
+                var boundedBy = latestUpstreamsWithPatchingEnd.FirstOrDefault();
+                var extendedBy = lastMinorToSupportLastUpstreamToEndPatching?.Last.Identity.Version == minor.Last.Identity.Version
+                    ? lastUpstreamToEndPatching
+                    : null;
+
+                if (nextMajor != null && (!patchingEnd.HasValue || nextMajor.ImpliedPatchingEnd <= patchingEnd.Value))
+                {
+                    patchingEnd = nextMajor.ImpliedPatchingEnd;
+                }
+
+                if (nextMinor != null && (!patchingEnd.HasValue || nextMinor.ImpliedPatchingEnd <= patchingEnd.Value))
+                {
+                    patchingEnd = nextMinor.ImpliedPatchingEnd;
+                }
+
+                if (extendedBy != null && patchingEnd.HasValue && extendedBy.PatchingEnd.Value.Date > patchingEnd.Value.Date)
+                {
+                    patchingEnd = extendedBy.PatchingEnd;
+                }
+
+                if (boundedBy != null && (!patchingEnd.HasValue || boundedBy.PatchingEnd.Value.Date < patchingEnd.Value.Date))
+                {
+                    patchingEnd = boundedBy.PatchingEnd;
+                }
+
+                if (patchingEnd == null && endOfLifePackages.Contains(packageId))
+                {
+                    patchingEnd = minor.Last.Published.Value.UtcDateTime.Date;
+                }
+			
                 return new Version
                 {
                     First = minor.First,
                     Last = minor.Last,
+					PatchingEnd = patchingEnd,
 					Dependencies = minor.Last?.DependencySets.FirstOrDefault(s => s.TargetFramework.Framework == "Any")?.Packages.Where(p => excludeOwnDependencies ? !p.Id.Contains("NServiceBus") : true),
                 };
             })
@@ -216,10 +301,12 @@ public static class PackageExtensions
         package.Versions
            .OrderByDescending(version => version.First.Identity.Version.Major)
            .ThenByDescending(version => version.First.Identity.Version.Minor)
+		   .Where(version => !version.PatchingEnd.HasValue || version.PatchingEnd.Value > utcTomorrow)
            .Select(version => new
            {
                Package = version.ToString(),
                Published = version.First.Published?.UtcDateTime.Date.ToString("yyyy-MM-dd"),
+			   PatchingEnd = version.PatchingEnd,
                Dependencies = version.Dependencies.Select(d => new { d.Id, d.VersionRange })
            })
            .Dump("Versions");
