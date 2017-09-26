@@ -8,7 +8,7 @@ Mandatory
   - [ ] smoke test 
 - [ ] [Announcement](https://github.com/Particular/PlatformDevelopment/blob/master/guidelines/release-notification-template.md) --> [PR](link)
 - [ ] [Release](https://github.com/Particular/PlatformDevelopment/blob/master/guidelines/branching-gitflow.md) -> [link](link)
-- [ ] Announce on Google Group -> [link](link)
+- [ ] Announce on the community platform -> [link](https://discuss.particular.net)
 
 Optional
 - [ ] [Update supported versions](https://github.com/Particular/PlatformDevelopment/blob/master/guidelines/releasing.md#supported-versions) (let package(s) get indexed)
